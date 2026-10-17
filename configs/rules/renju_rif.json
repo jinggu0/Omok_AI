@@ -1,0 +1,14 @@
+{
+  "id": "RENJU_RIF",
+  "description": "RIF Renju without an opening rule (empty board, black first). Pass allowed (RIF Art. 5, 10).",
+  "board_size": 15,
+  "black_win_condition": "EXACT_FIVE",
+  "white_win_condition": "FIVE_OR_MORE",
+  "black_forbidden_rules": ["OVERLINE", "DOUBLE_FOUR", "DOUBLE_THREE"],
+  "white_forbidden_rules": [],
+  "opening_rule": "NONE",
+  "pass_allowed": true,
+  "illegal_move_behavior": "REJECT",
+  "exact_five_precedence": true,
+  "five_beats_overline_other_dir": true
+}

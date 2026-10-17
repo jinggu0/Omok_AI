@@ -19,14 +19,14 @@ Status: **Draft v0.1** · 2026-10-18
 |---|---|---|---|---|---|
 | A-R1 | 흑이 한 방향에 정확한 5, 다른 방향에 장목을 동시에 만들면 흑 승 | RIF 9.2 문언 "without at the same time attaining five" | 장목 우선(흑 패) | 극히 드문 국면, 전술 엔진의 승리 판정 | OPEN (C-02) |
 | A-R2 | 엔진은 5목을 자동 감지·즉시 종국 (RIF 9.7의 "알아채지 못함" 절차 무시) | 엔진/앱 공통 관행 | — | 없음 | OPEN |
-| A-R3 | 한 방향에서 p가 FIVE/OVERLINE/FOUR를 만들면 그 방향은 THREE로 세지 않음 | RIF three = "row with three stones" | 같은 방향에 four와 three 동시 계수 | 4-3 판정 | OPEN — Phase 2 전수 열거로 해당 패턴 존재 여부 확인 |
-| A-R4 | 방향당 THREE는 최대 1개 | 한 직선에 two-three 패턴이 없다고 추정 | 방향당 2개 계수 | 3-3 판정 | OPEN — Phase 2 전수 열거로 검증 |
+| A-R3 | 한 방향에서 p가 FIVE/OVERLINE/FOUR를 만들면 그 방향은 THREE로 세지 않음 | RIF three = "row with three stones" | 같은 방향에 four와 three 동시 계수 | 4-3 판정 | VERIFIED(1D 전수 열거, 착수점 ±5칸, 모든 열 위치 354,051 패턴): "같은 직선에 p를 지나는 four와 겉보기 three가 동시에 존재"하는 패턴 **0건** → 이 가정은 판정 결과에 영향을 주지 않음. 범위 밖(±6 이상) 돌은 미열거 |
+| A-R4 | 방향당 THREE는 최대 1개 | 한 직선에 two-three 패턴이 없다고 추정 | 방향당 2개 계수 | 3-3 판정 | VERIFIED(같은 열거): p를 지나는 서로 다른 three 돌 집합이 한 직선에 2개 이상인 패턴 **0건** |
 | A-R5 | 흑 차례에 모든 빈 점이 금수이고 패스 불가면 무승부 | 규칙 공백 | 흑 패 / 강제 패스 | 극히 드묾 | OPEN (C-06) |
 | A-R6 | Opening 단계(NORMAL_RENJU 이전) 패스 불가 | RIF 12.9 (첫 3수 패스 불가)의 확장 | — | 없음 | OPEN |
 | A-R7 | 흑의 FOUR completion이 장목이 되는 점은 completion으로 치지 않음 | RIF "five in a row" = 정확히 5 (장목은 별도 정의) | — | 4-4, straight four 판정 | VERIFIED(RIF Art.3 정의 구조) |
 | A-T1 | Choice 1/Choice 2는 4수 직후 **흑 holder**가 결정 | RenjuNet 포럼 Taraguchi 해설 "Black player decides"; 한국어 해설 "흑이 10개 후보를 둘 경우 이 시점에 흑백 확정" | 백 holder 결정 | opening 정책 구조 전체 | OPEN (C-07) |
 | A-T2 | Choice 1의 첫 swap은 흑 holder가 결정 (≡ 흑 holder의 3지선다: 제안10 / swap / 유지 후 직접5) | "after move k, the other player may swap" 패턴 (4수=백 → other=흑 holder) | 백 holder가 결정 | opening 정책 | OPEN (C-08), profile `swap_before_direct5_actor` |
-| A-T3 | "대칭 금지"는 E1(5돌 국면 D4 동치) — E2(stabilizer orbit)와 동치임을 증명(RULES §10.2) | RenjuNet 포럼: "can not be symmetrical in any aspect of the position" | E3 점 단위 D4 | 제안 생성기 | OPEN (C-10), profile `proposal_symmetry_mode` |
+| A-T3 | "대칭 금지"는 E1(5돌 국면 D4 동치) — E2(stabilizer orbit)와 동치임을 증명(RULES §10.2) | RenjuNet 포럼: "can not be symmetrical in any aspect of the position" | E3 점 단위 D4 | 제안 생성기 | E1=E2는 VERIFIED(도달 가능한 4수 국면 8,464개 × 모든 빈 점 전수 비교). E1 vs E3 선택은 OPEN (C-10), profile `proposal_symmetry` |
 | A-T4 | 대칭 제안이 입력되면 `OFFER_TEN` 전체를 REJECT (자동 제거하지 않음) | 엔진 무결성 | 자동 dedupe | 외부 입력 처리 | OPEN (C-10) |
 | A-T5 | 10개 제안은 영역 제한 없음 | RIF-T10 "anywhere on board" | 9×9 제한 | 제안 정책 action space | VERIFIED(RIF-T10) / 앱은 OPEN (C-09) |
 | A-T6 | 영역 경계 포함 (Central(N)은 N×N 정사각형 전체) | 일반 해석 | — | 없음 | OPEN (C-20) |
@@ -130,3 +130,4 @@ AlphaZero 계열의 "최상급" 기력은 통상 수백~수천 GPU-일 규모 se
 | 날짜 | ID | 변경 |
 |---|---|---|
 | 2026-10-18 | 전체 | 초안 작성 |
+| 2026-10-18 | A-R3, A-R4, A-T3 | Phase 2 열거 결과로 갱신 (docs/PROGRESS.md) |

@@ -1,0 +1,22 @@
+{
+  "id": "TARAGUCHI10",
+  "description": "RIF Renju with the Taraguchi-10 opening rule (RULES.md §8).",
+  "board_size": 15,
+  "black_win_condition": "EXACT_FIVE",
+  "white_win_condition": "FIVE_OR_MORE",
+  "black_forbidden_rules": ["OVERLINE", "DOUBLE_FOUR", "DOUBLE_THREE"],
+  "white_forbidden_rules": [],
+  "opening_rule": "TARAGUCHI_10",
+  "pass_allowed": true,
+  "illegal_move_behavior": "REJECT",
+  "exact_five_precedence": true,
+  "five_beats_overline_other_dir": true,
+  "taraguchi": {
+    "region": [1, 3, 5, 7, 9],
+    "n_proposals": 10,
+    "choice_actor": "BLACK_HOLDER",
+    "swap_before_direct5_actor": "BLACK_HOLDER",
+    "proposal_symmetry": "POSITION",
+    "proposal_region": 0
+  }
+}

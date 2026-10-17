@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "description": "Deep false-forbidden positions found by dojozero_fuzz (seed 2) and then reviewed step by step against RULES.md §3-§5 (the decisive chain is written in each note). Source kind 'generated+reviewed': the position was machine-found, the expectation was checked by hand.",
+  "cases": [
+    {"id": "gen-false33-depth2-D4", "category": "false-forbidden-recursive",
+     "source": {"kind": "generated+reviewed", "generator": "dojozero_fuzz --seed 2",
+                "note": "Horizontal B4 . D4 E4: only extension C4. C4 (with D4) = straight four B4-E4 + vertical C3 C4 . C6 (ext C5 legal 4-3) + diagonal C4 D5 E6 (ext B3 legal) = 4-3-3 -> forbidden, so the horizontal three is false. Diagonal C3 D4 E5 is real (B2, F6 legal). 1 real three -> LEGAL."},
+     "position": {"black": ["E2", "C3", "B4", "E4", "D5", "E5", "C6", "E6", "I8", "F9"]},
+     "query": "D4", "expected": {"verdict": "LEGAL", "fours": 0, "apparent_threes": 2, "real_threes": 1}},
+    {"id": "gen-false33-depth3-K3", "category": "false-forbidden-recursive",
+     "source": {"kind": "generated+reviewed", "generator": "dojozero_fuzz --seed 2",
+                "note": "Vertical K3 . K5 K6 is real (K4 legal). Anti-diagonal K3 J4 . H6: only extension I5. I5 (with K3) = straight four K3-H6 (anti-diag) + horizontal H5 I5 . K5 (ext J5) + vertical I5 I6 I7 (ext I4 legal). J5 is legal: four H5-K5 + vertical J4 J5 . J7 whose only extension J6 would make the horizontal five H6-L6 (RIF: a three must reach a straight four WITHOUT making five), so at most 4-3. Hence I5 = 4-3-3 forbidden, anti-diagonal three false -> LEGAL."},
+     "position": {"black": ["E4", "J4", "H5", "K5", "H6", "I6", "K6", "L6", "H7", "I7", "J7"], "white": ["I1"]},
+     "query": "K3", "expected": {"verdict": "LEGAL", "fours": 0, "apparent_threes": 2, "real_threes": 1}},
+    {"id": "gen-false33-depth4-F12", "category": "false-forbidden-recursive",
+     "source": {"kind": "generated+reviewed", "generator": "dojozero_fuzz --seed 2",
+                "note": "Vertical F10 F11 F12 real (F9 legal; F13 = four + horizontal E13 F13 G13 real via D13, diagonal C10 D11 . F13 false since E12 is a double four -> legal 4-3). Horizontal C12 D12 . F12: only extension E12 = straight four C12-F12 + diagonal C10 D11 E12 (ext B9 legal) + anti-diagonal C14 . E12 F11 (ext D13 legal: four C14-F11 + horizontal D13 E13 . G13 false because F13 is a double four) = 4-3-3 forbidden. 1 real three -> LEGAL."},
+     "position": {"black": ["O4", "C10", "F10", "D11", "F11", "C12", "D12", "E13", "G13", "C14"], "white": ["C11"]},
+     "query": "F12", "expected": {"verdict": "LEGAL", "fours": 0, "apparent_threes": 2, "real_threes": 1}}
+  ]
+}

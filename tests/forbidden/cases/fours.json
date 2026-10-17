@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "description": "FOUR / STRAIGHT FOUR / DOUBLE FOUR (RULES.md §3.3, §3.4, §3.6).",
+  "cases": [
+    {"id": "straight-four", "category": "four", "source": {"kind": "handmade", "note": "F8-I8 open both ends: one four with two completions"},
+     "position": {"black": ["F8", "G8", "H8"]}, "query": "I8", "expected": {"verdict": "LEGAL", "fours": 1, "apparent_threes": 0}},
+    {"id": "simple-four-blocked", "category": "four", "source": {"kind": "handmade", "note": "white E8 blocks one end: completion J8 only"},
+     "position": {"black": ["F8", "G8", "H8"], "white": ["E8"]}, "query": "I8", "expected": {"verdict": "LEGAL", "fours": 1}},
+    {"id": "broken-four", "category": "four", "source": {"kind": "handmade", "note": "XX.XX after J8: completion H8"},
+     "position": {"black": ["F8", "G8", "I8"]}, "query": "J8", "expected": {"verdict": "LEGAL", "fours": 1, "apparent_threes": 0}},
+    {"id": "dead-four", "category": "four", "source": {"kind": "handmade", "note": "OXXXXO: no completion, not a four; plus a vertical four -> 1 four"},
+     "position": {"black": ["F8", "G8", "H8", "I5", "I6", "I7"], "white": ["E8", "J8"]}, "query": "I8", "expected": {"verdict": "LEGAL", "fours": 1}},
+    {"id": "double-four-h-v", "category": "double-four", "source": {"kind": "handmade", "note": "F8-I8 and I5-I8"},
+     "position": {"black": ["F8", "G8", "H8", "I5", "I6", "I7"]}, "query": "I8", "expected": {"verdict": "FORBIDDEN_DOUBLE_FOUR", "fours": 2}},
+    {"id": "double-four-diag-anti", "category": "double-four", "source": {"kind": "handmade", "note": "E5-H8 and K5-H8"},
+     "position": {"black": ["E5", "F6", "G7", "K5", "J6", "I7"]}, "query": "H8", "expected": {"verdict": "FORBIDDEN_DOUBLE_FOUR", "fours": 2}},
+    {"id": "double-four-edge", "category": "double-four", "source": {"kind": "handmade", "note": "A8-D8 (completion E8 only) and D5-D8"},
+     "position": {"black": ["A8", "B8", "C8", "D5", "D6", "D7"]}, "query": "D8", "expected": {"verdict": "FORBIDDEN_DOUBLE_FOUR", "fours": 2}},
+    {"id": "double-four-one-line-split", "category": "double-four", "source": {"kind": "handmade", "note": "X.X?X.X: completions E8 (D..H) and I8 (F..J) use different stone sets -> two fours in one line"},
+     "position": {"lines": [{"from": "D8", "dir": "H", "cells": "X.X.X.X"}]}, "query": "G8", "expected": {"verdict": "FORBIDDEN_DOUBLE_FOUR", "fours": 2}},
+    {"id": "double-four-one-line-gaps", "category": "double-four", "source": {"kind": "handmade", "note": "XXX.?.XXX: C..G via F8, G..K via H8"},
+     "position": {"lines": [{"from": "C8", "dir": "H", "cells": "XXX...XXX"}]}, "query": "G8", "expected": {"verdict": "FORBIDDEN_DOUBLE_FOUR", "fours": 2}},
+    {"id": "double-four-one-line-pairs", "category": "double-four", "source": {"kind": "handmade", "note": "XX.?X.XX: D..H via F8, G..K via I8"},
+     "position": {"lines": [{"from": "D8", "dir": "H", "cells": "XX..X.XX"}]}, "query": "G8", "expected": {"verdict": "FORBIDDEN_DOUBLE_FOUR", "fours": 2}},
+    {"id": "double-four-one-line-diag", "category": "double-four", "source": {"kind": "handmade", "note": "diagonal X.X?X.X"},
+     "position": {"lines": [{"from": "D4", "dir": "D", "cells": "X.X.X.X"}]}, "query": "G7", "expected": {"verdict": "FORBIDDEN_DOUBLE_FOUR", "fours": 2}},
+    {"id": "four-overline-completion-is-not-four", "category": "four", "source": {"kind": "handmade", "note": "B8 C8 D8 . F8 G8: filling E8 gives 6 -> horizontal is not a four (A-R7). Only the vertical G5-G8 four counts."},
+     "position": {"lines": [{"from": "B8", "dir": "H", "cells": "XXX.X"}], "black": ["G5", "G6", "G7"]}, "query": "G8", "expected": {"verdict": "LEGAL", "fours": 1, "apparent_threes": 0}},
+    {"id": "four-four-three", "category": "double-four", "source": {"kind": "handmade", "note": "4-4-3 is a double four"},
+     "position": {"black": ["F8", "G8", "H8", "I5", "I6", "I7", "G6", "H7"]}, "query": "I8", "expected": {"verdict": "FORBIDDEN_DOUBLE_FOUR", "fours": 2}}
+  ]
+}

@@ -17,7 +17,7 @@ Status: **Draft v0.1** · 2026-10-18
 | 지표 | 기준 |
 |---|---|
 | 규칙 단위 테스트 통과율 (RULES §12 카테고리 전부) | 100% |
-| oracle vs fast 차등 퍼징 | ≥10⁷ 국면, 불일치 0 |
+| oracle vs fast 차등 퍼징 | ≥10⁷ (국면, 착수점) 판정 비교, 불일치 0 — Phase 2 실측: 1.0×10⁸ 비교 / 980,775 국면, 불일치 0 |
 | 1차원 window 전수 열거 (테이블 생성기 = oracle) | 불일치 0 |
 | D4 가환성 property (금수·합법수·결과) | 위반 0 |
 | apply/undo 왕복 property (hash·상태 완전 복원) | 위반 0 |
@@ -99,18 +99,20 @@ forbidden-rule accuracy 지표(NN aux head의 금수 예측 정확도)는 별개
 Intel Core Ultra 7 258V (4P+4LPE), 32 GB, Intel Arc 140V iGPU, Windows 11, MSVC 14.43 Release(/O2), 전원 연결·고성능 모드, 다른 부하 없음. 결과에는 커밋·빌드 플래그·전원 모드 기록.
 
 ### 8.2 지표와 잠정 목표 (Phase 2–5 실측 후 갱신)
-| 지표 | 잠정 목표 | 비고 |
-|---|---|---|
-| apply+undo /s (단일 스레드) | ≥ 10M | ADR-01 결정 근거 |
-| 흑 금수 판정 /s (중반 국면, 무작위 빈 점) | ≥ 1M | 재귀 포함 실측 분포(p50/p99) 함께 |
-| legal_actions 생성 /s | ≥ 200k | 금수 판정 포함 |
-| VCF nodes/s | ≥ 1M | |
-| MCTS nodes/s (uniform evaluator) | ≥ 500k | NN 제외 순수 트리 비용 |
-| batched NN eval/s | 실측 후 설정 | 모델 크기·배치별 표 |
-| 평균 탐색 지연 (FAST/STANDARD) | 실측 후 설정 | |
-| self-play games/hour | 실측 후 설정 | Stage별 compute 계획의 입력 |
-| 메모리 (트리·TT·replay 인덱스) | 실측 | |
-| GPU 사용률 | 실측 | |
+| 지표 | 잠정 목표 | Phase 2 실측 (Board A, 2026-10-18) | 비고 |
+|---|---|---|---|
+| apply+undo /s (단일 스레드) | ≥ 10M | GameState 3.4M (합법성 검사 포함) / Board place+remove 74M | **미달**. GameState 비용 대부분은 흑 착수마다의 금수 판정(~0.4µs). ADR-01 참조 |
+| 흑 금수 판정 /s (중반 국면, 무작위 빈 점) | ≥ 1M | 2.1M (중반 평균 43돌), 2.9M (흑 밀집 퍼징 국면); p50 300–400ns, p99 700–900ns, max 0.4–1.1ms | 충족. max 이상치(깊은 재귀 또는 OS 지터)는 미조사 |
+| legal_actions 생성 /s | ≥ 200k | 25k (NORMAL_RENJU, 흑 차례 포함) | **미달**. 빈 점마다 금수 판정 → 증분 금수 캐시 필요 (Phase 5 전 ADR-01 재검토) |
+| VCF nodes/s | ≥ 1M | (Phase 3) | |
+| MCTS nodes/s (uniform evaluator) | ≥ 500k | (Phase 5) | NN 제외 순수 트리 비용 |
+| batched NN eval/s | 실측 후 설정 | (Phase 4) | 모델 크기·배치별 표 |
+| 평균 탐색 지연 (FAST/STANDARD) | 실측 후 설정 | (Phase 5) | |
+| self-play games/hour | 실측 후 설정 | (Phase 6) | Stage별 compute 계획의 입력 |
+| 메모리 (트리·TT·replay 인덱스) | 실측 | — | |
+| GPU 사용률 | 실측 | — | |
+
+측정 명령: `dojozero_bench --positions 300 --seed 7` (단일 스레드, Release, 다른 부하 없음 — 퍼징 종료 후 측정). 원본 출력: `runs/bench_rules_phase2.txt` (git 미추적).
 
 "잠정 목표"는 요구사항이 아니라 첫 측정의 비교 기준이다. 미달 시 원인 분석 후 목표 또는 설계를 갱신하고 이 표에 이력을 남긴다.
 

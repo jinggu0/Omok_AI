@@ -327,10 +327,10 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 ## 10. 결정 대기 (ADR 목록)
 | ID | 결정 | 결정 시점 | 기준 |
 |---|---|---|---|
-| ADR-01 | Board 표현 A/B/C | Phase 2 말 | apply/undo/s, forbidden/s, 정확성 동일 |
+| ADR-01 | Board 표현 A/B/C | Phase 2 말 → **부분 결정**: A(padded array + 8중 증분 Zobrist) 채택. 금수 판정 2.1M/s로 목표 충족, apply+undo(3.4M/s)·legal_actions(25k/s)는 미달. C(line code + 생성 테이블 + 증분 금수 캐시)는 Phase 2에서 **구현하지 않음** — MCTS nodes/s를 실측하는 Phase 5 전에 병목 여부로 재결정 | apply/undo/s, forbidden/s, 정확성 동일 |
 | ADR-02 | 추론 런타임 (ORT CPU / OpenVINO / DirectML / PyBridge / libtorch) | Phase 4–5 | batched eval/s, 지연, 설치 용이성 |
 | ADR-03 | PUCT vs Gumbel (self-play/대국 각각) | Phase 5–6 | 동일 compute Elo |
 | ADR-04 | 학습 장치 | Phase 4 | step/s, 안정성 |
-| ADR-05 | Python 빌드 방식 | Phase 2 | Windows 재현성 |
+| ADR-05 | Python 빌드 방식 | Phase 2 → **Phase 4로 연기** (pybind11 바인딩은 학습 파이프라인에서 처음 필요) | Windows 재현성 |
 | ADR-06 | 10제안 정책 방식 (top-k vs autoregressive vs beam) | Phase 7 | 제안 품질(regret) + Elo |
 | ADR-07 | ResNet vs Hybrid attention | Phase 6–8 | Elo/compute |

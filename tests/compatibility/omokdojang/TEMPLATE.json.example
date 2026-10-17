@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "compat_id": "C-00",
+  "source": {
+    "kind": "template",
+    "app_version": "",
+    "date": "",
+    "evidence": [],
+    "note": "Copy to <C-ID>_<slug>.json, replace the position and the expected_* values with what the app actually did, and attach screenshots under evidence."
+  },
+  "profile": "OMOKDOJANG_DAN",
+  "position": {"black": ["F8", "G8", "H6", "H7"], "white": ["A15", "C15", "E15", "G15"]},
+  "side": "BLACK",
+  "query": {"point": "H8"},
+  "expected_legal": false,
+  "expected_forbidden": "DOUBLE_THREE",
+  "expected_reason": "plain open 3-3 (engine default behaviour, not app evidence)"
+}

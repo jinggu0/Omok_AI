@@ -153,8 +153,8 @@ Phase 2 테스트: 군 공리(합성 닫힘, 역원, `T1^4 = T0`, `T4^2 = T0`)�
 조건 3을 빼고 1·2만 만족하는 것을 **APPARENT THREE (겉보기 삼)** 라 한다. 엔진은 디버그 출력에서 둘을 구분한다.
 
 방향 우선순위 `[INTERP, A-R3]`: 한 방향 `d`에서 `p`가 이미 FIVE/OVERLINE/FOUR를 만들면 그 방향은 THREE로 세지 않는다(그 방향은 4개 이상의 돌을 포함하므로 RIF의 "row with three stones"가 아님).
-방향당 THREE는 0 또는 1개로 센다 `[INTERP, A-R4]` — "한 직선에 THREE가 둘"인 패턴이 존재하지 않음을
-Phase 2에서 **모든 1차원 패턴 전수 열거**로 검증한다(존재하면 이 문서를 수정).
+방향당 THREE는 0 또는 1개로 센다 `[INTERP, A-R4]`. Phase 2의 1차원 전수 열거(착수점 ±5칸, 354,051 패턴)에서
+"한 직선에 서로 다른 THREE 둘" 및 "같은 직선에 FOUR와 겉보기 THREE 동시" 패턴은 모두 **0건**이었다(A-R3/A-R4 VERIFIED).
 
 예 (1차원, `|`=WALL, 흑만 표시, 다른 칸은 빈칸):
 - `. . B B B . .` (양쪽 2칸 이상 열림) → THREE (연속 삼)
@@ -250,7 +250,20 @@ BLACK H8: LEGAL (apparent DOUBLE_THREE)
   VERTICAL:   three ... extension H6 -> FORBIDDEN_DOUBLE_FOUR; extension H10 -> FORBIDDEN_OVERLINE => not real
   real threes = 1  => legal
 ```
-(위 좌표는 형식 예시이며 실제 국면이 아니다. 실제 국면 예시는 Phase 2에서 검증된 테스트 국면으로 교체한다.)
+(위 두 예시는 형식 예시다.) 실제 국면의 출력 — `tests/forbidden/cases/generated_recursive.json`의
+`gen-false33-depth2-D4` (흑 E2 C3 B4 E4 D5 E5 C6 E6 I8 F9, 착수 D4), `dojozero_engine forbidden --point D4`:
+```
+BLACK D4: LEGAL
+  HORIZONTAL: three; extension C4 -> straight four (FORBIDDEN_DOUBLE_THREE); => not real
+  DIAG: three; extension B2 -> straight four (LEGAL); extension F6 -> straight four (LEGAL); => real
+  fours=0 apparent_threes=2 real_threes=1
+  recursion path:
+      C4 (extends D4) = FORBIDDEN_DOUBLE_THREE
+        C5 (extends C4) = LEGAL
+        B3 (extends C4) = LEGAL
+      B2 (extends D4) = LEGAL
+      F6 (extends D4) = LEGAL
+```
 
 ---
 
@@ -437,7 +450,8 @@ enum class Role : uint8_t { BLACK_HOLDER, WHITE_HOLDER };  // phase가 지정하
 증명: D4의 모든 원소는 H8을 고정하므로 g(B∪{q1}) = B∪{q2} 이면 g({b3,q1}) = {b3,q2}.
 (i) g(b3)=b3 이면 g(q1)=q2 이고 g(B)=B, g(W)=W → g ∈ Stab(P).
 (ii) g(b3)=q2, g(q1)=b3 인 경우: g가 대합(involution: 반사 또는 rot180)이면 q1 = g⁻¹(b3) = g(b3) = q2 로 서로 다른 제안이 아니다. g가 rot90/rot270이면 g(W)=W 와 |W|=2, W∌H8 에서 g(w2)=w4, g(w4)=w2 → g²(w2)=w2 → rot180이 w2를 고정 → w2=H8 모순. ∎
-Phase 2에서 모든 합법 4수 국면을 열거해 E1 = E2를 기계 검증한다.
+기계 검증: 도달 가능한 4수 국면 8,464개(2수 8 × 3수 23 × 4수 46)의 모든 빈 점에서 E1 정규형 = E2 정규형
+(`tests/opening/test_symmetry.cpp`, Release 전수).
 
 **정의 E3 (점 대칭, 대안)**: `q1 ~ q2` ⇔ ∃ g ∈ D4 \ {id} : g(q1) = q2 (국면 무시). 더 많은 쌍을 대칭으로 거부하는 보수적 해석. 앱이 이 방식을 쓸 가능성을 배제할 수 없어 profile 옵션으로 둔다.
 
