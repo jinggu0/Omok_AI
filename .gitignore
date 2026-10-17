@@ -1,0 +1,17 @@
+# build
+build/
+out/
+*.obj
+*.pdb
+*.ilk
+# python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+# large artifacts (referenced by hash, not tracked)
+checkpoints/
+runs/
+# local
+.vs/
+.vscode/

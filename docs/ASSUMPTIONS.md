@@ -1,0 +1,132 @@
+# DojoZero — ASSUMPTIONS.md
+
+Status: **Draft v0.1** · 2026-10-18
+
+이 문서는 (1) 공식 규칙 문구가 모호해 엔진이 채택한 해석, (2) 오목도장 앱과의 호환성 중
+확인되지 않은 항목, (3) 개발 환경·자원에 대한 가정을 **숨기지 않고** 기록한다.
+코드에서 이 문서의 ID(`A-xx`, `C-xx`, `E-xx`)를 주석으로 참조한다.
+
+각 가정의 상태:
+- `OPEN` — 미검증. 기본값으로 구현하되 바꿀 수 있게 profile/config로 노출
+- `VERIFIED(source)` — 1차 출처 또는 앱 실측으로 확인
+- `REJECTED` — 검증 결과 틀림 → RULES.md 수정 이력 기록
+
+---
+
+## 1. 규칙 해석 가정 (Rule Interpretation)
+
+| ID | 가정 | 근거 | 대안 | 영향 | 상태 |
+|---|---|---|---|---|---|
+| A-R1 | 흑이 한 방향에 정확한 5, 다른 방향에 장목을 동시에 만들면 흑 승 | RIF 9.2 문언 "without at the same time attaining five" | 장목 우선(흑 패) | 극히 드문 국면, 전술 엔진의 승리 판정 | OPEN (C-02) |
+| A-R2 | 엔진은 5목을 자동 감지·즉시 종국 (RIF 9.7의 "알아채지 못함" 절차 무시) | 엔진/앱 공통 관행 | — | 없음 | OPEN |
+| A-R3 | 한 방향에서 p가 FIVE/OVERLINE/FOUR를 만들면 그 방향은 THREE로 세지 않음 | RIF three = "row with three stones" | 같은 방향에 four와 three 동시 계수 | 4-3 판정 | OPEN — Phase 2 전수 열거로 해당 패턴 존재 여부 확인 |
+| A-R4 | 방향당 THREE는 최대 1개 | 한 직선에 two-three 패턴이 없다고 추정 | 방향당 2개 계수 | 3-3 판정 | OPEN — Phase 2 전수 열거로 검증 |
+| A-R5 | 흑 차례에 모든 빈 점이 금수이고 패스 불가면 무승부 | 규칙 공백 | 흑 패 / 강제 패스 | 극히 드묾 | OPEN (C-06) |
+| A-R6 | Opening 단계(NORMAL_RENJU 이전) 패스 불가 | RIF 12.9 (첫 3수 패스 불가)의 확장 | — | 없음 | OPEN |
+| A-R7 | 흑의 FOUR completion이 장목이 되는 점은 completion으로 치지 않음 | RIF "five in a row" = 정확히 5 (장목은 별도 정의) | — | 4-4, straight four 판정 | VERIFIED(RIF Art.3 정의 구조) |
+| A-T1 | Choice 1/Choice 2는 4수 직후 **흑 holder**가 결정 | RenjuNet 포럼 Taraguchi 해설 "Black player decides"; 한국어 해설 "흑이 10개 후보를 둘 경우 이 시점에 흑백 확정" | 백 holder 결정 | opening 정책 구조 전체 | OPEN (C-07) |
+| A-T2 | Choice 1의 첫 swap은 흑 holder가 결정 (≡ 흑 holder의 3지선다: 제안10 / swap / 유지 후 직접5) | "after move k, the other player may swap" 패턴 (4수=백 → other=흑 holder) | 백 holder가 결정 | opening 정책 | OPEN (C-08), profile `swap_before_direct5_actor` |
+| A-T3 | "대칭 금지"는 E1(5돌 국면 D4 동치) — E2(stabilizer orbit)와 동치임을 증명(RULES §10.2) | RenjuNet 포럼: "can not be symmetrical in any aspect of the position" | E3 점 단위 D4 | 제안 생성기 | OPEN (C-10), profile `proposal_symmetry_mode` |
+| A-T4 | 대칭 제안이 입력되면 `OFFER_TEN` 전체를 REJECT (자동 제거하지 않음) | 엔진 무결성 | 자동 dedupe | 외부 입력 처리 | OPEN (C-10) |
+| A-T5 | 10개 제안은 영역 제한 없음 | RIF-T10 "anywhere on board" | 9×9 제한 | 제안 정책 action space | VERIFIED(RIF-T10) / 앱은 OPEN (C-09) |
+| A-T6 | 영역 경계 포함 (Central(N)은 N×N 정사각형 전체) | 일반 해석 | — | 없음 | OPEN (C-20) |
+| A-T7 | 6수 이후 swap 없음, 7수부터 일반 Renju | RIF-T10 | — | — | VERIFIED(RIF-T10) |
+
+---
+
+## 2. Compatibility Matrix — `OMOKDOJANG_DAN` vs RIF
+
+**전제 자체도 가정이다**: "오목도장 유단자 규칙 = RIF Renju 금수 + Taraguchi-10". 공개 웹에서
+오목도장 앱의 공식 규칙 문서를 찾지 못했다(2026-10-18 조사). 한국어 공개 해설은
+"2024년부터 Taraguchi-10 채택" 같은 2차 언급만 있다. → `C-11`.
+
+모든 행은 `UNVERIFIED_APP_BEHAVIOR` 이다(검증 전까지).
+
+| ID | 항목 | RIF/공식 | 엔진 기본값 | 오목도장 | 검증 방법 | 회귀 테스트 위치 |
+|---|---|---|---|---|---|---|
+| C-01 | 정확한 5 + 4-4/3-3 동시 | 흑 승 | 흑 승 | UNVERIFIED_APP_BEHAVIOR | 앱에서 해당 국면 재현, 착수 허용·결과 스크린샷 | `compatibility/omokdojang/five_precedence_*.json` |
+| C-02 | 정확한 5 + 장목 동시 | 흑 승(문언) | 흑 승 | UNVERIFIED_APP_BEHAVIOR | 동일 | 동일 |
+| C-03 | 금수점 착수 시도 | 반칙패(RIF, 백 지적 필요) | REJECT | UNVERIFIED_APP_BEHAVIOR (금수점 표시·클릭 차단 추정) | 앱에서 금수점 클릭 | `forbidden_handling_*.json` |
+| C-04 | 재귀 거짓금수 | 완전 재귀(RIF 9.3) | 완전 재귀 | UNVERIFIED_APP_BEHAVIOR (앱이 1단만 구현했을 가능성) | 1단/2단/3단 재귀 국면 세트를 앱에서 확인 | `false_forbidden_depth*.json` |
+| C-05 | 한 직선 4-4 | 금수 | 금수 | UNVERIFIED_APP_BEHAVIOR | `B.BBB.B` 류 국면 | `line_double_four_*.json` |
+| C-06 | 패스 / 둘 곳 없음 | 패스 허용, 연속 패스 무승부 | 패스 불가, 무승부 | UNVERIFIED_APP_BEHAVIOR | UI에 패스 버튼 존재 여부 | `pass_*.json` |
+| C-07 | Choice 1/2 결정자 | 미명시 | 흑 holder | UNVERIFIED_APP_BEHAVIOR | 4수 후 UI에서 어느 쪽에 선택지가 뜨는지 | `opening/choice_actor.json` |
+| C-08 | Choice 1 첫 swap 결정자 | "other player" | 흑 holder | UNVERIFIED_APP_BEHAVIOR | 동일 | `opening/swap_before_5.json` |
+| C-09 | 10제안 영역 | 보드 전체 | 보드 전체 | UNVERIFIED_APP_BEHAVIOR | 9×9 밖 제안 시도 | `opening/proposal_region.json` |
+| C-10 | 대칭 정의 / 처리 | "symmetrical not allowed" | E1, 입력 거부 | UNVERIFIED_APP_BEHAVIOR | 대칭 국면에서 거울상 쌍 제안 시도; 국면은 비대칭이지만 점 쌍이 D4 관계인 경우(E1≠E3) 시도 | `opening/proposal_symmetry.json` |
+| C-11 | 유단자 규칙이 Taraguchi-10인가 | — | Taraguchi-10 | UNVERIFIED_APP_BEHAVIOR | 앱 규칙 안내 화면 / 유단자 대국 기보 | 문서 |
+| C-12 | 1수 천원 자동 배치 | 흑이 둠 | action으로 표현(유일 합법수) | UNVERIFIED_APP_BEHAVIOR | UI 관찰 | `opening/move1.json` |
+| C-13 | 6수 후 swap | 없음 | 없음 | UNVERIFIED_APP_BEHAVIOR | UI 관찰 | — |
+| C-14 | 백 장목 | 승 | 승 | UNVERIFIED_APP_BEHAVIOR | 국면 재현 | `white_overline.json` |
+| C-15 | 판 꽉 참 | 사실상 무승부 | 무승부 | UNVERIFIED_APP_BEHAVIOR | (재현 어려움) | — |
+| C-16 | 시간 제한·초읽기 | 대회 규정 | 범위 밖 (엔진 SearchLimits로만) | UNVERIFIED_APP_BEHAVIOR | — | — |
+| C-17 | 무승부 제안·기권 | 대회 규정 | 범위 밖 | — | — | — |
+| C-20 | 중앙 N×N 경계 포함 | 포함(일반 해석) | 포함 | UNVERIFIED_APP_BEHAVIOR | 경계 점 착수 시도 | `opening/region_boundary.json` |
+
+### 2.1 앱 증거 수집 절차 (사용자 수동)
+자동 조작·온라인 대국 부착은 **하지 않는다**(PRD Non-goals). 증거는 사람이 직접 앱에서 수집한다.
+1. 국면을 앱의 대국/복기/연습 기능으로 재현한다.
+2. 스크린샷 + 관찰 결과(착수 허용 여부, 금수 표시, 결과)를 기록한다.
+3. `tests/compatibility/omokdojang/<C-ID>_<slug>.json` 으로 저장:
+
+```json
+{
+  "schema_version": 1,
+  "compat_id": "C-04",
+  "source": { "kind": "manual_app_test", "app_version": "x.y.z",
+              "date": "2026-10-20", "evidence": ["screenshots/C-04_a.png"] },
+  "profile": "OMOKDOJANG_DAN",
+  "position": { "moves": ["H8", "I9", "..."] },
+  "side": "BLACK",
+  "query": { "point": "J10" },
+  "expected_legal": false,
+  "expected_forbidden": "DOUBLE_THREE",
+  "expected_reason": "app marks J10 as forbidden",
+  "notes": ""
+}
+```
+- `position`은 착수 수순(`moves`) 또는 돌 목록(`black`/`white` + `phase` + `side_assignment`) 중 하나.
+- 다른 쿼리 종류: `expected_legal_moves`(전체 합법수 집합), `expected_result`(종국 판정), `expected_phase`(opening 전이).
+4. 테스트 러너는 이 디렉터리를 자동 수집한다. 엔진 기본값과 다르면 **실패**로 보고하고, 해당 `C-xx`를 VERIFIED/REJECTED로 갱신한 뒤 profile 기본값을 조정한다.
+
+---
+
+## 3. 환경·자원 가정 (Environment)
+
+조사 시점(2026-10-18) 실측:
+
+| ID | 항목 | 값 | 영향 |
+|---|---|---|---|
+| E-01 | OS | Windows 11 Home 10.0.26200 | 빌드/스크립트는 Windows 우선, Linux 호환 유지 |
+| E-02 | CPU | Intel Core Ultra 7 258V (Lunar Lake, 8코어 = 4P + 4LP-E, SMT 없음) | 병렬 self-play 워커 수 상한 ≈ 6–8 |
+| E-03 | RAM | 32 GB (공유 메모리) | replay buffer는 디스크 기반 |
+| E-04 | GPU | Intel Arc 140V 내장 GPU (공유 메모리, **CUDA 없음**) | 학습/추론 백엔드 선택에 결정적. PyTorch XPU 또는 ONNX Runtime(OpenVINO/DirectML EP) 후보 |
+| E-05 | NPU | Lunar Lake NPU 존재 (미검증) | OpenVINO NPU 추론은 Future Work |
+| E-06 | C++ 컴파일러 | MSVC 14.43 (VS 2022 Community), C++20 사용 | MinGW GCC 6.3도 PATH에 있으나 **사용 금지**(C++17 미흡) |
+| E-07 | CMake | 4.3.2 | |
+| E-08 | Python | 3.11.9, numpy 2.4.6, pytest 8.4.2 설치됨, **PyTorch 미설치** | Phase 4 전에 설치 필요 (XPU 빌드) |
+| E-09 | 저장소 | 빈 git 저장소 (`main`, 커밋 없음) | 기존 코드 제약 없음 |
+
+### 3.1 자원 가정에서 나오는 핵심 리스크 (PRD Risks R-01)
+AlphaZero 계열의 "최상급" 기력은 통상 수백~수천 GPU-일 규모 self-play를 필요로 한다. 노트북 내장 GPU 한 대로는
+그 규모가 불가능하다. 따라서 다음을 **가정하지 않는다**: "이 머신에서 RL만으로 최상급 기력 도달".
+대신 (a) 정확한 전술 solver 비중 확대, (b) 작은 네트워크 + 효율적 탐색, (c) 외부 기준 엔진과의 조기 비교,
+(d) 필요 시 외부 GPU(클라우드) 사용 여부를 사용자가 결정 — 를 PRD Open Questions에 둔다.
+
+---
+
+## 4. 데이터·라이선스 가정
+
+| ID | 가정 | 상태 |
+|---|---|---|
+| D-01 | 공개 렌주 기보 DB(RenjuNet 등)의 재사용 라이선스는 불명확 → 명시적 허가/라이선스 확인 전 사용하지 않음 | OPEN |
+| D-02 | 자체 solver·자체 엔진 생성 기보는 자유롭게 사용 | 확정 |
+| D-03 | 타 엔진(Rapfi 등, GPL-3.0) 은 **별도 프로세스로 대국 상대/평가 기준**으로만 사용, 코드·가중치 미포함 | OPEN — 타 엔진 생성 기보를 학습 데이터로 쓸지 사용자 결정 필요 (PRD OQ-05) |
+| D-04 | 오목도장 앱 데이터(기보·스크린샷)는 사용자가 직접 수집한 규칙 검증용 소량만 사용, 학습 데이터로 대량 수집하지 않음 | 확정 |
+
+---
+
+## 5. 변경 이력
+| 날짜 | ID | 변경 |
+|---|---|---|
+| 2026-10-18 | 전체 | 초안 작성 |
