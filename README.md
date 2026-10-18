@@ -5,7 +5,7 @@ Design docs: [docs/PRD.md](docs/PRD.md) · [RULES](docs/RULES.md) · [ARCHITECTU
 [TRAINING](docs/TRAINING.md) · [EVALUATION](docs/EVALUATION.md) · [ASSUMPTIONS](docs/ASSUMPTIONS.md) ·
 status: [PROGRESS](docs/PROGRESS.md).
 
-Current state: **Phase 2 (rule engine) complete.** No AI yet.
+Current state: **Phase 3 (rule engine + tactical solver) complete.** No neural network yet.
 
 ## Build (Windows, MSVC 2022, CMake ≥ 3.24)
 ```bash
@@ -27,6 +27,13 @@ cmake --build build/msvc --config Release
 ```
 ```bash
 ./build/msvc/cpp/Release/dojozero_engine.exe legal --profile OMOKDOJANG_DAN --position '{"moves":["H8","keep","I9"]}'
+```
+
+```bash
+./build/msvc/cpp/Release/dojozero_engine.exe tactics --position '{"black":["F8","G8","H8","I6","I7"],"white":["E8","B15","E15","H15","K15"],"side":"BLACK"}' --verify
+```
+```bash
+./build/msvc/cpp/Release/dojozero_engine.exe benchmark --suite benchmarks
 ```
 
 Coordinates: columns A–O (left to right), ranks 1–15 (bottom to top), `H8` = centre.

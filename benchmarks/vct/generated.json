@@ -1,0 +1,1060 @@
+{
+ "description": "Machine-generated vct problems from random midgames; every expected result was verified by the independent full-width GameState verifier when generated. tried=258 unverifiable_skipped=2",
+ "problems": [
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-0",
+   "position": {
+    "black": [
+     "F4",
+     "F6",
+     "J6",
+     "K6",
+     "L7",
+     "H8",
+     "I8",
+     "F9",
+     "H10",
+     "I12",
+     "K12",
+     "H13"
+    ],
+    "side": "BLACK",
+    "white": [
+     "I2",
+     "I4",
+     "F5",
+     "J5",
+     "L6",
+     "I7",
+     "J7",
+     "F8",
+     "G8",
+     "E10",
+     "M10",
+     "M12"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 9"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-1",
+   "position": {
+    "black": [
+     "K3",
+     "H8",
+     "K8",
+     "L8",
+     "M8",
+     "L11",
+     "M13",
+     "N13",
+     "M14",
+     "K15",
+     "L15"
+    ],
+    "side": "WHITE",
+    "white": [
+     "J3",
+     "L4",
+     "O4",
+     "G5",
+     "J6",
+     "N6",
+     "G7",
+     "H9",
+     "J9",
+     "L10"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 7"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-2",
+   "position": {
+    "black": [
+     "C5",
+     "E6",
+     "J6",
+     "F8",
+     "H8",
+     "H10",
+     "M11",
+     "O11",
+     "I12",
+     "I13",
+     "G15"
+    ],
+    "side": "BLACK",
+    "white": [
+     "D6",
+     "D7",
+     "J7",
+     "I9",
+     "L9",
+     "O9",
+     "J11",
+     "L12",
+     "N13",
+     "I14",
+     "J15"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 5"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-3",
+   "position": {
+    "black": [
+     "H2",
+     "M2",
+     "I3",
+     "H4",
+     "L4",
+     "J5",
+     "O6",
+     "I7",
+     "G8",
+     "H8",
+     "I8",
+     "M8",
+     "H9",
+     "L11",
+     "M11"
+    ],
+    "side": "BLACK",
+    "white": [
+     "J2",
+     "N2",
+     "O2",
+     "J3",
+     "K3",
+     "J4",
+     "M4",
+     "I6",
+     "L6",
+     "F7",
+     "J8",
+     "G9",
+     "K9",
+     "J10",
+     "K10"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 13"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-4",
+   "position": {
+    "black": [
+     "E1",
+     "H2",
+     "E4",
+     "G5",
+     "L5",
+     "H8",
+     "L8",
+     "M8",
+     "J9",
+     "K13",
+     "N13",
+     "J15"
+    ],
+    "side": "BLACK",
+    "white": [
+     "D3",
+     "J3",
+     "K4",
+     "C5",
+     "E5",
+     "G6",
+     "H7",
+     "H9",
+     "G10",
+     "H10",
+     "L11",
+     "H15"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 9"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-5",
+   "position": {
+    "black": [
+     "H5",
+     "C6",
+     "D6",
+     "J6",
+     "H8",
+     "E10",
+     "H10",
+     "J10",
+     "J11",
+     "K12"
+    ],
+    "side": "WHITE",
+    "white": [
+     "F3",
+     "L5",
+     "E7",
+     "H7",
+     "G8",
+     "I8",
+     "D11",
+     "D12",
+     "K14"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 13"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-6",
+   "position": {
+    "black": [
+     "K3",
+     "H5",
+     "H8",
+     "K9",
+     "J10",
+     "L11",
+     "H13",
+     "L13",
+     "O13"
+    ],
+    "side": "WHITE",
+    "white": [
+     "J3",
+     "I4",
+     "J4",
+     "H7",
+     "I10",
+     "J11",
+     "N14",
+     "M15"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 5"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-7",
+   "position": {
+    "black": [
+     "F4",
+     "J4",
+     "G5",
+     "H5",
+     "F7",
+     "G7",
+     "H8",
+     "L12"
+    ],
+    "side": "BLACK",
+    "white": [
+     "F3",
+     "F5",
+     "F6",
+     "H7",
+     "H9",
+     "J10",
+     "J11",
+     "K11"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 7"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-8",
+   "position": {
+    "black": [
+     "J1",
+     "L1",
+     "K3",
+     "M4",
+     "G5",
+     "H6",
+     "H8",
+     "J9",
+     "E12"
+    ],
+    "side": "WHITE",
+    "white": [
+     "G1",
+     "H2",
+     "H5",
+     "I5",
+     "E6",
+     "G6",
+     "H7",
+     "G10"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 5"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-9",
+   "position": {
+    "black": [
+     "H1",
+     "G4",
+     "I4",
+     "N4",
+     "J5",
+     "N5",
+     "L6",
+     "H8",
+     "J9",
+     "H11"
+    ],
+    "side": "WHITE",
+    "white": [
+     "J2",
+     "O2",
+     "H3",
+     "L3",
+     "O3",
+     "H6",
+     "G7",
+     "J7",
+     "M7"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 9"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-10",
+   "position": {
+    "black": [
+     "J2",
+     "K4",
+     "M6",
+     "E7",
+     "H8",
+     "J9",
+     "G10",
+     "L11",
+     "K13"
+    ],
+    "side": "WHITE",
+    "white": [
+     "N3",
+     "L4",
+     "G5",
+     "E6",
+     "J6",
+     "G7",
+     "J7",
+     "N10"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 9"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-11",
+   "position": {
+    "black": [
+     "F7",
+     "H8",
+     "H10",
+     "G11",
+     "I11",
+     "K11",
+     "G12",
+     "C13",
+     "J13",
+     "M13",
+     "A14"
+    ],
+    "side": "BLACK",
+    "white": [
+     "G9",
+     "H9",
+     "M9",
+     "N9",
+     "C10",
+     "J10",
+     "F11",
+     "D12",
+     "D13",
+     "N13",
+     "B14"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 11"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-12",
+   "position": {
+    "black": [
+     "M1",
+     "O1",
+     "H5",
+     "G6",
+     "H8",
+     "E10",
+     "H10",
+     "J10",
+     "K10",
+     "L10",
+     "N11",
+     "O12"
+    ],
+    "side": "BLACK",
+    "white": [
+     "K1",
+     "I3",
+     "N3",
+     "K5",
+     "L5",
+     "L7",
+     "E8",
+     "J8",
+     "N8",
+     "F9",
+     "I10",
+     "N14"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 9"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-13",
+   "position": {
+    "black": [
+     "I5",
+     "H6",
+     "J6",
+     "I7",
+     "H8",
+     "F10",
+     "I10",
+     "J11",
+     "I13"
+    ],
+    "side": "WHITE",
+    "white": [
+     "E8",
+     "F8",
+     "G8",
+     "I8",
+     "G9",
+     "K9",
+     "L11",
+     "E12"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 23"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-14",
+   "position": {
+    "black": [
+     "F5",
+     "N7",
+     "H8",
+     "H9",
+     "E10",
+     "G10",
+     "J10",
+     "C11",
+     "D11",
+     "J11",
+     "M12",
+     "K13"
+    ],
+    "side": "BLACK",
+    "white": [
+     "K2",
+     "J4",
+     "H6",
+     "J7",
+     "I9",
+     "L9",
+     "F10",
+     "I10",
+     "K11",
+     "G12",
+     "E13",
+     "O13"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 11"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-15",
+   "position": {
+    "black": [
+     "G3",
+     "E5",
+     "I5",
+     "F7",
+     "H8",
+     "I9",
+     "D10",
+     "K10",
+     "E11",
+     "L12",
+     "N13",
+     "K14"
+    ],
+    "side": "WHITE",
+    "white": [
+     "F2",
+     "J5",
+     "J7",
+     "I8",
+     "L8",
+     "K9",
+     "L9",
+     "F10",
+     "G11",
+     "O13",
+     "M14"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 7"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-16",
+   "position": {
+    "black": [
+     "G6",
+     "M6",
+     "D7",
+     "K7",
+     "F8",
+     "H8",
+     "J8",
+     "J11",
+     "K11",
+     "E13",
+     "G13"
+    ],
+    "side": "WHITE",
+    "white": [
+     "H7",
+     "J7",
+     "H9",
+     "M9",
+     "L10",
+     "G11",
+     "K12",
+     "F13",
+     "I14",
+     "G15"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 21"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-17",
+   "position": {
+    "black": [
+     "J5",
+     "J6",
+     "E7",
+     "H8",
+     "D9",
+     "F10",
+     "B11",
+     "D12"
+    ],
+    "side": "BLACK",
+    "white": [
+     "F4",
+     "G4",
+     "H5",
+     "G6",
+     "B8",
+     "F9",
+     "H12",
+     "C13"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 7"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-18",
+   "position": {
+    "black": [
+     "L4",
+     "F5",
+     "A6",
+     "G6",
+     "A7",
+     "J7",
+     "D8",
+     "F8",
+     "H8",
+     "F10",
+     "H10",
+     "I12"
+    ],
+    "side": "WHITE",
+    "white": [
+     "F4",
+     "J6",
+     "B7",
+     "F7",
+     "H7",
+     "I7",
+     "E9",
+     "H9",
+     "I11",
+     "F12",
+     "G13"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 7"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-19",
+   "position": {
+    "black": [
+     "J6",
+     "K6",
+     "G8",
+     "H8",
+     "J9",
+     "D11",
+     "F11",
+     "I11",
+     "K12"
+    ],
+    "side": "WHITE",
+    "white": [
+     "F7",
+     "I7",
+     "L8",
+     "E9",
+     "O9",
+     "H10",
+     "J10",
+     "M10"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 13"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-20",
+   "position": {
+    "black": [
+     "C2",
+     "G4",
+     "H4",
+     "C5",
+     "E6",
+     "J6",
+     "F7",
+     "F8",
+     "H8",
+     "J9",
+     "F10"
+    ],
+    "side": "BLACK",
+    "white": [
+     "F2",
+     "E3",
+     "F5",
+     "J5",
+     "H6",
+     "L6",
+     "G7",
+     "I7",
+     "F9",
+     "H9",
+     "L10"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 9"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-21",
+   "position": {
+    "black": [
+     "C3",
+     "G5",
+     "K5",
+     "L5",
+     "D6",
+     "D7",
+     "H7",
+     "H8",
+     "C9",
+     "D9",
+     "O10",
+     "D11"
+    ],
+    "side": "WHITE",
+    "white": [
+     "E5",
+     "J5",
+     "N5",
+     "I7",
+     "K7",
+     "F8",
+     "M8",
+     "O8",
+     "I9",
+     "B10",
+     "F10"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 9"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-22",
+   "position": {
+    "black": [
+     "A5",
+     "D5",
+     "M5",
+     "B7",
+     "F7",
+     "H8",
+     "J8",
+     "A9",
+     "C9",
+     "D9",
+     "I10",
+     "K10",
+     "F11",
+     "L11",
+     "M13",
+     "O13"
+    ],
+    "side": "BLACK",
+    "white": [
+     "F4",
+     "C5",
+     "C6",
+     "E6",
+     "J6",
+     "N6",
+     "I7",
+     "N7",
+     "L8",
+     "G9",
+     "H9",
+     "G11",
+     "K11",
+     "I12",
+     "K13",
+     "L15"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 9"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-23",
+   "position": {
+    "black": [
+     "D4",
+     "I4",
+     "F5",
+     "H5",
+     "J6",
+     "H8",
+     "G10",
+     "J10",
+     "F11"
+    ],
+    "side": "BLACK",
+    "white": [
+     "C2",
+     "B3",
+     "E3",
+     "G3",
+     "D5",
+     "G7",
+     "G9",
+     "H9",
+     "I11"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 13"
+   }
+  },
+  {
+   "category": "VCT",
+   "expected": {
+    "result": "WIN"
+   },
+   "id": "gen-vct-2-24",
+   "position": {
+    "black": [
+     "H2",
+     "E4",
+     "G4",
+     "H6",
+     "F8",
+     "G8",
+     "H8",
+     "L8",
+     "E10",
+     "L11"
+    ],
+    "side": "BLACK",
+    "white": [
+     "H1",
+     "I2",
+     "G3",
+     "I5",
+     "F7",
+     "E8",
+     "G9",
+     "I9",
+     "L9",
+     "J10"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "vct",
+   "source": {
+    "generator": "dojozero_tactics generate --kind vct --seed 2",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 11"
+   }
+  }
+ ],
+ "schema_version": 1,
+ "suite": "generated-vct"
+}

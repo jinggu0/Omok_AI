@@ -3,9 +3,12 @@
 //   dojozero_engine rules-test [--root <repo>] [--fuzz <comparisons>]
 //   dojozero_engine forbidden  [--profile <name|file.json>] --position '<json>' [--point H8]
 //   dojozero_engine legal      [--profile <name|file.json>] --position '<json>'
+//   dojozero_engine tactics    [--profile <name|file.json>] --position '<json>' [--budget N] [--verify]
+//   dojozero_engine benchmark  --suite <file.json|dir> [--budget N]
 //
 // <json> is a position spec (game/position_spec.h), e.g. '{"moves":["H8","keep","I9"]}' or
 // '{"black":["F8","G8","H6","H7"],"white":["A15","C15","E15","G15"]}'.
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
@@ -19,6 +22,9 @@
 
 #include "game/position_spec.h"
 #include "rules/reference_rules.h"
+#include "tactics/benchmark.h"
+#include "tactics/engine.h"
+#include "tactics/verify.h"
 #include "tools/random_positions.h"
 
 using namespace dz;
@@ -142,11 +148,75 @@ int cmd_rules_test(const std::map<std::string, std::string>& f) {
   return failures == 0 && mismatches == 0 ? 0 : 1;
 }
 
+int cmd_tactics(const std::map<std::string, std::string>& f) {
+  const GameState g = load_state(f);
+  std::cout << g.to_string();
+  const uint64_t budget = f.count("budget") ? std::strtoull(f.at("budget").c_str(), nullptr, 10) : 100000;
+  const tactics::TacticalDecision d = tactics::analyze_tactics(g, {budget, budget, budget / 2, 40});
+  std::cout << d.to_string() << "\n";
+  if (f.count("verify") && d.result != tactics::ProofResult::UNKNOWN) {
+    const tactics::ProofMoveFn oracle = [&](uint64_t key) -> std::optional<Point> {
+      auto it = d.proof_moves.find(key);
+      if (it == d.proof_moves.end()) return std::nullopt;
+      return it->second;
+    };
+    const auto v = d.result == tactics::ProofResult::WIN ? tactics::verify_forced_win(g, oracle)
+                                                         : tactics::verify_forced_loss(g, oracle);
+    std::cout << "independent verification: " << tactics::verify_status_name(v) << "\n";
+    return v == tactics::VerifyStatus::REFUTED ? 1 : 0;
+  }
+  return 0;
+}
+
+int cmd_benchmark(const std::map<std::string, std::string>& f) {
+  if (!f.count("suite")) throw std::runtime_error("--suite is required");
+  std::vector<fs::path> files;
+  const fs::path suite = f.at("suite");
+  if (fs::is_directory(suite)) {
+    for (const auto& e : fs::recursive_directory_iterator(suite)) {
+      if (e.path().extension() == ".json") files.push_back(e.path());
+    }
+    std::sort(files.begin(), files.end());
+  } else {
+    files.push_back(suite);
+  }
+  tactics::BenchmarkSettings settings;
+  if (f.count("budget")) settings.budget_nodes = std::strtoull(f.at("budget").c_str(), nullptr, 10);
+  int total = 0, passed = 0, false_claims = 0, expected_proofs = 0, solved = 0;
+  double ms = 0;
+  for (const auto& file : files) {
+    for (const auto& o : tactics::run_suite_file(file.string(), settings)) {
+      ++total;
+      passed += o.pass;
+      false_claims += o.false_claim;
+      solved += o.solved;
+      ms += o.ms;
+      std::cout << (o.pass ? "PASS " : "FAIL ") << file.filename().string() << " " << o.id << " [" << o.category
+                << "] claimed=" << o.claimed << " verify=" << o.verification << " nodes=" << o.nodes
+                << " ms=" << static_cast<int>(o.ms) << (o.message.empty() ? "" : " : " + o.message) << "\n";
+    }
+  }
+  for (const auto& file : files) {
+    std::ifstream in(file);
+    const json doc = json::parse(in);  // keep alive: .at() returns a reference into it
+    for (const auto& p : doc.at("problems")) {
+      const std::string r = p.at("expected").at("result").get<std::string>();
+      expected_proofs += (r == "WIN" || r == "FOUND" || r == "LOSS") ? 1 : 0;
+    }
+  }
+  std::cout << "problems=" << total << " passed=" << passed << " false_claims=" << false_claims
+            << " solve_rate=" << solved << "/" << expected_proofs << " solver_time_ms=" << static_cast<int>(ms)
+            << "\n";
+  return passed == total && false_claims == 0 ? 0 : 1;
+}
+
 void usage() {
-  std::cerr << "usage: dojozero_engine <rules-test|forbidden|legal> [options]\n"
+  std::cerr << "usage: dojozero_engine <rules-test|forbidden|legal|tactics|benchmark> [options]\n"
                "  rules-test [--root <repo>] [--fuzz N]\n"
                "  forbidden  [--profile NAME|file] --position JSON [--point H8]\n"
-               "  legal      [--profile NAME|file] --position JSON\n";
+               "  legal      [--profile NAME|file] --position JSON\n"
+               "  tactics    [--profile NAME|file] --position JSON [--budget N] [--verify]\n"
+               "  benchmark  --suite FILE|DIR [--budget N]\n";
 }
 
 }  // namespace
@@ -162,6 +232,8 @@ int main(int argc, char** argv) {
     if (cmd == "rules-test") return cmd_rules_test(flags);
     if (cmd == "forbidden") return cmd_forbidden(flags);
     if (cmd == "legal") return cmd_legal(flags);
+    if (cmd == "tactics") return cmd_tactics(flags);
+    if (cmd == "benchmark") return cmd_benchmark(flags);
   } catch (const std::exception& e) {
     std::cerr << "error: " << e.what() << "\n";
     return 1;

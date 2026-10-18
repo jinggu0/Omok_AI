@@ -10,6 +10,8 @@ add_executable(dojozero_tests
   opening/test_opening.cpp
   opening/test_symmetry.cpp
   compatibility/test_compat.cpp
+  tactics/test_threats.cpp
+  tactics/test_solvers.cpp
 )
 target_include_directories(dojozero_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(dojozero_tests PRIVATE DOJOZERO_SOURCE_DIR="${PROJECT_SOURCE_DIR}")

@@ -5,6 +5,7 @@
 #include <random>
 
 #include "board/board.h"
+#include "game/game_state.h"
 
 namespace dz::tools {
 
@@ -48,6 +49,44 @@ inline bool near_black(const Board& b, Point p) {
     }
   }
   return false;
+}
+
+// NORMAL_RENJU game after random play biased to moves near existing stones (tactically rich).
+// Returns the last non-terminal state reached.
+inline GameState random_midgame(std::mt19937_64& rng, ProfilePtr profile, int min_plies, int max_plies) {
+  GameState g(std::move(profile));
+  const int plies = min_plies + static_cast<int>(rng() % (max_plies - min_plies + 1));
+  std::vector<Action> legal, near;
+  for (int i = 0; i < plies; ++i) {
+    g.legal_actions(legal);
+    if (legal.empty()) break;
+    // Opening decisions (swap / branch / proposals / selection): uniformly random.
+    if (g.phase() != OpeningPhase::NORMAL_RENJU && !is_placement_phase(g.phase())) {
+      g.apply(legal[rng() % legal.size()]);
+      --i;  // decisions do not count as plies
+      continue;
+    }
+    near.clear();
+    for (const Action& a : legal) {
+      if (a.type != ActionType::PLACE) continue;
+      bool close = g.board().stone_count() == 0 && a.point == kCenterPoint;
+      for (int dr = -2; dr <= 2 && !close; ++dr) {
+        for (int dc = -2; dc <= 2 && !close; ++dc) {
+          const int r = row_of(a.point) + dr, c = col_of(a.point) + dc;
+          close = on_board(r, c) && !g.board().empty_at(make_point(r, c));
+        }
+      }
+      if (close) near.push_back(a);
+    }
+    if (near.empty()) break;
+    const Action a = near[rng() % near.size()];
+    g.apply(a);
+    if (g.is_terminal()) {
+      g.undo();
+      break;
+    }
+  }
+  return g;
 }
 
 }  // namespace dz::tools

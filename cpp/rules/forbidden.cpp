@@ -354,7 +354,31 @@ int count_fours(const Board& board, Point p, Color c) {
 }
 
 int count_threes(const Board& board, Point p, Color c, const BlackRuleOptions& opt) {
-  if (c == Color::BLACK) return explain_black_move(board, p, opt).real_three_count();
+  if (c == Color::BLACK) {
+    // Real threes: directions with a straight-four extension that is a LEGAL black move.
+    Board::Cells scratch = board.cells();
+    const int idx = Board::index_of(p);
+    scratch[idx] = BLACK_STONE;
+    std::array<bool, kNumDirections> skip{};
+    for (int d = 0; d < kNumDirections; ++d) {
+      const int step = Board::kStep[d];
+      DirFours df;
+      fours_in_dir(scratch.data(), idx, step, BLACK_STONE, true, df);
+      skip[d] = df.count > 0 || run_len(scratch.data(), idx, step, BLACK_STONE) >= 5;
+    }
+    Extensions ext;
+    collect_extensions(scratch.data(), idx, BLACK_STONE, /*exact=*/true, skip, ext);
+    int real = 0;
+    for (int d = 0; d < kNumDirections; ++d) {
+      for (int j = 0; j < ext.n[d]; ++j) {
+        if (black_verdict_cells(scratch, ext.pt[d][j], opt) == MoveVerdict::LEGAL) {
+          ++real;
+          break;
+        }
+      }
+    }
+    return real;
+  }
   Board::Cells scratch = board.cells();
   const int idx = Board::index_of(p);
   scratch[idx] = WHITE_STONE;

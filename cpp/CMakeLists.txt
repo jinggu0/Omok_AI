@@ -11,6 +11,12 @@ add_library(dojozero_core STATIC
   game/action.cpp
   game/game_state.cpp
   game/position_spec.cpp
+  tactics/threats.cpp
+  tactics/vcf.cpp
+  tactics/dfpn.cpp
+  tactics/verify.cpp
+  tactics/engine.cpp
+  tactics/benchmark.cpp
 )
 target_include_directories(dojozero_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(dojozero_core PUBLIC nlohmann_json::nlohmann_json)
@@ -24,4 +30,7 @@ if(DOJOZERO_BUILD_TOOLS)
 
   add_executable(dojozero_fuzz tools/fuzz_rules.cpp)
   target_link_libraries(dojozero_fuzz PRIVATE dojozero_core)
+
+  add_executable(dojozero_tactics tools/tactics_tool.cpp)
+  target_link_libraries(dojozero_tactics PRIVATE dojozero_core)
 endif()

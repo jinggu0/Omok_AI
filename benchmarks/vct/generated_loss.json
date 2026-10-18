@@ -1,0 +1,1019 @@
+{
+ "description": "Machine-generated loss problems from random midgames; every expected result was verified by the independent full-width GameState verifier when generated. tried=294 unverifiable_skipped=3",
+ "problems": [
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-0",
+   "position": {
+    "black": [
+     "J2",
+     "B4",
+     "K4",
+     "I6",
+     "G7",
+     "J7",
+     "K7",
+     "H8",
+     "L10",
+     "H12",
+     "I13"
+    ],
+    "side": "BLACK",
+    "white": [
+     "A4",
+     "B5",
+     "I7",
+     "J8",
+     "I9",
+     "G10",
+     "G11",
+     "H11",
+     "K11",
+     "K13",
+     "J14"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 6"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-1",
+   "position": {
+    "black": [
+     "C1",
+     "E2",
+     "G2",
+     "J3",
+     "L3",
+     "C4",
+     "A5",
+     "G5",
+     "C6",
+     "D6",
+     "H8",
+     "K8",
+     "L8",
+     "M8",
+     "J9",
+     "K9",
+     "H10",
+     "E12",
+     "C13",
+     "D13",
+     "D14",
+     "E14",
+     "H14",
+     "D15"
+    ],
+    "side": "BLACK",
+    "white": [
+     "G1",
+     "N1",
+     "H2",
+     "H4",
+     "E5",
+     "F5",
+     "I5",
+     "G6",
+     "I6",
+     "N6",
+     "F7",
+     "J7",
+     "N7",
+     "J8",
+     "F9",
+     "I9",
+     "G10",
+     "J10",
+     "A11",
+     "G11",
+     "D12",
+     "I12",
+     "F13",
+     "B14"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 4"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-2",
+   "position": {
+    "black": [
+     "C2",
+     "H2",
+     "G3",
+     "E4",
+     "H6",
+     "L6",
+     "H8",
+     "K8",
+     "N8",
+     "F10",
+     "L10",
+     "G11",
+     "J11",
+     "G12",
+     "N12",
+     "N13",
+     "H14",
+     "K14",
+     "M15"
+    ],
+    "side": "BLACK",
+    "white": [
+     "M1",
+     "I2",
+     "L3",
+     "B5",
+     "K5",
+     "D6",
+     "G6",
+     "M6",
+     "C7",
+     "C8",
+     "E8",
+     "F9",
+     "H9",
+     "G10",
+     "J10",
+     "F12",
+     "H12",
+     "L12",
+     "G14"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 8"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-3",
+   "position": {
+    "black": [
+     "D5",
+     "A6",
+     "N7",
+     "H8",
+     "J8",
+     "N8",
+     "A9",
+     "G9",
+     "J9",
+     "K9",
+     "N9",
+     "C10",
+     "E12",
+     "J12",
+     "N12"
+    ],
+    "side": "WHITE",
+    "white": [
+     "F3",
+     "A4",
+     "B7",
+     "F7",
+     "L8",
+     "H9",
+     "I9",
+     "D10",
+     "E10",
+     "G10",
+     "B11",
+     "E11",
+     "I11",
+     "M11"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 10"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-4",
+   "position": {
+    "black": [
+     "F3",
+     "I4",
+     "L4",
+     "H8",
+     "D10",
+     "F10",
+     "G10",
+     "D11",
+     "B12",
+     "C13",
+     "J13",
+     "G14",
+     "J15"
+    ],
+    "side": "WHITE",
+    "white": [
+     "H2",
+     "H4",
+     "I6",
+     "K6",
+     "J7",
+     "D8",
+     "G8",
+     "G9",
+     "H11",
+     "I12",
+     "A14",
+     "C14"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 14"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-5",
+   "position": {
+    "black": [
+     "K1",
+     "I2",
+     "E3",
+     "D5",
+     "G5",
+     "G6",
+     "L6",
+     "H8",
+     "N8",
+     "G10",
+     "I10",
+     "F12"
+    ],
+    "side": "BLACK",
+    "white": [
+     "M1",
+     "E2",
+     "F2",
+     "I3",
+     "F4",
+     "J4",
+     "I6",
+     "I7",
+     "I8",
+     "F9",
+     "I11",
+     "E12"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 6"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-6",
+   "position": {
+    "black": [
+     "C3",
+     "D3",
+     "B4",
+     "E4",
+     "I5",
+     "J5",
+     "E6",
+     "F6",
+     "G8",
+     "H8",
+     "G9",
+     "D11",
+     "E11",
+     "G12"
+    ],
+    "side": "BLACK",
+    "white": [
+     "B2",
+     "G2",
+     "H5",
+     "I6",
+     "J8",
+     "E10",
+     "F10",
+     "G10",
+     "B11",
+     "D12",
+     "B13",
+     "C13",
+     "C15",
+     "E15"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 8"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-7",
+   "position": {
+    "black": [
+     "K3",
+     "G4",
+     "J5",
+     "K5",
+     "M5",
+     "I6",
+     "H8",
+     "H10",
+     "I10",
+     "F11",
+     "K11",
+     "O11",
+     "L14"
+    ],
+    "side": "WHITE",
+    "white": [
+     "L2",
+     "M2",
+     "L3",
+     "K4",
+     "O7",
+     "E8",
+     "D9",
+     "H9",
+     "J11",
+     "I12",
+     "L12",
+     "M12"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 10"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-8",
+   "position": {
+    "black": [
+     "G3",
+     "J3",
+     "L3",
+     "H4",
+     "I4",
+     "F5",
+     "H8",
+     "F9",
+     "G10",
+     "J10",
+     "E11"
+    ],
+    "side": "BLACK",
+    "white": [
+     "I2",
+     "M4",
+     "H5",
+     "K5",
+     "J7",
+     "E8",
+     "K8",
+     "K9",
+     "H10",
+     "D11",
+     "K12"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 6"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-9",
+   "position": {
+    "black": [
+     "M7",
+     "H8",
+     "I8",
+     "K9",
+     "G10",
+     "K10",
+     "M10",
+     "I11",
+     "E12",
+     "G12",
+     "J12",
+     "B13",
+     "B14",
+     "C14"
+    ],
+    "side": "BLACK",
+    "white": [
+     "F3",
+     "G3",
+     "H5",
+     "J7",
+     "G8",
+     "K8",
+     "B9",
+     "F9",
+     "H9",
+     "D10",
+     "J10",
+     "A13",
+     "D13",
+     "F14"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 4"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-10",
+   "position": {
+    "black": [
+     "C4",
+     "F4",
+     "G5",
+     "F6",
+     "H6",
+     "B8",
+     "C8",
+     "G8",
+     "H8",
+     "D9",
+     "K10",
+     "E12"
+    ],
+    "side": "WHITE",
+    "white": [
+     "F3",
+     "B6",
+     "D6",
+     "E6",
+     "F9",
+     "F10",
+     "I10",
+     "G11",
+     "D13",
+     "E13",
+     "G14"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 4"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-11",
+   "position": {
+    "black": [
+     "J3",
+     "H6",
+     "H8",
+     "N8",
+     "D9",
+     "E9",
+     "J9",
+     "M9",
+     "F10",
+     "H10",
+     "K10",
+     "M10",
+     "H11",
+     "N11",
+     "E12",
+     "K12",
+     "G15"
+    ],
+    "side": "BLACK",
+    "white": [
+     "M1",
+     "H2",
+     "K2",
+     "H4",
+     "J5",
+     "L5",
+     "J6",
+     "N6",
+     "H7",
+     "N7",
+     "J8",
+     "L8",
+     "B9",
+     "H12",
+     "O12",
+     "I13",
+     "O13"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 6"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-12",
+   "position": {
+    "black": [
+     "G5",
+     "J6",
+     "F7",
+     "H7",
+     "F8",
+     "H8",
+     "O9",
+     "C10",
+     "F10",
+     "B11",
+     "J11",
+     "K13"
+    ],
+    "side": "WHITE",
+    "white": [
+     "C1",
+     "B3",
+     "D5",
+     "I5",
+     "F6",
+     "L6",
+     "G8",
+     "I9",
+     "N10",
+     "D11",
+     "I13"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 4"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-13",
+   "position": {
+    "black": [
+     "G5",
+     "N5",
+     "H7",
+     "B8",
+     "H8",
+     "O8",
+     "B9",
+     "E10",
+     "H10",
+     "M10",
+     "O11",
+     "E12",
+     "J13"
+    ],
+    "side": "BLACK",
+    "white": [
+     "M6",
+     "O6",
+     "F7",
+     "L7",
+     "G8",
+     "D9",
+     "M9",
+     "I10",
+     "D11",
+     "G11",
+     "H11",
+     "H13",
+     "J15"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 18"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-14",
+   "position": {
+    "black": [
+     "D4",
+     "A5",
+     "C5",
+     "D6",
+     "O6",
+     "E7",
+     "F7",
+     "H8",
+     "K8",
+     "O8",
+     "F10",
+     "L10",
+     "N10",
+     "D11",
+     "G11",
+     "E13",
+     "F13",
+     "D14",
+     "G14",
+     "F15"
+    ],
+    "side": "WHITE",
+    "white": [
+     "E2",
+     "E4",
+     "H4",
+     "I5",
+     "J5",
+     "F6",
+     "G6",
+     "M6",
+     "L7",
+     "M7",
+     "I9",
+     "C10",
+     "H10",
+     "I10",
+     "F12",
+     "G12",
+     "C14",
+     "B15",
+     "G15"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 6"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-15",
+   "position": {
+    "black": [
+     "H8",
+     "F9",
+     "J10",
+     "F11",
+     "H11",
+     "J12",
+     "G13",
+     "I13",
+     "H14"
+    ],
+    "side": "WHITE",
+    "white": [
+     "L7",
+     "J9",
+     "E10",
+     "E11",
+     "G11",
+     "J11",
+     "H12",
+     "I14"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 4"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-16",
+   "position": {
+    "black": [
+     "N1",
+     "O3",
+     "E4",
+     "M4",
+     "N4",
+     "H5",
+     "F6",
+     "H6",
+     "D7",
+     "F7",
+     "J7",
+     "E8",
+     "H8",
+     "I8",
+     "H9",
+     "L9",
+     "N10"
+    ],
+    "side": "WHITE",
+    "white": [
+     "E1",
+     "F3",
+     "A5",
+     "D5",
+     "K5",
+     "C6",
+     "K6",
+     "O6",
+     "H7",
+     "I7",
+     "F8",
+     "E9",
+     "F9",
+     "G10",
+     "H11",
+     "K11"
+    ]
+   },
+   "profile": "OMOKDOJANG_DAN",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 4"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-17",
+   "position": {
+    "black": [
+     "B1",
+     "C1",
+     "D1",
+     "B3",
+     "F3",
+     "H3",
+     "K3",
+     "I4",
+     "D5",
+     "F5",
+     "L6",
+     "F7",
+     "G7",
+     "J7",
+     "H8",
+     "K8",
+     "F9",
+     "K9",
+     "E11"
+    ],
+    "side": "WHITE",
+    "white": [
+     "A2",
+     "D3",
+     "I3",
+     "J3",
+     "C4",
+     "N4",
+     "E5",
+     "G6",
+     "N6",
+     "H7",
+     "L8",
+     "G9",
+     "H9",
+     "I9",
+     "L9",
+     "E10",
+     "J10",
+     "F11"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 8"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-18",
+   "position": {
+    "black": [
+     "K3",
+     "N5",
+     "H7",
+     "J7",
+     "H8",
+     "I8",
+     "M8",
+     "F9",
+     "A10",
+     "C10",
+     "F10",
+     "I10",
+     "F12",
+     "I12",
+     "M12",
+     "C13",
+     "J13",
+     "A14",
+     "F14",
+     "J14",
+     "F15"
+    ],
+    "side": "BLACK",
+    "white": [
+     "H2",
+     "I3",
+     "J4",
+     "N4",
+     "L5",
+     "M6",
+     "F7",
+     "N7",
+     "G8",
+     "J9",
+     "L10",
+     "N10",
+     "D11",
+     "F11",
+     "H11",
+     "C12",
+     "B13",
+     "F13",
+     "K13",
+     "N13",
+     "H14"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 4"
+   }
+  },
+  {
+   "category": "proven-loss",
+   "expected": {
+    "result": "LOSS"
+   },
+   "id": "gen-loss-3-19",
+   "position": {
+    "black": [
+     "G1",
+     "F3",
+     "G3",
+     "D4",
+     "F5",
+     "J6",
+     "C7",
+     "F7",
+     "B8",
+     "H8",
+     "C9",
+     "G9",
+     "J10",
+     "E11",
+     "A14"
+    ],
+    "side": "WHITE",
+    "white": [
+     "E2",
+     "G6",
+     "I6",
+     "B7",
+     "D8",
+     "B10",
+     "F10",
+     "G10",
+     "M10",
+     "C11",
+     "L11",
+     "N11",
+     "B13",
+     "M13"
+    ]
+   },
+   "profile": "RENJU_RIF",
+   "query": "loss",
+   "source": {
+    "generator": "dojozero_tactics generate --kind loss --seed 3",
+    "kind": "generated+verified",
+    "note": "claim verified full-width by tactics/verify (GameState only); pv length 8"
+   }
+  }
+ ],
+ "schema_version": 1,
+ "suite": "generated-loss"
+}

@@ -32,7 +32,7 @@ forbidden-rule accuracy 지표(NN aux head의 금수 예측 정확도)는 별개
 ## 3. 전술 평가 (Milestone 2 게이트)
 - 세트: `benchmarks/{tactical,vcf,vct,endgame,adversarial}` (학습 데이터에 포함 금지 — 해시로 누출 검사).
 - 문제 출처: 손으로 구성·검토한 문제, 공개 문제집(출처·라이선스 기록, 좌표만), 차등 비교로 발견한 사례. **자기 solver가 만든 문제만으로 구성하지 않는다**(순환 검증).
-- 지표: solve rate(시간/노드 budget별 곡선), 평균 노드·시간, **오답률(WIN을 잘못 주장)** — 0이어야 함. 모든 WIN 주장은 PV 재생으로 검증.
+- 지표: solve rate(시간/노드 budget별 곡선), 평균 노드·시간, **오답률(WIN을 잘못 주장)** — 0이어야 함. 모든 WIN/LOSS 주장은 독립 검증기(`cpp/tactics/verify.*`: GameState 규칙만 사용, 방어자 노드 full-width)로 재검증하며, 검증기가 REFUTED를 내면 false claim.
 - `UNKNOWN`과 `LOSS` 혼동 검사: LOSS로 보고된 모든 문제는 독립 검증(완전 탐색 가능한 소형 사례 또는 교차 엔진).
 - 금수 관련 전술 하위 세트: 금수 유도로만 이기는 백 VCF, 거짓금수를 이용한 흑 승리, 흑 차단점이 금수인 방어 실패.
 
@@ -104,7 +104,9 @@ Intel Core Ultra 7 258V (4P+4LPE), 32 GB, Intel Arc 140V iGPU, Windows 11, MSVC 
 | apply+undo /s (단일 스레드) | ≥ 10M | GameState 3.4M (합법성 검사 포함) / Board place+remove 74M | **미달**. GameState 비용 대부분은 흑 착수마다의 금수 판정(~0.4µs). ADR-01 참조 |
 | 흑 금수 판정 /s (중반 국면, 무작위 빈 점) | ≥ 1M | 2.1M (중반 평균 43돌), 2.9M (흑 밀집 퍼징 국면); p50 300–400ns, p99 700–900ns, max 0.4–1.1ms | 충족. max 이상치(깊은 재귀 또는 OS 지터)는 미조사 |
 | legal_actions 생성 /s | ≥ 200k | 25k (NORMAL_RENJU, 흑 차례 포함) | **미달**. 빈 점마다 금수 판정 → 증분 금수 캐시 필요 (Phase 5 전 ADR-01 재검토) |
-| VCF nodes/s | ≥ 1M | (Phase 3) | |
+| VCF nodes/s | ≥ 1M | 70–78k (Phase 3, `dojozero_tactics perf`) | **미달 (~13배)**. 노드마다 전체 보드 스캔으로 위협 재계산. 증분 위협 추적(ADR-01 C안 line code) 필요 |
+| df-pn (VCT) nodes/s | — | 13.5–14k | AND 노드가 방어자 전체 합법수를 실제 보드에서 반박 검사(건전성 비용) |
+| analyze_tactics 지연 | — | 노드 예산만: p50 0ms, p90 ~20ms, p99 4.5s, max 6.1s / `max_ms=500`: p99 308ms, max 311ms | MCTS 통합 시 시간 상한 필수 |
 | MCTS nodes/s (uniform evaluator) | ≥ 500k | (Phase 5) | NN 제외 순수 트리 비용 |
 | batched NN eval/s | 실측 후 설정 | (Phase 4) | 모델 크기·배치별 표 |
 | 평균 탐색 지연 (FAST/STANDARD) | 실측 후 설정 | (Phase 5) | |

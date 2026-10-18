@@ -176,6 +176,19 @@ struct ProofOutput { ProofResult result; std::vector<Action> pv; uint64_t nodes;
   4. budget 소진·탐색 범위 밖 → `UNKNOWN`. "VCF 없음"은 `LOSS`가 아니다.
 - 의사결정 우선순위 (`AIEngine`): 즉시 5 → 상대 즉시 5 방어(강제) → 증명된 전술 WIN/LOSS → neural MCTS.
 
+**Phase 3 구현 현황 (모듈 ↔ 파일)**
+| 명세 모듈 | 구현 | 비고 |
+|---|---|---|
+| ThreatDetector | `cpp/tactics/threats.*` | five point, four, 이중위협(open four / 백 4-4), three(흑: 진짜 three) |
+| VCFSolver | `cpp/tactics/vcf.*` | DFS + 실패 TT + 노드/깊이 예산. `NONE`은 깊이 제한에 걸리지 않았을 때만 "VCF 없음"으로 해석 |
+| VCTSolver / ThreatSpaceSearch | `cpp/tactics/dfpn.*` (threat-restricted OR 노드) | **별도 TSS 모듈은 없음**: df-pn의 OR 노드 수생성(four + three)이 threat space 역할 |
+| ProofNumberSolver | `cpp/tactics/dfpn.*` | df-pn, `PROVE_WIN` / `PROVE_LOSS`, `fours_only` 옵션 |
+| (검증) | `cpp/tactics/verify.*` | GameState만으로 증명 트리 full-width 재검증. 힌트는 후보 제안만 |
+| AIEngine 전술층 | `cpp/tactics/engine.*` `analyze_tactics` | 즉시 승리 → 방어 불가/강제 차단 → VCF → VCT → 증명된 패배 |
+| 벤치마크 러너 | `cpp/tactics/benchmark.*`, CLI `benchmark`, `dojozero_tactics` | 모든 WIN/LOSS 주장 독립 검증 |
+
+AND 노드 건전성: 방어자의 모든 합법수(패스 포함)를 생성하고, "그 수 이후 실제 보드에서 공격자가 합법적인 이중위협(five point 2개)을 만들 수 있고 방어자에게 five point가 없음"이 확인된 수만 제외한다. 흑 금수의 비단조성(백 돌이 흑의 수를 금수로 만들 수 있음) 때문에 사전 계산된 위협이 사라질 수 있으므로, 제외 판정은 반드시 해당 수를 둔 뒤 재검사한다.
+
 ### 3.8 Features (NN 입력)
 - `encode(const GameState&, const FeatureConfig&, float* out)` → `C×15×15`. `FeatureConfig`(plane 목록·history K·tactical planes on/off)는 해시되어 체크포인트·ONNX manifest에 기록. 로드시 불일치면 거부.
 - Plane 목록 (기본, 행위자 관점):
