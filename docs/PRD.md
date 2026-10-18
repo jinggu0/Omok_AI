@@ -253,7 +253,7 @@ C++ 라이브러리·`dojozero_engine.exe`, Python 패키지 `dojozero`(+`dojoze
 | OQ-04 | 외부 기준 엔진(Rapfi 등) 바이너리 다운로드·평가 사용 허용? | M3 평가 |
 | OQ-05 | 타 엔진이 생성한 기보를 학습 데이터로 써도 되는가(Stage C)? | M3 |
 | OQ-06 | compute 제약이 심할 경우 AlphaZero 대신(또는 병행) CPU 친화 alpha-beta + 경량 NN(NNUE류) 아키텍처를 검토할 것인가? 권장: 명세대로 AlphaZero로 진행하되 M3 실측 후 재평가 | M3 |
-| OQ-07 | PyTorch XPU(Intel GPU) 빌드 설치 허용? 실패 시 CPU 학습 또는 외부 GPU | M3(Phase 4) |
+| OQ-07 | ~~PyTorch XPU(Intel GPU) 빌드 설치 허용?~~ **해결**: 사용자 승인으로 torch 2.14.1+xpu 설치(Phase 4). XPU 백엔드 우회 3건은 PROGRESS 참조 | — |
 | OQ-08 | `pass_allowed` 기본값(C-06) | 없음 |
 | OQ-09 | 10제안 대칭 모드 기본값 E1 vs E3 (C-10) | 없음(옵션) |
 | OQ-10 | 프로젝트 라이선스 | Final |

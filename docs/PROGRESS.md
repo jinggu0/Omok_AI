@@ -5,6 +5,50 @@ and what is still open. Newest phase first.
 
 ---
 
+## Phase 4 — Neural network, dataset pipeline, supervised pretraining (2026-10-18)
+
+### Environment
+`.venv` (Python 3.11.9): torch **2.14.1+xpu** (공식 XPU 인덱스), numpy 2.4.6, PyYAML 6.0.3, pytest 9.1.1 (`runs/venv_freeze.txt`). Intel Arc 140V 드라이버 32.0.101.8626. `torch.xpu.is_available() == True`.
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| C++ feature encoder (26 plane 기본, 옵션 history/tactical/forbidden), legal mask, aux targets | `cpp/features/features.*` |
+| pybind11 바인딩 `dojozero._core` (GameState, encode, encode_boards[멀티스레드], aux, transform table, analyze_tactics) | `cpp/bindings/module.cpp`, CMake `_core` |
+| Stage A 데이터 생성기 (solver 라벨, NPY + manifest) | `cpp/tools/datagen.cpp` → `dojozero_datagen` |
+| Python 패키지: feature spec·D4 증강, ResNet policy/value/aux/opening heads, 마스킹 손실, 데이터셋(캐시·결정적 split·벤치마크 누출 제외), 체크포인트, 트레이너, 평가 | `python/dojozero/`, `pyproject.toml` |
+| 장치 벤치마크, 네트워크 전술 해결률 평가 | `python/dojozero/tools/bench_device.py`, `evaluation/net_tactics.py` |
+| 설정 | `configs/training/stage_b_tactical.yaml` |
+
+### Verified
+| 검증 | 결과 |
+|---|---|
+| `dojozero_tests` Release | 235개 중 234 통과, 1 skip (변화 없음) |
+| `pytest tests/python` | 17/17 통과: D4 증강 = C++ 재인코딩(8변환, 2 profile), legal mask = legal_actions, encode_boards = 단일 encode, 손실 마스킹/불법 target 거부/NaN 감지, **CPU 결정적 모드에서 체크포인트 재개가 손실 단위로 정확히 일치**, XPU foreach 회피 |
+| XPU 수치 | 같은 배치·가중치에서 CPU 대비: fp32 손실 일치(소수 5자리), 기울기 상대오차 1.2e-4; bf16 기울기 상대오차 8.7%(bf16 정밀도 수준) |
+| Stage A 데이터 | 120,000 샘플, 중복 1건 제거, 라벨 분포는 TRAINING §2.1 |
+| Stage B 학습 (`runs/stage_b_b6c64_v1`, B6C64 422k 파라미터, 6,000 step × b256, XPU bf16) | holdout(5%, 벤치마크 국면 제외): policy top-1 즉시승 100% / VCF 70.9% / VCT 54.5% / 강제차단 100%(n=38) — 무작위 합법수 기준선 0.5–1.2%; 증명 가치 정확도 98.0% |
+| 네트워크 단독(탐색 없음) 고정 벤치마크 승리 문제 73개 | **83.6% 해결**(VCF 90.9%, VCT 69.2%, 금수유도 100%, 1수승 100%) vs 미학습 13.7%. 해결 판정은 C++ solver(네트워크 수 이후 상대가 증명된 패배) |
+| XPU 크래시 후 재개 | step 2000 체크포인트에서 재개, 같은 step 손실이 원 실행과 0.1% 이내 |
+
+### 계획 대비 차이 / 발견 (중요)
+1. **PyTorch XPU 백엔드 문제 3건 발견·우회**:
+   (a) 불리언 마스크 인덱싱(동적 shape)이 `UR_RESULT_ERROR_OUT_OF_RESOURCES`/네이티브 assert → 손실을 마스크 가중합으로 재작성(수학적으로 동일, 테스트로 확인);
+   (b) **foreach AdamW가 간헐적으로 잘못된 업데이트**(한 스텝에 |w| 1→31, 이후 NaN) → `foreach=False`;
+   (c) `clip_grad_norm_`의 foreach 커널에서 네이티브 크래시(학습 2,800 step에서 종료) → `foreach=False`. 회귀 테스트 추가.
+   NaN 감지가 (b)를 즉시 잡아냈다(조용한 실패 없음). PRD 리스크 R-04가 실제로 발생한 사례.
+2. **ONNX export 미구현** — onnx/onnxruntime 미설치. 추론 런타임 결정(ADR-02)은 Phase 5로.
+3. 학습 데이터·벤치마크가 **같은 생성 방식(무작위 대국)** 이라 벤치마크 해결률은 분포 내 진단이다. 실전 기력 근거 아님.
+4. 데이터 생성 중 노트북 절전으로 추정되는 벽시계 공백(~6시간)이 있었다(datagen `seconds` 값과 pytest 소요시간 표기에 영향, 결과에는 무영향).
+5. 보조 head 중 **forbidden recall 14.8%**, three_threat recall 68%: 양성 라벨이 드물어 BCE가 0 쪽으로 치우침(forbidden은 입력 plane에도 있어 사실상 복사 문제). pos_weight 조정은 다음 단계 후보.
+6. policy 라벨이 "증명된 첫수 1개"라 다른 승리수를 둔 경우 오답 처리됨 → holdout top-1은 하한 추정.
+
+### Open
+- OQ-03(목표 기력 정의·외부 GPU), OQ-04/05(외부 엔진) 미결.
+- Phase 5 전제: 추론 런타임(ADR-02) 측정, MCTS nodes/s, 전술 solver 속도(Phase 3 미달 항목).
+
+---
+
 ## Phase 3 — Tactical solver + tactical benchmark (2026-10-18)
 
 ### Delivered

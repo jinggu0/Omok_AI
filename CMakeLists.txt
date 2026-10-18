@@ -7,6 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(DOJOZERO_BUILD_TESTS "Build unit tests" ON)
 option(DOJOZERO_BUILD_TOOLS "Build CLI and benchmark tools" ON)
+option(DOJOZERO_BUILD_PYTHON "Build the dojozero._core Python extension" ON)
 
 if(MSVC)
   add_compile_options(/W4 /permissive- /utf-8 /EHsc /Zc:__cplusplus)
@@ -25,6 +26,22 @@ FetchContent_Declare(nlohmann_json
 FetchContent_MakeAvailable(nlohmann_json)
 
 add_subdirectory(cpp)
+
+if(DOJOZERO_BUILD_PYTHON)
+  # ADR-05: CMake builds the extension and copies it into python/dojozero/ (editable package).
+  # Configure with -DPython_EXECUTABLE=<repo>/.venv/Scripts/python.exe to target the project venv.
+  set(PYBIND11_FINDPYTHON ON)
+  find_package(Python 3.11 COMPONENTS Interpreter Development.Module REQUIRED)
+  FetchContent_Declare(pybind11
+    URL https://github.com/pybind/pybind11/archive/refs/tags/v2.13.6.zip
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+  FetchContent_MakeAvailable(pybind11)
+  pybind11_add_module(_core cpp/bindings/module.cpp)
+  target_link_libraries(_core PRIVATE dojozero_core)
+  add_custom_command(TARGET _core POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:_core> ${PROJECT_SOURCE_DIR}/python/dojozero/
+    COMMENT "Copying _core into python/dojozero")
+endif()
 
 if(DOJOZERO_BUILD_TESTS)
   enable_testing()

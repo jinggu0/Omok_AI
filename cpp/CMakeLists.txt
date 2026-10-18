@@ -17,6 +17,7 @@ add_library(dojozero_core STATIC
   tactics/verify.cpp
   tactics/engine.cpp
   tactics/benchmark.cpp
+  features/features.cpp
 )
 target_include_directories(dojozero_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(dojozero_core PUBLIC nlohmann_json::nlohmann_json)
@@ -33,4 +34,7 @@ if(DOJOZERO_BUILD_TOOLS)
 
   add_executable(dojozero_tactics tools/tactics_tool.cpp)
   target_link_libraries(dojozero_tactics PRIVATE dojozero_core)
+
+  add_executable(dojozero_datagen tools/datagen.cpp)
+  target_link_libraries(dojozero_datagen PRIVATE dojozero_core)
 endif()

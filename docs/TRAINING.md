@@ -37,6 +37,8 @@ Status: **Draft v0.1** · 2026-10-18
 - 라벨: policy target = 증명된 승리 첫 수 집합의 균등 분포(승리 국면) / 차단수 집합(방어), value target = 증명 결과(WIN/LOSS)만, UNKNOWN 국면은 **value target 없음**(마스킹). UNKNOWN을 LOSS/DRAW로 라벨링 금지.
 - 메타데이터: 생성기 버전, solver budget, seed, profile hash.
 
+**Phase 4 구현 (`dojozero_datagen`, `data/stage_a_v1`, git 미추적)**: 무작위 NORMAL_RENJU 중반 국면(RENJU_RIF·OMOKDOJANG_DAN 반반, canonical D4 hash 중복 제거) 120,000개를 `analyze_tactics`(VCF 8k / VCT 3k / LOSS 1.5k 노드)로 라벨링. policy: 즉시승 → 모든 five point, VCF/VCT/강제차단 → 증명된 수 1개(다른 승리수가 있어도 1개만이라 편향 있음). value: 증명된 WIN/LOSS만, UNKNOWN은 마스킹. 실측 분포: IMMEDIATE_WIN 43.5%, VCF 22.9%, NONE 13.6%, PROVEN_LOSS 8.4%, NO_DEFENSE 6.3%, VCT 4.7%, FORCED_BLOCK 0.6% — **무작위 대국 국면이라 즉시승리에 치우침**(실전 국면 분포와 다름). 생성 속도 ~33 샘플/s(8스레드, 라벨링이 지배적).
+
 ### 2.2 Stage B — supervised 전술 사전학습
 - 손실: §4 전체 (policy + value(증명된 것만) + aux).
 - 홀드아웃: 생성 seed가 다른 별도 세트 + `benchmarks/tactical`(학습 금지 세트).

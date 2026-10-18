@@ -5,7 +5,7 @@ Design docs: [docs/PRD.md](docs/PRD.md) · [RULES](docs/RULES.md) · [ARCHITECTU
 [TRAINING](docs/TRAINING.md) · [EVALUATION](docs/EVALUATION.md) · [ASSUMPTIONS](docs/ASSUMPTIONS.md) ·
 status: [PROGRESS](docs/PROGRESS.md).
 
-Current state: **Phase 3 (rule engine + tactical solver) complete.** No neural network yet.
+Current state: **Phase 4 complete** — rule engine, tactical solver, feature encoder + Python bindings, supervised tactical pretraining (no search/MCTS yet).
 
 ## Build (Windows, MSVC 2022, CMake ≥ 3.24)
 ```bash
@@ -34,6 +34,26 @@ cmake --build build/msvc --config Release
 ```
 ```bash
 ./build/msvc/cpp/Release/dojozero_engine.exe benchmark --suite benchmarks
+```
+
+## Python (training)
+```bash
+python -m venv .venv
+```
+```bash
+./.venv/Scripts/python.exe -m pip install torch --index-url https://download.pytorch.org/whl/xpu
+```
+```bash
+./.venv/Scripts/python.exe -m pip install -e .[dev]
+```
+```bash
+cmake --preset msvc -DPython_EXECUTABLE=.venv/Scripts/python.exe
+```
+```bash
+./build/msvc/cpp/Release/dojozero_datagen.exe --out data/stage_a_v1 --samples 120000 --seed 1 --threads 8 --vcf-nodes 8000 --vct-nodes 3000 --loss-nodes 1500
+```
+```bash
+./.venv/Scripts/python.exe -m dojozero.trainer.train --config configs/training/stage_b_tactical.yaml
 ```
 
 Coordinates: columns A–O (left to right), ranks 1–15 (bottom to top), `H8` = centre.

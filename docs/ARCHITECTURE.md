@@ -210,6 +210,9 @@ AND 노드 건전성: 방어자의 모든 합법수(패스 포함)를 생성하�
   | (opt) | tactical planes: 양측 five/four/three 위협점 | `use_tactical_feature_planes` ablation |
 - D4 증강은 `GameState::transformed` + 동일 encode로 수행(Python 쪽 배열 회전으로 하지 않음 → 회전 규약 불일치 원천 차단). 대안으로 Python 회전을 쓰려면 C++ 결과와 일치 테스트 필수.
 
+**Phase 4 구현 (`cpp/features/features.*`, FeatureConfig v1)**: 기본 26 plane = 돌 4(actor/opponent/black/white) + last_move + history K(기본 0) + legal + black_forbidden(옵션, 기본 on) + actor_is_black + placement_region + offered + chosen_fifth + phase one-hot 15 + tactical 6(옵션, 기본 off → ablation E). 모든 plane은 0/1이며 `FeatureConfig::hash()`(plane 이름 목록 + version)가 체크포인트에 기록되고 불일치 시 로드 거부. 학습 시 D4 증강은 캐시된 plane을 **C++ 변환표**(`_core.transform_table`)로 치환하며, `encode(transform(s)) == permute(encode(s))`를 Python 테스트로 검증(대안 경로를 택했으므로 일치 테스트 필수 조건을 충족).
+보조 타깃(`aux_targets`): immediate_win, forced_block, four_threat, three_threat, forbidden — 학습 시 C++에서 재계산(데이터에 저장하지 않음).
+
 ### 3.9 NN Evaluator 인터페이스
 ```cpp
 struct EvalRequest { const float* features; PhaseHeadMask heads; const uint8_t* legal_mask; };
@@ -341,9 +344,9 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 | ID | 결정 | 결정 시점 | 기준 |
 |---|---|---|---|
 | ADR-01 | Board 표현 A/B/C | Phase 2 말 → **부분 결정**: A(padded array + 8중 증분 Zobrist) 채택. 금수 판정 2.1M/s로 목표 충족, apply+undo(3.4M/s)·legal_actions(25k/s)는 미달. C(line code + 생성 테이블 + 증분 금수 캐시)는 Phase 2에서 **구현하지 않음** — MCTS nodes/s를 실측하는 Phase 5 전에 병목 여부로 재결정 | apply/undo/s, forbidden/s, 정확성 동일 |
-| ADR-02 | 추론 런타임 (ORT CPU / OpenVINO / DirectML / PyBridge / libtorch) | Phase 4–5 | batched eval/s, 지연, 설치 용이성 |
+| ADR-02 | 추론 런타임 (ORT CPU / OpenVINO / DirectML / PyBridge / libtorch) | Phase 4–5 → **Phase 5에서 결정**. Phase 4 기준점(PyTorch, B6C64): CPU fp32 최대 ~316 eval/s(b512), XPU bf16 최대 ~5.6k eval/s(b512), 배치 1은 모든 장치에서 수십 eval/s. ONNX Runtime/OpenVINO는 아직 미설치·미측정 | batched eval/s, 지연, 설치 용이성 |
 | ADR-03 | PUCT vs Gumbel (self-play/대국 각각) | Phase 5–6 | 동일 compute Elo |
-| ADR-04 | 학습 장치 | Phase 4 | step/s, 안정성 |
-| ADR-05 | Python 빌드 방식 | Phase 2 → **Phase 4로 연기** (pybind11 바인딩은 학습 파이프라인에서 처음 필요) | Windows 재현성 |
+| ADR-04 | 학습 장치 | **결정(Phase 4)**: Intel Arc 140V XPU + bf16 autocast + `AdamW(foreach=False)`. 측정(B6C64, b256): CPU fp32 0.18 step/s, XPU fp32 0.74–1.7, XPU bf16 3.4 step/s(측정 편차 큼). XPU foreach AdamW는 간헐적으로 잘못된 업데이트를 내므로 사용 금지 | step/s, 안정성 |
+| ADR-05 | Python 빌드 방식 | **결정(Phase 4)**: CMake가 pybind11(v2.13.6) 확장 `_core`를 빌드해 `python/dojozero/`로 복사, `pyproject.toml`은 순수 Python 패키지(setuptools). scikit-build-core는 배포 단계까지 보류 | Windows 재현성 |
 | ADR-06 | 10제안 정책 방식 (top-k vs autoregressive vs beam) | Phase 7 | 제안 품질(regret) + Elo |
 | ADR-07 | ResNet vs Hybrid attention | Phase 6–8 | Elo/compute |

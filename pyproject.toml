@@ -1,0 +1,24 @@
+[project]
+name = "dojozero"
+version = "0.4.0"
+description = "Renju (RIF) + Taraguchi-10 engine: training and evaluation tooling"
+requires-python = ">=3.11"
+dependencies = ["numpy", "pyyaml"]
+# torch is installed separately from the PyTorch XPU index (docs/PROGRESS.md Phase 4):
+#   pip install torch --index-url https://download.pytorch.org/whl/xpu
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.setuptools.package-data]
+dojozero = ["*.pyd", "*.so"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
