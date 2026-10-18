@@ -57,12 +57,21 @@ def solves(g, move: int, budget: int) -> bool:
     return d["result"] == "LOSS"
 
 
-def evaluate_model(model, spec: FeatureSpec, problems: list[dict], device, budget: int) -> dict:
+def evaluate_model(model, spec: FeatureSpec, problems: list[dict], device, budget: int, sims: int = 0) -> dict:
+    """sims == 0: network policy only. sims > 0: MCTS with that many simulations, root tactics OFF
+    (otherwise the C++ solver, not the network+search, would answer)."""
     model.eval()
     by_cat: dict[str, list[int]] = defaultdict(list)
-    for p in problems:
-        g = _core.GameState.from_spec(json.dumps(p["position"]), p.get("profile", "RENJU_RIF"))
-        by_cat[p["category"]].append(int(solves(g, top_move(model, spec, g, device), budget)))
+    states = [_core.GameState.from_spec(json.dumps(p["position"]), p.get("profile", "RENJU_RIF")) for p in problems]
+    if sims > 0:
+        from ..search.driver import NetEvaluator, SearchSettings, search_many
+        settings = SearchSettings(simulations=sims, root_tactics_nodes=0)
+        res = search_many(states, NetEvaluator(model, device), settings, spec.core())
+        moves = [_core.str_to_point(r["action"]) if r["action"] not in ("pass",) else 225 for r in res]
+    else:
+        moves = [top_move(model, spec, g, device) for g in states]
+    for p, g, m in zip(problems, states, moves):
+        by_cat[p["category"]].append(int(solves(g, m, budget)))
     res = {f"solve_rate/{k}": float(np.mean(v)) for k, v in sorted(by_cat.items())}
     res["solve_rate/all"] = float(np.mean([x for v in by_cat.values() for x in v]))
     res["problems"] = sum(len(v) for v in by_cat.values())
@@ -73,6 +82,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--checkpoint", required=True)
     ap.add_argument("--budget", type=int, default=20000)
+    ap.add_argument("--sims", type=int, default=0, help="0 = policy only; >0 = MCTS (root tactics off)")
     ap.add_argument("--out")
     args = ap.parse_args()
     device = torch.device("cpu")
@@ -86,8 +96,9 @@ def main() -> int:
     torch.manual_seed(ck["config"]["seed"])
     untrained = PolicyValueNet(mcfg)
     result = {"checkpoint": args.checkpoint, "step": ck["step"],
-              "trained": evaluate_model(trained, spec, problems, device, args.budget),
-              "untrained_baseline": evaluate_model(untrained, spec, problems, device, args.budget)}
+              "sims": args.sims,
+              "trained": evaluate_model(trained, spec, problems, device, args.budget, args.sims),
+              "untrained_baseline": evaluate_model(untrained, spec, problems, device, args.budget, args.sims)}
     text = json.dumps(result, indent=2)
     print(text)
     if args.out:

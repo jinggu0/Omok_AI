@@ -246,6 +246,13 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
          ProposalSet generate_ten_fifths(const GameState&, const SearchLimits&); };
 ```
 
+**Phase 5 구현 (`cpp/search/search.*`, `cpp/search/bots.*`, `python/dojozero/search/driver.py`)**
+- 트리: 노드/엣지 arena, 값은 모두 P0 관점 합계, 선택 시 노드 actor 관점으로 변환. PUCT(FPU reduction) 또는 Gumbel 루트(Gumbel-top-k, Sequential Halving, σ(q̂)=(c_visit+max N)·c_scale·q̂, q̂=(q+1)/2 아핀 정규화; 개선 정책 = softmax(logit+σ(completed q))). Gumbel 결과의 `value`는 선택한 수의 Q(SH가 방문을 고르게 나누므로 루트 평균은 가치 추정이 아님).
+- MCTS-solver: 자식 중 actor 승 증명 → 노드 증명; 모든 자식 증명 → 최선값. 증명된 노드 재방문은 정확값 백업.
+- 리프 전술(`leaf_tactics`): 자기 five point → 증명 승, 상대 five point 2개 이상/금수 차단 → 증명 패, 1개 → 그 차단만 자식으로. 선택적 리프 VCF. 루트: 즉시 승 + `analyze_tactics`(노드 예산) → 증명 승이면 탐색 생략.
+- 배치: `Tree::select(features)`/`complete(ticket, eval)`, virtual loss(트리당 in-flight 상한). Python `SearchBatch`가 여러 트리의 리프를 모아 한 번에 평가(제어 역전: C++ 스레드에서 Python 호출 없음), 트리 생성(루트 전술)은 `add_many`로 병렬. 네트워크 배치는 고정 버킷 크기로 패딩(XPU에서 shape마다 커널 준비 비용).
+- 트리 재사용, 루트 Dirichlet 노이즈, 시간 기반 탐색 한도는 **아직 없음**(Phase 6 self-play에서 추가).
+
 ### 3.11 Self-play runtime (Phase 6)
 - `dojozero_engine selfplay --config ... --model <manifest>`: G개 동시 게임, 결과를 chunk 파일로 기록(§5.1). 파일은 `tmp → rename` 원자적 쓰기.
 - 모델 갱신: `runs/<run>/models/manifest.json`(현재 best/candidate 버전, hash) 폴링. 기보에 사용 모델 hash 기록.
@@ -345,7 +352,7 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 |---|---|---|---|
 | ADR-01 | Board 표현 A/B/C | Phase 2 말 → **부분 결정**: A(padded array + 8중 증분 Zobrist) 채택. 금수 판정 2.1M/s로 목표 충족, apply+undo(3.4M/s)·legal_actions(25k/s)는 미달. C(line code + 생성 테이블 + 증분 금수 캐시)는 Phase 2에서 **구현하지 않음** — MCTS nodes/s를 실측하는 Phase 5 전에 병목 여부로 재결정 | apply/undo/s, forbidden/s, 정확성 동일 |
 | ADR-02 | 추론 런타임 (ORT CPU / OpenVINO / DirectML / PyBridge / libtorch) | Phase 4–5 → **Phase 5에서 결정**. Phase 4 기준점(PyTorch, B6C64): CPU fp32 최대 ~316 eval/s(b512), XPU bf16 최대 ~5.6k eval/s(b512), 배치 1은 모든 장치에서 수십 eval/s. ONNX Runtime/OpenVINO는 아직 미설치·미측정 | batched eval/s, 지연, 설치 용이성 |
-| ADR-03 | PUCT vs Gumbel (self-play/대국 각각) | Phase 5–6 | 동일 compute Elo |
+| ADR-03 | PUCT vs Gumbel (self-play/대국 각각) | Phase 5–6 → **미결**: 둘 다 구현·정확성 검증, 매치는 PUCT만 수행. Phase 6에서 동일 compute 비교 | 동일 compute Elo |
 | ADR-04 | 학습 장치 | **결정(Phase 4)**: Intel Arc 140V XPU + bf16 autocast + `AdamW(foreach=False)`. 측정(B6C64, b256): CPU fp32 0.18 step/s, XPU fp32 0.74–1.7, XPU bf16 3.4 step/s(측정 편차 큼). XPU foreach AdamW는 간헐적으로 잘못된 업데이트를 내므로 사용 금지 | step/s, 안정성 |
 | ADR-05 | Python 빌드 방식 | **결정(Phase 4)**: CMake가 pybind11(v2.13.6) 확장 `_core`를 빌드해 `python/dojozero/`로 복사, `pyproject.toml`은 순수 Python 패키지(setuptools). scikit-build-core는 배포 단계까지 보류 | Windows 재현성 |
 | ADR-06 | 10제안 정책 방식 (top-k vs autoregressive vs beam) | Phase 7 | 제안 품질(regret) + Elo |

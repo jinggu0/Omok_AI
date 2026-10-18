@@ -5,6 +5,56 @@ and what is still open. Newest phase first.
 
 ---
 
+## Phase 5 — MCTS / Gumbel search and search verification (2026-10-18)
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| 탐색 트리: PUCT·Gumbel 루트(SH), MCTS-solver, actor-aware 백업(P0 관점 값), 리프/루트 전술, virtual loss, 동기·배치 API, 불변식 검사 | `cpp/search/search.*` |
+| 기준 봇: random-legal, 1-ply 휴리스틱 | `cpp/search/bots.*` |
+| 바인딩: `SearchConfig`, `SearchBatch`(다중 트리 collect/apply, 병렬 `add_many`), 봇, `black_holder` | `cpp/bindings/module.cpp` |
+| Python 배치 탐색 드라이버(PyTorch XPU bf16, 버킷 패딩) | `python/dojozero/search/driver.py`, `model/load.py` |
+| 쌍대국 매치 러너 + 통계(pentanomial, 정규·Wilson CI, Elo) | `python/dojozero/evaluation/match.py` |
+| 벤치마크: 탐색 포함 전술 해결률(`net_tactics --sims`), 트리 비용(`dojozero_bench_search`) | |
+
+### Verified — 탐색 정확성
+| 검증 | 결과 |
+|---|---|
+| `dojozero_tests` Release / Debug(탐색·오프닝·규칙) | 246개 중 245 통과 + 1 skip / 28/28 |
+| `pytest tests/python` | 22/22 (배치 크기 1 vs 256 결과 동일, 모든 phase에서 합법 action, 망 탐색이 즉시승 증명) |
+| swap 결정(플레이어≠색) | 첫 결정으로 승자가 고정되는 일관된 평가기에서 PUCT·Gumbel 모두 올바른 swap/keep 선택, 자식 Q = ±0.9 정확 |
+| 같은 플레이어 연속 결정 (CHOICE_AFTER_4 → SWAP_BEFORE_DIRECT_5 / OFFER) | 두 모드 모두 올바른 분기, 자식 Q가 정확값(0.9/0.6)과 1e-3 이내 — negamax식 부호 반전이면 실패하도록 설계 |
+| MCTS-solver | 루트 전술 없이 균등 prior로 열린 삼 → straight four 승리를 트리에서 증명 |
+| 배치 경로 = 동기 경로 | in-flight 1에서 방문 수까지 동일 (PUCT·Gumbel) |
+| virtual loss 배치(in-flight 8) | 트리 불변식(visits = 1 + Σ자식) 유지, in-flight 0으로 종료 |
+
+### Verified — 강도 (체크포인트 `runs/stage_b_b6c64_v1/checkpoints/step_6000.pt`, OMOKDOJANG_DAN, 무작위 Taraguchi 오프닝 50쌍 = 100판, 역할 교대)
+| A vs B | 점수(A) | Elo [95% CI] | A 흑/백 점수 |
+|---|---|---|---|
+| 엔진(PUCT 64 sims) vs random | 1.00 (100-0) | ≥ +446 | 1.00 / 1.00 |
+| 엔진(PUCT 64) vs 휴리스틱 | 0.69 (68-2-30) | **+139 [+36, +242]** | **0.48** / 0.90 |
+| 정책만(탐색 없음) vs 휴리스틱 | 0.31 | −139 [−242, −36] | 0.16 / 0.46 |
+| 엔진(PUCT 64) vs 정책만 | 0.92 | +424 [+254, +612] | 0.88 / 0.96 |
+고정 벤치마크 승리 문제 73개: 정책만 83.6% → **탐색 64 sims(루트 전술 끔) 91.8%** (VCF 100%, VCT 76.9%); 미학습+탐색 16.4%.
+
+### 성능
+- 트리 비용(균등 평가기, 단일 스레드): PUCT 34–39k sims/s, Gumbel 11–17k sims/s — 목표 500k **크게 미달**. 확장마다 `legal_actions`(빈 점별 금수 판정 ~40µs)가 지배. Gumbel은 σ 계산이 루트 엣지를 매번 순회.
+- 망 평가(탐색 중, B6C64 XPU bf16): 실행마다 0.4k–7.5k eval/s로 편차 큼(XPU 워밍업·내장 GPU 클럭). 고정 버킷 패딩 적용.
+- 매치 50쌍(엔진 vs 휴리스틱) 525초. 루트 전술(5,000 노드) 직렬 실행이 라운드당 42초를 만들던 것을 `add_many` 병렬화로 18.7초 → 이후 ~5초.
+
+### 계획 대비 차이 / 발견
+1. **Milestone 3 "random/heuristic 봇 결정적 격파"는 부분 달성**: random은 결정적, 휴리스틱은 통계적으로 유의(+139)하지만 **엔진이 흑일 때 0.48** — 흑 플레이(금수 제약)가 약점. 학습 데이터가 무작위 국면 전술 위주이고 self-play가 아직 없음.
+2. **ADR-03(PUCT vs Gumbel)은 미결**: 매치는 PUCT로만 했다. Gumbel은 정확성 테스트만 통과.
+3. 첫 테스트 실패 2건은 엔진 버그가 아니라 테스트 설계 오류였다(균등 prior + FPU 감점으로 E8 미탐색; 이후 swap으로 흑을 다시 가져갈 수 있어 "흑이 이긴다" 평가기가 트리와 모순). 트리와 일관된 평가기로 교체 — 이것이 actor-aware 백업을 정확히 검증하는 형태.
+4. 트리 재사용, 루트 Dirichlet 노이즈, 시간 기반 한도 미구현(Phase 6).
+5. 오프닝 결정 헤드(swap/branch/propose/select)는 아직 학습되지 않아 사실상 무작위 prior.
+
+### Open
+- 흑 약점 원인 분석(금수 관련 수 선택? 가치 head 보정?) — Phase 6 self-play 데이터로 재평가 필요.
+- 증분 금수/위협 캐시(ADR-01 C안): 트리 비용·전술 solver·legal_actions 공통 병목.
+
+---
+
 ## Phase 4 — Neural network, dataset pipeline, supervised pretraining (2026-10-18)
 
 ### Environment

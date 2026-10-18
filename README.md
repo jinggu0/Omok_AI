@@ -5,7 +5,7 @@ Design docs: [docs/PRD.md](docs/PRD.md) · [RULES](docs/RULES.md) · [ARCHITECTU
 [TRAINING](docs/TRAINING.md) · [EVALUATION](docs/EVALUATION.md) · [ASSUMPTIONS](docs/ASSUMPTIONS.md) ·
 status: [PROGRESS](docs/PROGRESS.md).
 
-Current state: **Phase 4 complete** — rule engine, tactical solver, feature encoder + Python bindings, supervised tactical pretraining (no search/MCTS yet).
+Current state: **Phase 5 complete** — rule engine, tactical solver, supervised tactical network, MCTS/Gumbel search with batched XPU inference, paired match evaluation. No self-play RL yet.
 
 ## Build (Windows, MSVC 2022, CMake ≥ 3.24)
 ```bash
@@ -54,6 +54,10 @@ cmake --preset msvc -DPython_EXECUTABLE=.venv/Scripts/python.exe
 ```
 ```bash
 ./.venv/Scripts/python.exe -m dojozero.trainer.train --config configs/training/stage_b_tactical.yaml
+```
+
+```bash
+PYTHONPATH=python ./.venv/Scripts/python.exe -m dojozero.evaluation.match --a engine:runs/stage_b_b6c64_v1/checkpoints/step_6000.pt:sims=64 --b heuristic --pairs 50
 ```
 
 Coordinates: columns A–O (left to right), ranks 1–15 (bottom to top), `H8` = centre.

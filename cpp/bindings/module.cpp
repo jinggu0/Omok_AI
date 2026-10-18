@@ -5,6 +5,8 @@
 #include <pybind11/stl.h>
 
 #include <algorithm>
+#include <cstring>
+#include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <thread>
@@ -14,6 +16,8 @@
 #include "board/transform.h"
 #include "features/features.h"
 #include "game/position_spec.h"
+#include "search/bots.h"
+#include "search/search.h"
 #include "tactics/engine.h"
 
 namespace py = pybind11;
@@ -82,6 +86,130 @@ py::array_t<int8_t> board_array(const GameState& g) {
   return out;
 }
 
+// Many search trees driven together: Python collects leaf features from all trees, evaluates them
+// in one network batch, and applies the results (ARCHITECTURE.md §3.10, game-parallel batching).
+class SearchBatch {
+ public:
+  explicit SearchBatch(const features::FeatureConfig& fcfg) : fcfg_(fcfg) {}
+
+  int add(const GameState& g, const search::SearchConfig& cfg) {
+    trees_.push_back(std::make_unique<search::Tree>(g, cfg, fcfg_));
+    return static_cast<int>(trees_.size() - 1);
+  }
+
+  // Tree construction runs root tactics (can take ~0.1-1 s each): build many trees in parallel.
+  std::vector<int> add_many(const std::vector<GameState>& states, const search::SearchConfig& cfg, int threads) {
+    const size_t base = trees_.size();
+    trees_.resize(base + states.size());
+    {
+      py::gil_scoped_release release;
+      parallel_for(states.size(), threads, [&](size_t i) {
+        search::SearchConfig c = cfg;
+        c.seed = cfg.seed * 1000003ULL + base + i;
+        trees_[base + i] = std::make_unique<search::Tree>(states[i], c, fcfg_);
+      });
+    }
+    std::vector<int> ids(states.size());
+    for (size_t i = 0; i < states.size(); ++i) ids[i] = static_cast<int>(base + i);
+    return ids;
+  }
+
+  bool done() const {
+    for (const auto& t : trees_) {
+      if (!t->done() || t->inflight() > 0) return false;
+    }
+    return true;
+  }
+
+  // Up to max_leaves leaves (round-robin over trees). Returns uint8 features [N, C, 15, 15].
+  py::array_t<uint8_t> collect(int max_leaves) {
+    if (!pending_.empty()) throw std::runtime_error("apply() the previous batch first");
+    const size_t plane_bytes = static_cast<size_t>(fcfg_.num_planes()) * kNumPoints;
+    buffer_.resize(static_cast<size_t>(max_leaves) * plane_bytes);
+    bool progress = true;
+    while (static_cast<int>(pending_.size()) < max_leaves && progress) {
+      progress = false;
+      for (size_t i = 0; i < trees_.size() && static_cast<int>(pending_.size()) < max_leaves; ++i) {
+        const int ticket = trees_[i]->select(buffer_.data() + pending_.size() * plane_bytes);
+        if (ticket >= 0) {
+          pending_.push_back({static_cast<int>(i), ticket});
+          progress = true;
+        } else if (ticket == -1) {
+          progress = true;  // resolved without the network: keep going
+        }
+      }
+    }
+    const py::ssize_t n = static_cast<py::ssize_t>(pending_.size());
+    py::array_t<uint8_t> out({n, static_cast<py::ssize_t>(fcfg_.num_planes()), static_cast<py::ssize_t>(kBoardSize),
+                              static_cast<py::ssize_t>(kBoardSize)});
+    std::memcpy(out.mutable_data(), buffer_.data(), static_cast<size_t>(n) * plane_bytes);
+    return out;
+  }
+
+  void apply(py::array_t<float, py::array::c_style | py::array::forcecast> policy,
+             py::array_t<float, py::array::c_style | py::array::forcecast> wdl,
+             py::array_t<float, py::array::c_style | py::array::forcecast> swap,
+             py::array_t<float, py::array::c_style | py::array::forcecast> branch,
+             py::array_t<float, py::array::c_style | py::array::forcecast> propose,
+             py::array_t<float, py::array::c_style | py::array::forcecast> select) {
+    const size_t n = pending_.size();
+    if (static_cast<size_t>(wdl.size()) != n * 3 || static_cast<size_t>(policy.size()) != n * features::kNumPolicyActions ||
+        static_cast<size_t>(swap.size()) != n * 2 || static_cast<size_t>(branch.size()) != n * 2 ||
+        static_cast<size_t>(propose.size()) != n * kNumPoints || static_cast<size_t>(select.size()) != n * kNumPoints) {
+      throw std::invalid_argument("apply: shapes do not match the collected batch");
+    }
+    for (size_t k = 0; k < n; ++k) {
+      search::Evaluation e;
+      std::memcpy(e.policy.data(), policy.data() + k * features::kNumPolicyActions, sizeof(float) * features::kNumPolicyActions);
+      std::memcpy(e.wdl.data(), wdl.data() + k * 3, sizeof(float) * 3);
+      std::memcpy(e.swap.data(), swap.data() + k * 2, sizeof(float) * 2);
+      std::memcpy(e.branch.data(), branch.data() + k * 2, sizeof(float) * 2);
+      std::memcpy(e.propose.data(), propose.data() + k * kNumPoints, sizeof(float) * kNumPoints);
+      std::memcpy(e.select.data(), select.data() + k * kNumPoints, sizeof(float) * kNumPoints);
+      trees_[pending_[k].first]->complete(pending_[k].second, e);
+    }
+    pending_.clear();
+  }
+
+  py::dict result(int i) const {
+    const search::SearchResult r = trees_.at(static_cast<size_t>(i))->result();
+    py::dict d;
+    d["action"] = to_string(r.action);
+    d["actor"] = player_name(r.actor);
+    d["value"] = r.value;
+    d["proven"] = r.proven;
+    d["proof_source"] = r.proof_source;
+    py::list children;
+    for (size_t k = 0; k < r.children.size(); ++k) {
+      const auto& c = r.children[k];
+      py::dict cd;
+      cd["action"] = to_string(c.action);
+      cd["prior"] = c.prior;
+      cd["visits"] = c.visits;
+      cd["q"] = c.q;
+      cd["proven"] = c.proven;
+      cd["target"] = k < r.policy_target.size() ? r.policy_target[k] : 0.0f;
+      children.append(cd);
+    }
+    d["children"] = children;
+    std::vector<std::string> pv;
+    for (const Action& a : r.pv) pv.push_back(to_string(a));
+    d["pv"] = pv;
+    d["simulations"] = r.simulations;
+    d["nodes"] = r.nodes;
+    d["elapsed_ms"] = r.elapsed_ms;
+    return d;
+  }
+
+  size_t size() const { return trees_.size(); }
+
+ private:
+  features::FeatureConfig fcfg_;
+  std::vector<std::unique_ptr<search::Tree>> trees_;
+  std::vector<std::pair<int, int>> pending_;
+  std::vector<uint8_t> buffer_;
+};
+
 }  // namespace
 
 PYBIND11_MODULE(_core, m) {
@@ -129,6 +257,7 @@ PYBIND11_MODULE(_core, m) {
       .def_property_readonly("phase", [](const GameState& g) { return std::string(phase_name(g.phase())); })
       .def_property_readonly("side_to_move", [](const GameState& g) { return std::string(color_name(g.side_to_move())); })
       .def_property_readonly("actor", [](const GameState& g) { return std::string(player_name(g.actor())); })
+      .def_property_readonly("black_holder", [](const GameState& g) { return std::string(player_name(g.assignment().black_holder)); })
       .def_property_readonly("is_terminal", &GameState::is_terminal)
       .def_property_readonly("result", [](const GameState& g) { return std::string(result_name(g.outcome().result)); })
       .def_property_readonly("winner", [](const GameState& g) -> py::object {
@@ -215,6 +344,41 @@ PYBIND11_MODULE(_core, m) {
     }
     return py::make_tuple(feats, legal, aux);
   }, py::arg("boards"), py::arg("sides"), py::arg("profiles"), py::arg("config"), py::arg("threads") = 0);
+
+  py::enum_<search::RootMode>(m, "RootMode").value("PUCT", search::RootMode::PUCT).value("GUMBEL", search::RootMode::GUMBEL);
+  py::class_<search::SearchConfig>(m, "SearchConfig")
+      .def(py::init<>())
+      .def_readwrite("simulations", &search::SearchConfig::simulations)
+      .def_readwrite("c_puct", &search::SearchConfig::c_puct)
+      .def_readwrite("fpu_reduction", &search::SearchConfig::fpu_reduction)
+      .def_readwrite("root", &search::SearchConfig::root)
+      .def_readwrite("gumbel_m", &search::SearchConfig::gumbel_m)
+      .def_readwrite("gumbel_c_visit", &search::SearchConfig::gumbel_c_visit)
+      .def_readwrite("gumbel_c_scale", &search::SearchConfig::gumbel_c_scale)
+      .def_readwrite("gumbel_noise", &search::SearchConfig::gumbel_noise)
+      .def_readwrite("leaf_tactics", &search::SearchConfig::leaf_tactics)
+      .def_readwrite("leaf_vcf_nodes", &search::SearchConfig::leaf_vcf_nodes)
+      .def_readwrite("root_tactics_nodes", &search::SearchConfig::root_tactics_nodes)
+      .def_readwrite("max_inflight", &search::SearchConfig::max_inflight)
+      .def_readwrite("virtual_loss", &search::SearchConfig::virtual_loss)
+      .def_readwrite("seed", &search::SearchConfig::seed);
+  py::class_<SearchBatch>(m, "SearchBatch")
+      .def(py::init<const features::FeatureConfig&>())
+      .def("add", &SearchBatch::add)
+      .def("add_many", &SearchBatch::add_many, py::arg("states"), py::arg("config"), py::arg("threads") = 0)
+      .def("done", &SearchBatch::done)
+      .def("collect", &SearchBatch::collect, py::arg("max_leaves"))
+      .def("apply", &SearchBatch::apply)
+      .def("result", &SearchBatch::result)
+      .def("__len__", &SearchBatch::size);
+  m.def("heuristic_action", [](const GameState& g, uint64_t seed) {
+    std::mt19937_64 rng(seed);
+    return to_string(search::heuristic_action(g, rng));
+  });
+  m.def("random_action", [](const GameState& g, uint64_t seed) {
+    std::mt19937_64 rng(seed);
+    return to_string(search::random_action(g, rng));
+  });
 
   m.def("analyze_tactics", [](const GameState& g, uint64_t vcf_nodes, uint64_t vct_nodes, uint64_t loss_nodes,
                               double max_ms) {
