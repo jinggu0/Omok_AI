@@ -1,0 +1,26 @@
+# External Strength Ladder calibration (EVALUATION §12, §14). Initial values; revise from measurements.
+# Ladder order below is only the initial weak -> strong HYPOTHESIS (not a rating); engines whose
+# conformance check is not `eligible` are skipped automatically.
+openings: renju_provisional_v0   # PROVISIONAL set (balance not assessed, PRD OQ-14) -> Tier A only
+tier: A
+time_ms: 500                     # per move, both sides (PRD OQ-13 open); externals single-threaded CPU
+probe_pairs: 4                   # per eligible engine, last openings of the set
+main_pairs: 24                   # per primary opponent, disjoint from the probe openings
+lo: 0.25
+hi: 0.75
+max_primary: 3
+prior_sd: 600                    # weak prior around the anchor (keeps all-win/all-loss finite)
+anchor: embryo_2026              # dojo_external_elo = 0 for this engine (must be in the probed pool)
+seed: 1
+ladder:
+  - pela_2023
+  - yixin_2018
+  - rapfi_2021
+  - embryo_2021r
+  - katagomo_2021r
+  - alphagomoku_2023
+  - jax_2024
+  - embryo_2026
+  - katagomo_2026
+  - alphagomoku_2026
+  - rapfi_2025

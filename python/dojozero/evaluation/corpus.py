@@ -105,7 +105,7 @@ def stones_of_taraguchi(actions: list[str], profile: str = "OMOKDOJANG_DAN") -> 
     return out
 
 
-def build_smoke(n: int, seed: int) -> dict:
+def build_smoke(n: int, seed: int, set_id: str = "renju_smoke_v0", prefix: str = "smoke0") -> dict:
     """PROVISIONAL Standard Renju smoke set: stone sequences of random Taraguchi-10 openings
     (6 stones, black to move). Balance is NOT assessed -> for harness tests and Tier A only; not
     for Tier B/C until the corpus source is decided (PRD OQ-14)."""
@@ -113,12 +113,12 @@ def build_smoke(n: int, seed: int) -> dict:
     openings = []
     for k, acts in enumerate(make_openings(n, seed)):
         moves = stones_of_taraguchi(acts)
-        openings.append({"opening_id": f"smoke0-{k:04d}", "moves": moves, "rule_profile": "RENJU_GOMOCUP",
+        openings.append({"opening_id": f"{prefix}-{k:04d}", "moves": moves, "rule_profile": "RENJU_GOMOCUP",
                          "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
                          "source_version": f"seed={seed}", "expected_legal": True,
                          "approx_balance": {"value_black": None, "method": "not assessed", "uncertainty": None},
                          "creation_method": "stones_of_taraguchi(make_openings(n, seed))"})
-    return {"schema_version": 1, "set_id": "renju_smoke_v0", "profile": "RENJU_GOMOCUP",
+    return {"schema_version": 1, "set_id": set_id, "profile": "RENJU_GOMOCUP",
             "status": "PROVISIONAL - harness tests / Tier A only; balance not assessed (PRD OQ-14)",
             "openings": openings}
 
@@ -129,15 +129,18 @@ def main(argv: list[str] | None = None) -> int:
     b = sub.add_parser("build-smoke")
     b.add_argument("--n", type=int, default=24)
     b.add_argument("--seed", type=int, default=1)
-    b.add_argument("--out", default=str(CORPUS_DIR / "renju_smoke_v0.json"))
+    b.add_argument("--set-id", default="renju_smoke_v0")
+    b.add_argument("--prefix", default="smoke0")
+    b.add_argument("--out")
     c = sub.add_parser("check")
     c.add_argument("path")
     args = ap.parse_args(argv)
     if args.cmd == "build-smoke":
-        d = build_smoke(args.n, args.seed)
-        Path(args.out).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.out).write_text(json.dumps(d, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-        s = load(args.out)
+        d = build_smoke(args.n, args.seed, args.set_id, args.prefix)
+        out = Path(args.out or CORPUS_DIR / f"{args.set_id}.json")
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(d, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+        s = load(out)
         print(f"{s.set_id}: {len(s.openings)} openings, hash {s.set_hash[:16]}")
     else:
         s = load(args.path)

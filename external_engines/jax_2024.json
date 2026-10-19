@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "engine_id": "jax_2024",
+  "engine_name": "JAX",
+  "version": "2024 (Gomocup 2024)",
+  "executable_sha256": "1f3e2c6b65f5db0ac46d75c0e5faa5beeb019e6f099d5b8cdb68f2ce6e3575bc",
+  "source": "https://download.gomocup.com/ai/JAX24.zip (official Gomocup download page, fetched 2026-10-19)",
+  "package_sha256": "e567b743baa21e3eaa7f4f9b1ff6f65332a5fb2ab93c05eb5a0fe1a55d663ea9",
+  "license": "UNVERIFIED",
+  "supported_rules": [
+    "RENJU"
+  ],
+  "protocol": "gomocup",
+  "config": {
+    "args": [],
+    "rule": 4,
+    "timeout_turn_ms": 1000,
+    "timeout_match_ms": 0,
+    "max_memory_mb": 1024,
+    "extra_info": {}
+  },
+  "public_reference_rating": {
+    "system": "gomocup",
+    "value": null,
+    "date": null,
+    "note": "metadata only (EVALUATION §16)"
+  },
+  "conformance": {
+    "checked": true,
+    "date": "2026-10-19",
+    "forbidden_violations": 0,
+    "failures": 9,
+    "missed_wins": [],
+    "eligible": false,
+    "about": "name=\"Jax\", version=\"2024\", author=\"Kailong Jiang\", country=\"China\"",
+    "note": "Not usable on the reference machine (Intel Core Ultra 7 258V): the process dies with 0xC0000005 (access violation) whenever its network is evaluated (BEGIN book move works; BOARD/TURN crash), with or without match-clock INFO. Cause not identified (instruction set / ONNX Runtime suspected). 2026-10-19."
+  },
+  "notes": "config.toml: device cpu, 1 search thread, ONNX Runtime"
+}

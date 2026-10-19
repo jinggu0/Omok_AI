@@ -35,9 +35,10 @@ Status: **Draft v0.1** · 2026-10-18
 ### 1.1 외부 프로토콜 가정 (Gomocup/Piskvork, v0.2 추가)
 | ID | 가정 | 근거 | 대안 | 영향 | 상태 |
 |---|---|---|---|---|---|
-| A-P1 | `INFO rule`은 비트마스크이며 Renju 값을 받은 엔진은 흑 금수(3-3·4-4·장목)를 RIF와 같게 처리 | Gomocup 프로토콜 관행 | 엔진별 해석 차이(재귀 거짓금수 미구현, 장목 처리 차이) | 외부 대국 결과 오염 | OPEN — 엔진마다 적합성 검사(EVALUATION §12.2)로 확인, 심판은 항상 canonical `GameState` |
+| A-P1 | `INFO rule`은 비트마스크이며 Renju 값을 받은 엔진은 흑 금수(3-3·4-4·장목)를 RIF와 같게 처리 | Gomocup 프로토콜 관행 | 엔진별 해석 차이(재귀 거짓금수 미구현, 장목 처리 차이) | 외부 대국 결과 오염 | 부분 VERIFIED(2026-10-19, `rule 4`): 사용 가능한 10개 엔진 모두 장목·4-4·3-3 함정 회피, 백 장목 승리 인식, 짧은 대국 4판 실패 0 (`dojozero.evaluation.conformance`). 재귀 거짓금수는 미검사. 심판은 항상 canonical `GameState` |
+| A-P4 | 외부 엔진은 `timeout_turn`만 주어도 수당 시간을 지킨다 | 프로토콜 문서 | 매치 시계(`timeout_match`/`time_left`)가 없으면 기본값(사실상 무제한)으로 오래 생각 | TIMEOUT 오판 | REJECTED(Embryo 2021/2026이 시계 없이 timeout) → 클라이언트가 항상 `timeout_match`(기본 250×turn)와 수마다 `time_left`를 보냄 |
 | A-P2 | Gomocup 좌표 `x,y`는 왼쪽 위 원점(x = 열, y = 행, 아래로 증가) | Gomocup 프로토콜 문서 관행 | 다른 원점 | 모든 외부 착수 | OPEN — 변환은 어댑터 1곳(`gomocup_to_point`/`point_to_gomocup`), 전 점 왕복 테스트 통과. 실제 외부 엔진으로 방향 확인은 바이너리 확보 후. 방향이 틀려도 Renju는 D4 불변이라 게임은 동치(단 corpus 국면이 외부 엔진에게 대칭 변환되어 보임) |
-| A-P3 | Renju 시작 국면을 `BOARD`로 주면 엔진은 돌 수로 자기 색을 판단 | Renju는 흑 선수 | 엔진이 색을 별도로 가정 | 색 혼동 | OPEN — E1 적합성 검사 |
+| A-P3 | Renju 시작 국면을 `BOARD`로 주면 엔진은 돌 수로 자기 색을 판단 | Renju는 흑 선수 | 엔진이 색을 별도로 가정 | 색 혼동 | VERIFIED(10개 엔진): 흑·백 차례 BOARD 함정에서 모두 올바른 색으로 착수(즉승점·백 장목 승리) |
 
 ---
 

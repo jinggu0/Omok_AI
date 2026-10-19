@@ -26,7 +26,10 @@ struct EngineConfig {
   std::string expected_sha256;  // empty = not checked here (the Python registry checks hashes)
   int rule = kRuleRenju;
   int timeout_turn_ms = 1000;
-  int timeout_match_ms = 0;     // 0 = no match clock sent
+  // Match clock sent to the engine (Gomocup managers always send one; some engines, e.g. Embryo,
+  // ignore timeout_turn without it). 0 = 250 * timeout_turn_ms. time_left is updated before every
+  // move from the engine's own elapsed time.
+  int timeout_match_ms = 0;
   long long max_memory_bytes = 0;
   std::vector<std::pair<std::string, std::string>> extra_info;  // engine-specific INFO key value
   int start_timeout_ms = 10000;  // START -> OK (engines may load weights)
@@ -67,11 +70,15 @@ class ExternalEngine {
 
  private:
   EngineReply await_move(double budget_ms);
+  EngineReply timed_move(double budget_ms);
   bool send(const std::string& line);
 
   EngineConfig cfg_;
   GomocupProcess proc_;
   bool started_ = false;
+  long long match_ms_ = 0;
+  double used_ms_ = 0;
+  bool send_time_left();
 };
 
 }  // namespace dz::protocol

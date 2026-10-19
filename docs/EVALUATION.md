@@ -200,6 +200,7 @@ DojoZero ─▶ internal checkpoints (historical best, 내부 봇)
 2. 흑 장목·백 장목 처리, 정확한 5 우선 국면에서 종국 판정이 canonical `GameState`와 일치하는가(심판은 항상 DojoZero `GameState`).
 3. 짧은 시험 대국 20판에서 crash/timeout/malformed 0건.
 - 위반이 있는 엔진은 사용할 수 있으나 해당 사유로 끝난 대국은 `termination_reason`으로 구분하고(§17), 위반율을 report에 표기. 금수 착수가 잦은 엔진은 사다리에서 제외(임계값 config).
+- **구현(Phase 8 E2)**: `python -m dojozero.evaluation.conformance --engines all --update-meta`. 함정 5종(즉승점, 흑 장목·4-4·3-3 회피, 백 장목 승리) — 함정 국면과 정답은 C++ 규칙이 자체 검증 — + heuristic 상대 짧은 대국 2쌍. 위반 0·실패 0일 때만 `eligible`(임계값 0). 결과는 `external_engines/<id>.json`의 `conformance`와 `runs/evaluation/conformance/`. 재귀 거짓금수 함정은 아직 없음.
 
 ## 13. Evaluation Tiers
 
@@ -221,6 +222,7 @@ lo ≤ score ≤ hi                   → primary calibration opponent
 - 임계값·후보 수·탐색 쌍 수(예: 첫 10쌍으로 구간 판정 후 본 매치)는 config(`configs/evaluation/ladder.yaml`).
 - 선택 로그(어떤 점수로 어떤 상대를 골랐는가)를 DB에 저장.
 - 최상위 엔진과의 대국은 Tier C로 유지하되, Rapfi 상대 0–2% 같은 결과만으로 개발 성능을 판단하지 않는다.
+- **구현(Phase 8 E2)**: `python -m dojozero.evaluation.ladder calibrate`(`configs/evaluation/ladder.yaml`). calibration v0의 교훈: (1) 프로브 4쌍은 흑 유리 opening에서 강도를 거의 구분하지 못함 → 균형 corpus 전에는 프로브를 늘리거나 생략, (2) DojoZero하고만 대국한 엔진들의 rating은 prior가 지배 → 사다리 순서를 내려면 **엔진 간 대국**이 필요, (3) anchor는 대국 수가 많은 엔진으로 정한다.
 - `dojo_external_elo` 추정: 사다리 전체 결과를 BayesElo/Ordo식 최대우도로 일괄 적합(§5), 외부 엔진 하나를 기준점(0)으로 고정하고 그 선택을 report에 명시.
 
 ## 15. Benchmark Opening Policy & Opening Corpus

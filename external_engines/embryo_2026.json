@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "engine_id": "embryo_2026",
+  "engine_name": "Embryo",
+  "version": "1.2.3-9f111a5f (Gomocup 2026)",
+  "executable_sha256": "59b8a6ff9f9a457d7bfc7ecae2fae62a03f0ce25d9c85f6e503a731e5dfd9dfe",
+  "source": "https://download.gomocup.com/ai/EMBRYO26.zip (official Gomocup download page, fetched 2026-10-19)",
+  "package_sha256": "4fcd9b3e66d4881cc2078795d967ab95af6e3698bfe6116fee4cedf283aa99d7",
+  "license": "UNVERIFIED",
+  "supported_rules": [
+    "RENJU"
+  ],
+  "protocol": "gomocup",
+  "config": {
+    "args": [],
+    "rule": 4,
+    "timeout_turn_ms": 1000,
+    "timeout_match_ms": 0,
+    "max_memory_mb": 1024,
+    "extra_info": {}
+  },
+  "public_reference_rating": {
+    "system": "gomocup",
+    "value": null,
+    "date": null,
+    "note": "metadata only (EVALUATION §16)"
+  },
+  "conformance": {
+    "checked": true,
+    "date": "2026-10-19",
+    "forbidden_violations": 0,
+    "failures": 0,
+    "missed_wins": [],
+    "eligible": true,
+    "about": "name=\"Embryo\", version=\"1.2.3-new_devel-9f111a5f\", build=\"Speedy\", variant=\"Renju\", author=\"Mira Fontan, generic search: T. Romstad, M. Costalba, J. Kiiski, G. Linscott\", country=\"CZ\""
+  },
+  "notes": "renju build _r"
+}

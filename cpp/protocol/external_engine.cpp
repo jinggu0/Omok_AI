@@ -37,7 +37,10 @@ Failure ExternalEngine::start(std::string* detail) {
   }
   started_ = true;
   bool ok = send("INFO timeout_turn " + std::to_string(cfg_.timeout_turn_ms));
-  if (cfg_.timeout_match_ms > 0) ok &= send("INFO timeout_match " + std::to_string(cfg_.timeout_match_ms));
+  match_ms_ = cfg_.timeout_match_ms > 0 ? cfg_.timeout_match_ms : 250LL * cfg_.timeout_turn_ms;
+  used_ms_ = 0;
+  ok &= send("INFO timeout_match " + std::to_string(match_ms_));
+  ok &= send("INFO time_left " + std::to_string(match_ms_));
   if (cfg_.max_memory_bytes > 0) ok &= send("INFO max_memory " + std::to_string(cfg_.max_memory_bytes));
   ok &= send("INFO rule " + std::to_string(cfg_.rule));
   for (const auto& [k, v] : cfg_.extra_info) ok &= send("INFO " + k + " " + v);
@@ -127,27 +130,40 @@ EngineReply ExternalEngine::await_move(double budget_ms) {
   }
 }
 
+EngineReply ExternalEngine::timed_move(double budget_ms) {
+  EngineReply r = await_move(budget_ms);
+  used_ms_ += r.elapsed_ms;
+  return r;
+}
+
 EngineReply ExternalEngine::begin() {
-  if (!send("BEGIN")) return {Failure::CRASH, std::nullopt, -1, -1, 0, "could not write BEGIN", {}};
-  return await_move(cfg_.timeout_turn_ms + cfg_.slack_ms);
+  if (!send_time_left() || !send("BEGIN")) return {Failure::CRASH, std::nullopt, -1, -1, 0, "could not write BEGIN", {}};
+  return timed_move(cfg_.timeout_turn_ms + cfg_.slack_ms);
 }
 
 EngineReply ExternalEngine::turn(Point p) {
-  if (!send("TURN " + format_move(p))) return {Failure::CRASH, std::nullopt, -1, -1, 0, "could not write TURN", {}};
-  return await_move(cfg_.timeout_turn_ms + cfg_.slack_ms);
+  if (!send_time_left() || !send("TURN " + format_move(p))) return {Failure::CRASH, std::nullopt, -1, -1, 0, "could not write TURN", {}};
+  return timed_move(cfg_.timeout_turn_ms + cfg_.slack_ms);
 }
 
 EngineReply ExternalEngine::board(const std::vector<Point>& moves) {
   // After an even number of moves black is to move. Field 1 = the engine's (side to move) stones.
   const size_t mover_parity = moves.size() % 2;  // stones with index parity == mover_parity are the mover's
-  bool ok = send("BOARD");
+  bool ok = send_time_left();
+  ok &= send("BOARD");
   for (size_t i = 0; i < moves.size(); ++i) ok &= send(format_board_line(moves[i], (i % 2) == mover_parity ? 1 : 2));
   ok &= send("DONE");
   if (!ok) return {Failure::CRASH, std::nullopt, -1, -1, 0, "could not write BOARD", {}};
-  return await_move(cfg_.timeout_turn_ms + cfg_.slack_ms);
+  return timed_move(cfg_.timeout_turn_ms + cfg_.slack_ms);
+}
+
+bool ExternalEngine::send_time_left() {
+  const long long left = std::max<long long>(0, match_ms_ - static_cast<long long>(used_ms_));
+  return send("INFO time_left " + std::to_string(left));
 }
 
 Failure ExternalEngine::restart(std::string* detail) {
+  used_ms_ = 0;
   if (!started_ || !send("RESTART")) {
     if (detail) *detail = "could not write RESTART";
     return Failure::CRASH;

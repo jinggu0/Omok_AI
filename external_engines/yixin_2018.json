@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "engine_id": "yixin_2018",
+  "engine_name": "Yixin",
+  "version": "0.7.13 (Gomocup 2018)",
+  "executable_sha256": "f6d1a01bcc2eeaec267ad5fcc612942166ae4c27bbd12401b9a9143199d76be9",
+  "source": "https://download.gomocup.com/ai/YIXIN18.zip (official Gomocup download page, fetched 2026-10-19)",
+  "package_sha256": "768e816b3cdf6dc44a728f2d89109a77a78ece90e326f0904d9599eeba91a61f",
+  "license": "UNVERIFIED",
+  "supported_rules": [
+    "RENJU"
+  ],
+  "protocol": "gomocup",
+  "config": {
+    "args": [],
+    "rule": 4,
+    "timeout_turn_ms": 1000,
+    "timeout_match_ms": 0,
+    "max_memory_mb": 1024,
+    "extra_info": {}
+  },
+  "public_reference_rating": {
+    "system": "gomocup",
+    "value": null,
+    "date": null,
+    "note": "metadata only (EVALUATION §16)"
+  },
+  "conformance": {
+    "checked": true,
+    "date": "2026-10-19",
+    "forbidden_violations": 0,
+    "failures": 0,
+    "missed_wins": [],
+    "eligible": true,
+    "about": "name=\"Yixin\", author=\"Kai Sun\", version=\"2018 Kernal 0.7.13\", country=\"China\", www=\"www.aiexp.info\""
+  },
+  "notes": "older ladder rung; renju support UNVERIFIED"
+}

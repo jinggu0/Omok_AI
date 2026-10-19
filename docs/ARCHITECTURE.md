@@ -301,7 +301,7 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 - **Renju 규칙 전달**: `INFO rule` 비트마스크에서 Renju 값(가정 A-P1, 엔진별 적합성 검사 §EVALUATION 12.2로 확인). RECTSTART는 15×15 외 미지원 → pbrain은 `ERROR` 응답(명시적 비지원). Taraguchi action은 프로토콜에 없음 → 외부 대국은 Standard Renju 시작 국면만.
 - **색 결정**: 시작 국면은 `BOARD`로 전달(own=1, opponent=2). Renju에서 흑/백은 돌 수로 정해지므로 어댑터는 `GameState.side_to_move`와 돌 수 일관성을 검사해 불일치 시 `PROTOCOL_ERROR`.
 - **좌표**: 프로젝트 좌표계는 하나(RULES §1). Gomocup `x,y`는 어댑터 내부에서만 존재하며 변환 함수는 D4·경계 property 테스트로 고정.
-- **시간**: `INFO timeout_turn / timeout_match / time_left / max_memory` + 엔진별 `extra_info`(예: 스레드 수, 엔진이 지원할 때만). DojoZero 측 시간 기반 `SearchLimits`는 E1에서 구현(현재 sims 기반만).
+- **시간**: `INFO timeout_turn / timeout_match / time_left / max_memory` + 엔진별 `extra_info`(예: 스레드 수, 엔진이 지원할 때만). 매치 시계는 **항상** 보낸다(`timeout_match` 기본 250×turn, 매 수 전 `time_left` = 시계 − 그 엔진이 쓴 시간) — 시계가 없으면 turn 제한을 무시하는 엔진이 있다(ASSUMPTIONS A-P4). DojoZero 측은 `SearchConfig.max_ms`(E1).
 - **동시성**: TournamentRunner는 동시 대국 수를 match 메타에 기록(Tier C = 1). 외부 프로세스는 대국마다 새로 기동(기본) 또는 RESTART 재사용(config).
 - **신뢰 경계**: 외부 출력은 신뢰하지 않는 입력(PRD §27): 줄 길이 상한, 정수 파싱 검증, 응답 없는 프로세스 kill.
 
