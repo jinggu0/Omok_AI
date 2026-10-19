@@ -20,6 +20,9 @@ add_library(dojozero_core STATIC
   features/features.cpp
   search/search.cpp
   search/bots.cpp
+  protocol/piskvork_adapter.cpp
+  protocol/gomocup_process.cpp
+  protocol/external_engine.cpp
 )
 target_include_directories(dojozero_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(dojozero_core PUBLIC nlohmann_json::nlohmann_json)

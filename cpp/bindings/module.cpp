@@ -16,6 +16,8 @@
 #include "board/transform.h"
 #include "features/features.h"
 #include "game/position_spec.h"
+#include "protocol/external_engine.h"
+#include "protocol/piskvork_adapter.h"
 #include "search/bots.h"
 #include "search/search.h"
 #include "tactics/engine.h"
@@ -29,6 +31,7 @@ ProfilePtr profile_named(const std::string& name) {
   if (name == "RENJU_RIF") return make_profile(RuleProfile::renju_rif());
   if (name == "TARAGUCHI10") return make_profile(RuleProfile::taraguchi10());
   if (name == "OMOKDOJANG_DAN") return make_profile(RuleProfile::omokdojang_dan());
+  if (name == "RENJU_GOMOCUP") return make_profile(RuleProfile::renju_gomocup());
   throw std::invalid_argument("unknown profile " + name);
 }
 
@@ -279,6 +282,12 @@ PYBIND11_MODULE(_core, m) {
       .def("canonical_hash", [](const GameState& g) { return g.canonical_hash(); })
       .def("transformed", &GameState::transformed)
       .def("copy", [](const GameState& g) { return GameState(g); })
+      // Verdict of a black stone at `p` on the current board (e.g. "FORBIDDEN_DOUBLE_THREE"),
+      // regardless of whose turn it is. Used to classify rejected external moves.
+      .def("black_verdict", [](const GameState& g, int p) {
+        if (p < 0 || p >= kNumPoints) throw std::invalid_argument("point out of range");
+        return std::string(verdict_name(g.forbidden(static_cast<Point>(p)).verdict));
+      })
       .def("__str__", &GameState::to_string);
 
   py::class_<features::FeatureConfig>(m, "FeatureConfig")
@@ -369,7 +378,9 @@ PYBIND11_MODULE(_core, m) {
       .def_readwrite("root_tactics_nodes", &search::SearchConfig::root_tactics_nodes)
       .def_readwrite("max_inflight", &search::SearchConfig::max_inflight)
       .def_readwrite("virtual_loss", &search::SearchConfig::virtual_loss)
-      .def_readwrite("seed", &search::SearchConfig::seed);
+      .def_readwrite("seed", &search::SearchConfig::seed)
+      .def_readwrite("max_ms", &search::SearchConfig::max_ms)
+      .def_readwrite("root_tactics_time_share", &search::SearchConfig::root_tactics_time_share);
   py::class_<SearchBatch>(m, "SearchBatch")
       .def(py::init<const features::FeatureConfig&>())
       .def("add", &SearchBatch::add)
@@ -407,4 +418,109 @@ PYBIND11_MODULE(_core, m) {
     return out;
   }, py::arg("state"), py::arg("vcf_nodes") = 100000, py::arg("vct_nodes") = 50000, py::arg("loss_nodes") = 20000,
      py::arg("max_ms") = 0.0);
+
+  // ---- Gomocup / Piskvork protocol (ARCHITECTURE.md §3.12) ----
+  m.def("gomocup_to_point", [](int x, int y) -> py::object {
+    const auto p = protocol::gomocup_to_point(x, y);
+    return p ? py::object(py::int_(static_cast<int>(*p))) : py::object(py::none());
+  });
+  m.def("point_to_gomocup", [](int p) {
+    int x, y;
+    protocol::point_to_gomocup(static_cast<Point>(p), x, y);
+    return py::make_tuple(x, y);
+  });
+
+  py::class_<protocol::EngineConfig>(m, "EngineConfig")
+      .def(py::init<>())
+      .def_readwrite("path", &protocol::EngineConfig::path)
+      .def_readwrite("args", &protocol::EngineConfig::args)
+      .def_readwrite("working_dir", &protocol::EngineConfig::working_dir)
+      .def_readwrite("rule", &protocol::EngineConfig::rule)
+      .def_readwrite("timeout_turn_ms", &protocol::EngineConfig::timeout_turn_ms)
+      .def_readwrite("timeout_match_ms", &protocol::EngineConfig::timeout_match_ms)
+      .def_readwrite("max_memory_bytes", &protocol::EngineConfig::max_memory_bytes)
+      .def_readwrite("extra_info", &protocol::EngineConfig::extra_info)
+      .def_readwrite("start_timeout_ms", &protocol::EngineConfig::start_timeout_ms)
+      .def_readwrite("slack_ms", &protocol::EngineConfig::slack_ms)
+      .def_readwrite("crlf", &protocol::EngineConfig::crlf);
+
+  auto reply_dict = [](const protocol::EngineReply& r) {
+    py::dict d;
+    d["failure"] = protocol::failure_name(r.failure);
+    d["move"] = r.move ? py::object(py::int_(static_cast<int>(*r.move))) : py::object(py::none());
+    d["x"] = r.x;
+    d["y"] = r.y;
+    d["elapsed_ms"] = r.elapsed_ms;
+    d["detail"] = r.detail;
+    d["messages"] = r.messages;
+    return d;
+  };
+  py::class_<protocol::ExternalEngine>(m, "ExternalEngine")
+      .def(py::init<protocol::EngineConfig>())
+      .def("start", [](protocol::ExternalEngine& e) {
+        std::string detail;
+        protocol::Failure f;
+        {
+          py::gil_scoped_release release;
+          f = e.start(&detail);
+        }
+        return py::make_tuple(protocol::failure_name(f), detail);
+      })
+      .def("begin", [reply_dict](protocol::ExternalEngine& e) {
+        protocol::EngineReply r;
+        { py::gil_scoped_release release; r = e.begin(); }
+        return reply_dict(r);
+      })
+      .def("turn", [reply_dict](protocol::ExternalEngine& e, int p) {
+        protocol::EngineReply r;
+        { py::gil_scoped_release release; r = e.turn(static_cast<Point>(p)); }
+        return reply_dict(r);
+      })
+      .def("board", [reply_dict](protocol::ExternalEngine& e, const std::vector<int>& moves) {
+        std::vector<Point> pts;
+        for (int p : moves) pts.push_back(static_cast<Point>(p));
+        protocol::EngineReply r;
+        { py::gil_scoped_release release; r = e.board(pts); }
+        return reply_dict(r);
+      })
+      .def("restart", [](protocol::ExternalEngine& e) {
+        std::string detail;
+        protocol::Failure f;
+        {
+          py::gil_scoped_release release;
+          f = e.restart(&detail);
+        }
+        return py::make_tuple(protocol::failure_name(f), detail);
+      })
+      .def("set_time_left", &protocol::ExternalEngine::set_time_left)
+      .def("about", [](protocol::ExternalEngine& e) { py::gil_scoped_release release; return e.about(); })
+      .def("end", [](protocol::ExternalEngine& e) { py::gil_scoped_release release; e.end(); })
+      .def("alive", &protocol::ExternalEngine::alive)
+      .def("stderr_tail", &protocol::ExternalEngine::stderr_tail)
+      .def_property_readonly("pid", &protocol::ExternalEngine::pid);
+
+  // Engine side: Python supplies think(state, limits) -> point | None (dojozero.protocol.pbrain).
+  py::class_<protocol::EngineSession>(m, "EngineSession")
+      .def(py::init([](py::function think, const std::string& about) {
+        protocol::ThinkFn fn = [think](const GameState& g, const protocol::ThinkLimits& l) -> std::optional<Point> {
+          py::gil_scoped_acquire acquire;
+          py::dict lim;
+          lim["timeout_turn_ms"] = l.timeout_turn_ms;
+          lim["timeout_match_ms"] = l.timeout_match_ms;
+          lim["time_left_ms"] = l.time_left_ms;
+          lim["max_memory_bytes"] = l.max_memory_bytes;
+          py::object r = think(GameState(g), lim);
+          if (r.is_none()) return std::nullopt;
+          const int p = r.cast<int>();
+          if (p < 0 || p >= kNumPoints) return std::nullopt;
+          return static_cast<Point>(p);
+        };
+        return protocol::EngineSession(std::move(fn), about);
+      }), py::arg("think"), py::arg("about"))
+      .def("feed", &protocol::EngineSession::feed)
+      .def_property_readonly("quit", &protocol::EngineSession::quit)
+      .def_property_readonly("rule", &protocol::EngineSession::rule)
+      .def_property_readonly("state", [](const protocol::EngineSession& s) -> py::object {
+        return s.state() ? py::cast(GameState(*s.state())) : py::object(py::none());
+      });
 }

@@ -30,6 +30,7 @@ class SearchSettings:
     root_tactics_nodes: int = 5000
     max_inflight: int = 8
     seed: int = 1
+    max_ms: float = 0.0           # wall-clock limit per move (0 = simulations only; then a cap)
 
 
 def make_config(s: SearchSettings) -> "_core.SearchConfig":
@@ -45,6 +46,7 @@ def make_config(s: SearchSettings) -> "_core.SearchConfig":
     c.root_tactics_nodes = s.root_tactics_nodes
     c.max_inflight = s.max_inflight
     c.seed = s.seed
+    c.max_ms = s.max_ms
     return c
 
 

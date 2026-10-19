@@ -16,3 +16,6 @@ runs/
 .vs/
 .vscode/
 data/
+
+# external engines: local binary paths (binaries are never committed)
+external_engines/local_paths.json

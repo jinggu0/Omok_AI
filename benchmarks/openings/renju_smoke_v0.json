@@ -1,0 +1,512 @@
+{
+ "schema_version": 1,
+ "set_id": "renju_smoke_v0",
+ "profile": "RENJU_GOMOCUP",
+ "status": "PROVISIONAL - harness tests / Tier A only; balance not assessed (PRD OQ-14)",
+ "openings": [
+  {
+   "opening_id": "smoke0-0000",
+   "moves": [
+    "H8",
+    "G9",
+    "H7",
+    "E10",
+    "K8",
+    "H9"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0001",
+   "moves": [
+    "H8",
+    "G8",
+    "I6",
+    "K10",
+    "G9",
+    "H7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0002",
+   "moves": [
+    "H8",
+    "H7",
+    "I6",
+    "E10",
+    "F8",
+    "F7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0003",
+   "moves": [
+    "H8",
+    "I9",
+    "I10",
+    "J5",
+    "G11",
+    "K11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0004",
+   "moves": [
+    "H8",
+    "G9",
+    "H9",
+    "J7",
+    "I6",
+    "H10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0005",
+   "moves": [
+    "H8",
+    "H7",
+    "J10",
+    "K7",
+    "E9",
+    "E10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0006",
+   "moves": [
+    "H8",
+    "G7",
+    "J8",
+    "I5",
+    "G10",
+    "J7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0007",
+   "moves": [
+    "H8",
+    "I9",
+    "I8",
+    "J8",
+    "E5",
+    "K8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0008",
+   "moves": [
+    "H8",
+    "I9",
+    "H7",
+    "G8",
+    "E10",
+    "I8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0009",
+   "moves": [
+    "H8",
+    "H9",
+    "F8",
+    "H5",
+    "H11",
+    "F11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0010",
+   "moves": [
+    "H8",
+    "H7",
+    "F8",
+    "K10",
+    "F5",
+    "F10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0011",
+   "moves": [
+    "H8",
+    "H9",
+    "J9",
+    "K11",
+    "F5",
+    "J11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0012",
+   "moves": [
+    "H8",
+    "G8",
+    "H10",
+    "G7",
+    "J6",
+    "J9"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0013",
+   "moves": [
+    "H8",
+    "H7",
+    "H6",
+    "E8",
+    "F7",
+    "I11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0014",
+   "moves": [
+    "H8",
+    "G9",
+    "G8",
+    "H6",
+    "F11",
+    "E7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0015",
+   "moves": [
+    "H8",
+    "H9",
+    "I8",
+    "F9",
+    "E8",
+    "F11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0016",
+   "moves": [
+    "H8",
+    "I9",
+    "F10",
+    "K6",
+    "G11",
+    "F8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0017",
+   "moves": [
+    "H8",
+    "H7",
+    "H10",
+    "E9",
+    "E10",
+    "K9"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0018",
+   "moves": [
+    "H8",
+    "G9",
+    "F6",
+    "H11",
+    "I10",
+    "F7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0019",
+   "moves": [
+    "H8",
+    "H9",
+    "G7",
+    "H10",
+    "J10",
+    "F6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0020",
+   "moves": [
+    "H8",
+    "G7",
+    "J10",
+    "F5",
+    "F9",
+    "J5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0021",
+   "moves": [
+    "H8",
+    "G9",
+    "H9",
+    "F10",
+    "I6",
+    "I9"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0022",
+   "moves": [
+    "H8",
+    "G9",
+    "H7",
+    "G10",
+    "K8",
+    "H11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  },
+  {
+   "opening_id": "smoke0-0023",
+   "moves": [
+    "H8",
+    "H9",
+    "I7",
+    "E6",
+    "G8",
+    "J8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: random Taraguchi-10 opening (dojozero.evaluation.match.make_openings)",
+   "source_version": "seed=1",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": null,
+    "method": "not assessed",
+    "uncertainty": null
+   },
+   "creation_method": "stones_of_taraguchi(make_openings(n, seed))"
+  }
+ ]
+}

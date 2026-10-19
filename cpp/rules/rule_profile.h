@@ -67,6 +67,8 @@ struct RuleProfile {
   static RuleProfile renju_rif();
   static RuleProfile taraguchi10();
   static RuleProfile omokdojang_dan();
+  // RIF Renju without PASS: the Gomocup protocol has no pass move (external evaluation, FR-21).
+  static RuleProfile renju_gomocup();
 
   nlohmann::json to_json() const;
   // Rejects unknown keys and unsupported values (no silent defaults for misspelled fields).

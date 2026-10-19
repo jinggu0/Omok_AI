@@ -4,12 +4,15 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
+#include <chrono>
 #include <random>
+#include <thread>
 
 #include "common/test_util.h"
 #include "game/position_spec.h"
 #include "search/bots.h"
 #include "search/search.h"
+#include "tactics/engine.h"
 #include "tools/random_positions.h"
 
 namespace dz::search {
@@ -273,6 +276,54 @@ TEST(Search, NeverStallsInTacticalPositions) {
   }
   EXPECT_EQ(stalled, 0);
   EXPECT_GT(searched, 400);
+}
+
+// Time-limited search (external tournaments are time-controlled): stops near max_ms with
+// `simulations` only a cap, always completes at least one simulation, returns a legal action.
+TEST(Search, TimeLimitStopsSearch) {
+  std::mt19937_64 rng(5);
+  GameState g = tools::random_midgame(rng, make_profile(RuleProfile::renju_rif()), 10, 20);
+  LambdaEvaluator slow([](const GameState&) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    return Evaluation{};
+  });
+  SearchConfig c = cfg(1000000);
+  c.max_ms = 60;
+  const SearchResult r = Tree(g, c).run(slow);
+  EXPECT_TRUE(g.is_legal(r.action));
+  EXPECT_GE(r.simulations, 2);
+  EXPECT_LT(r.simulations, 1000000);
+  EXPECT_GE(r.elapsed_ms, 60.0);
+  EXPECT_LT(r.elapsed_ms, 60.0 + 250.0) << "one evaluation past the limit at most (plus scheduler jitter)";
+
+  c.max_ms = 0.001;  // below one evaluation: still one simulation, never an empty result
+  const SearchResult r1 = Tree(g, c).run(slow);
+  EXPECT_EQ(r1.simulations, 1);
+  EXPECT_TRUE(g.is_legal(r1.action));
+}
+
+TEST(Search, TimeLimitCapsRootTactics) {
+  // Find a position whose root tactics take long with the node budget alone, then check that the
+  // time limit caps them (tactics get root_tactics_time_share of max_ms).
+  std::mt19937_64 rng(9);
+  const uint64_t n = 400000;
+  for (int k = 0; k < 40; ++k) {
+    GameState g = tools::random_midgame(rng, make_profile(RuleProfile::renju_rif()), 20, 34);
+    if (g.is_terminal()) continue;
+    const auto t0 = std::chrono::steady_clock::now();
+    tactics::analyze_tactics(g, {n, n, n / 2, 40, 0});
+    const double slow_ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    if (slow_ms < 400) continue;
+    UniformEvaluator u;
+    SearchConfig c = cfg(1000000);
+    c.root_tactics_nodes = n;
+    c.max_ms = 100;
+    const SearchResult r = Tree(g, c).run(u);
+    EXPECT_TRUE(g.is_legal(r.action));
+    EXPECT_LT(r.elapsed_ms, 100.0 + 250.0) << "unbounded root tactics took " << slow_ms << " ms";
+    return;
+  }
+  GTEST_SKIP() << "no position with slow root tactics found";
 }
 
 TEST(Bots, HeuristicTakesWinsAndBlocks) {

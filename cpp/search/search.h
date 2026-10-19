@@ -42,6 +42,12 @@ struct SearchConfig {
   int max_inflight = 8;          // leaves pending evaluation per tree (virtual loss)
   float virtual_loss = 1.0f;
   uint64_t seed = 1;
+  // Wall-clock limit from tree construction (root tactics included); 0 = simulations only. With a
+  // time limit `simulations` is only a cap. The search always completes >= 1 simulation (or a
+  // tactical proof) before stopping, so a result exists. Use PUCT roots for time-limited play:
+  // Gumbel Sequential Halving plans its phases from `simulations` and would stop mid-schedule.
+  double max_ms = 0;
+  double root_tactics_time_share = 0.25;  // root tactics wall-clock cap = share * max_ms
 };
 
 // Raw network outputs; the tree picks the head that matches each node's action types.
@@ -114,6 +120,7 @@ class Tree {
   void complete(int ticket, const Evaluation& e);
   bool done() const;
   int inflight() const { return static_cast<int>(pending_.size()); }
+  double elapsed_ms() const;
 
   SearchResult result() const;
   int completed() const { return completed_; }

@@ -52,6 +52,13 @@ RuleProfile RuleProfile::renju_rif() {
   return p;
 }
 
+RuleProfile RuleProfile::renju_gomocup() {
+  RuleProfile p = renju_rif();
+  p.id = "RENJU_GOMOCUP";
+  p.pass_allowed = false;
+  return p;
+}
+
 RuleProfile RuleProfile::taraguchi10() {
   RuleProfile p = renju_rif();
   p.id = "TARAGUCHI10";

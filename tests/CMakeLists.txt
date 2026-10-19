@@ -13,6 +13,7 @@ add_executable(dojozero_tests
   tactics/test_threats.cpp
   tactics/test_solvers.cpp
   search/test_search.cpp
+  protocol/test_protocol.cpp
 )
 target_include_directories(dojozero_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(dojozero_tests PRIVATE DOJOZERO_SOURCE_DIR="${PROJECT_SOURCE_DIR}")

@@ -13,7 +13,7 @@ and what is still open. Newest phase first.
 |---|---|
 | version | Phase 7 best = `taraguchi_v1` registry v1 (Phase 6 best `selfplay_v2` v2에서 이어 학습) |
 | best checkpoint | `runs/taraguchi_v1/models/gen_001.pt` |
-| external calibration date | UNKNOWN (외부 엔진 대국 0회) |
+| external calibration date | UNKNOWN (외부 엔진 대국 0회; Phase 8 E1 인프라 준비 완료, 바이너리 대기 — OQ-04) |
 | strongest opponent with score ≥ 50% | 내부: Phase 6 best `selfplay_v2` v2 (prefix 오프닝 0.67, 전체 무작위 오프닝 0.51) — 외부: UNKNOWN |
 | weakest opponent with score < 50% | UNKNOWN (점수 50% 미만 상대 미측정) |
 | Rapfi / KataGomo / AlphaGomoku / JAX / Embryo score | UNKNOWN / UNKNOWN / UNKNOWN / UNKNOWN / UNKNOWN |
@@ -22,6 +22,45 @@ and what is still open. Newest phase first.
 | `dojo_taraguchi_elo` | taraguchi v1 vs selfplay v2: **+123 [+22, +224]** (prefix 오프닝 50쌍, 64 sims, 엔진이 opening 결정) — 절대 척도 아님(기준점 = selfplay v2) |
 | tactical score | 네트워크 단독 83.6%, 탐색 포함 91.8% (102문제, Phase 4–5; 이후 모델은 미측정) |
 | primary known weakness | 측정 근거 있는 것: 탐색 속도(EVALUATION §8.2 미달 항목), opening 결정 붕괴(2·3수 후 swap 100%, offer10 98%), 색 편향(흑으로 0.74–0.83 / 백으로 0.28–0.35). 외부 상대 기준 약점은 UNKNOWN |
+
+---
+
+## Phase 8 (E1) — External evaluation infrastructure (2026-10-19)
+
+Phase 8의 첫 단계로 PRD §33 E1을 구현했다. **외부 엔진 바이너리가 없어(OQ-04) 실제 external calibration(M3 소급 gate)은 아직 수행하지 않았다** — 인프라는 mock 엔진과 DojoZero 자신(별도 프로세스)으로만 검증.
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| 시간 제한 탐색(`SearchConfig.max_ms`, 루트 전술은 그 25%까지, ≥1 시뮬레이션 보장) | `cpp/search/search.*`, `python/dojozero/search/driver.py` |
+| Gomocup 코덱 + engine-side 세션(좌표 변환 1곳) | `cpp/protocol/piskvork_adapter.*` |
+| 외부 프로세스(Windows CreateProcess + Job object, 리더 스레드, timeout; POSIX 경로 미검증) | `cpp/protocol/gomocup_process.*` |
+| ExternalEngine 클라이언트(START/BEGIN/TURN/BOARD/RESTART/ABOUT/END, 실패 분류) | `cpp/protocol/external_engine.*`, 바인딩 |
+| 규칙 profile `RENJU_GOMOCUP`(RIF, 패스 없음) | `cpp/rules/rule_profile.*`, RULES §7.3 |
+| Python 호스트 pbrain(임시 `pbrain-DojoZero`, 장애 주입 mock 겸용, 네트워크 warm-up) | `python/dojozero/protocol/pbrain.py` |
+| TournamentRunner(paired, canonical GameState 심판, FORBIDDEN/ILLEGAL/CRASH/TIMEOUT/MALFORMED/PROTOCOL_ERROR/START_FAILED, RESTART 재사용) | `python/dojozero/evaluation/tournament.py` |
+| 엔진 레지스트리(sha256 고정 필수, drift 거부), 템플릿·README | `python/dojozero/evaluation/external.py`, `external_engines/` |
+| Strength DB(EVALUATION §17 스키마 v1, rating 이름·decision 값 강제) | `python/dojozero/evaluation/strength_db.py` |
+| opening corpus(검증·set hash·누출 검사), **임시** `renju_smoke_v0`(24개, 균형 미평가, Tier A 전용) | `python/dojozero/evaluation/corpus.py`, `benchmarks/openings/renju_smoke_v0.json` |
+| Strength Report v0(측정 안 한 절은 UNKNOWN) | `python/dojozero/evaluation/report.py` |
+
+### Verified
+| 검증 | 결과 |
+|---|---|
+| `dojozero_tests` Release | 255 통과 + 1 skip (신규: 시간 제한 탐색 2, 프로토콜 7) |
+| `pytest tests/python` | **57/57** (신규 16: 프로토콜 왕복, paired 기록·DB, 실패 6종 사유 기록, 바이너리 없음 → START_FAILED, 금수/불법 분류, 레지스트리 hash 가드, corpus 검증·누출, DB 제약, 시간 제한 배치 탐색, report, 프로세스 재사용) |
+| 스모크: taraguchi v1(in-process, 200 ms/수) vs heuristic(**별도 프로세스, 프로토콜 경유**), smoke 12쌍 | 0.958, 실패 0, DojoZero 평균 120 ms/수·**~30 sims/수** |
+| 스모크: taraguchi v1 in-process vs 같은 모델 pbrain-py(별도 프로세스), 6쌍 200 ms | 첫 실행: **B 쪽 TIMEOUT 3건, 1,300초** → 원인: 새 프로세스마다 torch 기동 + 첫 XPU 평가가 수 초. 수정(warm-up + RESTART 재사용) 후 재실행: **실패 0, 63초**, 0.667 [−147, +388](차이 감지 안 됨, 같은 모델과 일관) |
+
+### 사고·발견
+1. **fixed time에서 탐색량이 매우 적다**: 200 ms/수에서 ~30 sims(배치 1–8 XPU 지연 지배). fixed-visits 평가(64 sims)보다 적어, 외부 엔진과의 fixed-time 비교에서 불리할 것으로 예상 — EVALUATION §20 "performance problem" 후보. 아직 외부 상대로 측정하지 않았으므로 가설.
+2. 위 timeout은 "외부 엔진 실패"가 실제로 기록·분리되는 것을 보여준 사례(설계대로 B:TIMEOUT으로 집계)이자, 같은 문제가 DojoZero를 외부 매니저에 올릴 때도 생긴다는 경고(ADR-08 결정 시 warm-up 필수).
+3. 장애 주입 테스트 중 `illegal` 케이스 1회 실패(전체 스위트 실행 중), 재현 안 됨(단독 3회, 전체 2회 통과). 300 ms 제한이 부하에서 TIMEOUT으로 바뀐 것으로 **추정**(원인 미확정) → TIMEOUT 케이스 외에는 2,000 ms로 완화.
+4. self-match에서도 양쪽이 같은 XPU를 공유하고 외부 쪽 예산은 85%−30 ms라 대칭이 아니다. Tier B/C에서는 동시 실행 작업·장치 공유를 기록·통제해야 함(E-10).
+
+### Open (E1 잔여 → 사용자 결정 필요)
+- **실제 외부 엔진 calibration**: 바이너리 확보(OQ-04), 버전 고정(OQ-11), 시간 규정(OQ-13), Standard Renju corpus 출처(OQ-14) 결정 후.
+- 규칙 적합성 사전 검사 자동화(EVALUATION §12.2), ladder rating 최대우도 적합, adaptive selection(E2), 병렬 대국, POSIX 프로세스 경로 실행 검증.
 
 ---
 

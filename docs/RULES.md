@@ -337,6 +337,7 @@ BLACK D4: LEGAL
 - Taraguchi-10 opening 단계(§8, `NORMAL_RENJU` 이전)에서는 패스 불가 `[INTERP, A-R6]`.
 - 오목도장 앱의 패스 가능 여부: `UNVERIFIED_APP_BEHAVIOR (C-06)` → profile 값 `pass_allowed`.
 - 패스는 별도 action(`PASS`, NN action index 225)로 표현한다.
+- `RENJU_GOMOCUP` profile = `RENJU_RIF`와 동일하되 `pass_allowed = false`. Gomocup 프로토콜에 패스가 없으므로 **외부 엔진 평가 전용**(PRD FR-21/22). 금수·승리 규칙은 RIF 그대로이며, 둘 곳 없음은 §7.2에 따라 무승부.
 
 ### 7.4 불법수 처리 (`illegal_move_behavior`)
 | 값 | 의미 |

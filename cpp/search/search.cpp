@@ -42,7 +42,7 @@ float action_logit(const Evaluation& e, const Action& a) {
 
 Tree::Tree(const GameState& root, const SearchConfig& cfg, const features::FeatureConfig& fcfg)
     : root_state_(root), work_(root), cfg_(cfg), fcfg_(fcfg), rng_(cfg.seed), start_(std::chrono::steady_clock::now()) {
-  nodes_.reserve(static_cast<size_t>(cfg.simulations) + cfg.max_inflight + 16);
+  nodes_.reserve(static_cast<size_t>(std::min(cfg.simulations, 100000)) + cfg.max_inflight + 16);
   new_node(-1);
   if (root.is_terminal() || root.phase() != OpeningPhase::NORMAL_RENJU) return;
   const tactics::Rules r = rules_of(root);
@@ -55,7 +55,8 @@ Tree::Tree(const GameState& root, const SearchConfig& cfg, const features::Featu
   }
   if (cfg.root_tactics_nodes > 0) {
     const uint64_t n = cfg.root_tactics_nodes;
-    const tactics::TacticalDecision d = tactics::analyze_tactics(root, {n, n, n / 2, 40, 0});
+    const double tactics_ms = cfg.max_ms > 0 ? std::max(1.0, cfg.max_ms * cfg.root_tactics_time_share) : 0.0;
+    const tactics::TacticalDecision d = tactics::analyze_tactics(root, {n, n, n / 2, 40, tactics_ms});
     if (d.result == tactics::ProofResult::WIN && d.move) {
       root_proven_by_tactics_ = 1;
       root_tactics_move_ = Action::place(*d.move);
@@ -77,7 +78,12 @@ bool Tree::done() const {
   if (root_proven_by_tactics_ == 1 && root_tactics_move_) return true;
   if (nodes_[0].proven != kUnknown) return true;
   if (nodes_[0].state == NodeState::EXPANDED && nodes_[0].edge_count == 1 && completed_ >= 1) return true;
+  if (cfg_.max_ms > 0 && completed_ >= 1 && elapsed_ms() >= cfg_.max_ms) return true;
   return completed_ >= cfg_.simulations;
+}
+
+double Tree::elapsed_ms() const {
+  return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start_).count();
 }
 
 std::vector<Action> Tree::leaf_actions(const GameState& g, int8_t& proven_p0) const {

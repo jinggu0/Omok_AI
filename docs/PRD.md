@@ -265,7 +265,7 @@ C++ API(ARCHITECTURE §3.6, §3.7, §3.9, §3.10): `GameState{apply, undo, legal
 | 단계 | 시점 | 내용 | 선행 조건 |
 |---|---|---|---|
 | E0 | Phase 7 (현재) | 문서·아키텍처 준비만. Taraguchi-10 full-game 보고를 Standard Renju 보고와 분리 기록(이미 prefix-opening 매치로 측정 중) | — |
-| E1 | Phase 8 착수 직후 (Ablation 전) | `cpp/protocol/`(Gomocup 클라이언트·좌표 변환·프로세스), ExternalEngine 메타 + sha256 검증, 시간 기반 SearchLimits, TournamentRunner, failure reason, opening corpus v1, `results.sqlite`, report v0, **첫 external calibration(M3 소급 gate)** | OQ-04 승인, OQ-11 버전 고정, OQ-13 시간 규정 |
+| E1 | Phase 8 착수 직후 (Ablation 전) — **인프라 구현됨(2026-10-19), 외부 calibration은 바이너리 대기** | `cpp/protocol/`(Gomocup 클라이언트·좌표 변환·프로세스), ExternalEngine 메타 + sha256 검증, 시간 기반 SearchLimits, TournamentRunner, failure reason, opening corpus v1, `results.sqlite`, report v0, **첫 external calibration(M3 소급 gate)** | OQ-04 승인, OQ-11 버전 고정, OQ-13 시간 규정 |
 | E2 | Phase 8 중 | Tier A/B 자동화, adaptive opponent selection, compute 기록 전 항목, FAST/STANDARD/STRONG scaling curve, M4 소급(세대별 internal vs external 상관) | E1 |
 | E3 | Phase 8 말 | `pbrain-DojoZero.exe`(ADR-08), 패배 원인 분류 + reanalysis 큐, Diagnosis 자동 연결 | E2, ADR-02 |
 | E4 | Final | Tier C reference evaluation, 최종 Strength Report | E3 |
