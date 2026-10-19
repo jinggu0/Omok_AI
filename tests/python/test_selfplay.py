@@ -33,7 +33,7 @@ def test_records_round_trip_and_replay(games, tmp_path):
     assert read_chunk(path) == games
     buf = ReplayBuffer(FeatureSpec(), window=2)
     n = buf.ingest(path, 1)
-    assert n == sum(len(g["positions"]) for g in games) - buf.stats["skipped_opening_targets"]
+    assert n == sum(len(g["positions"]) for g in games)
     assert n > 0
     b = buf.sample(32, seed=1, step=0, device="cpu")
     support = b["policy"] > 0
@@ -46,8 +46,7 @@ def test_value_targets_follow_winner(games, tmp_path):
     write_chunk(path, games)
     buf = ReplayBuffer(FeatureSpec())
     buf.ingest(path, 1)
-    expected = [z_for(p["actor"], g["meta"]["winner"]) for g in games for p in g["positions"]
-                if all(":" not in a and a not in ("swap", "keep", "direct5", "offer10") for a in p["policy"])]
+    expected = [z_for(p["actor"], g["meta"]["winner"]) for g in games for p in g["positions"]]
     assert list(buf._concat()["value"]) == expected
 
 
@@ -55,7 +54,10 @@ def test_value_targets_follow_winner(games, tmp_path):
 def test_corrupted_records_are_rejected(games, tmp_path, corruption):
     bad = copy.deepcopy(games[0])
     if corruption == "action":
-        bad["actions"][len(bad["actions"]) // 2] = "A1" if bad["actions"][len(bad["actions"]) // 2] != "A1" else "B1"
+        # the last move (NORMAL_RENJU) onto move 1's point, which is occupied: illegal in any game. (A
+        # replaced opening action can be another LEGAL game, e.g. "A1" parses as "propose:A1" in
+        # OFFER_TEN_5TH_MOVES, which replay correctly accepts.)
+        bad["actions"][-1] = bad["actions"][0]
     elif corruption == "policy":
         p = bad["positions"][0]
         occupied = bad["actions"][0]  # move 1 (H8) is occupied in every later position
@@ -131,6 +133,33 @@ def test_one_generation_loop(tiny_init):
         loop.run(cfg, quiet=True)
     reg2 = loop.run(cfg, resume=True, quiet=True)
     assert [x["generation"] for x in reg2.data["generations"]] == [1, 2]
+
+
+def test_one_generation_opening_league_loop(tiny_init):
+    """Phase 7 settings: empty/prefix starts with opening targets, a league pool, prefix-opening eval."""
+    root, data, ck = tiny_init
+    from dojozero.rl import loop
+    cfg = {"run_name": "loop7", "run_dir": str(root), "seed": 3, "device": "cpu", "amp_bf16": False,
+           "init_checkpoint": str(ck), "generations": 1, "regret_positions": 2,
+           "selfplay": {"games": 4, "sims_full": 6, "sims_fast": 3, "p_full": 0.8, "root": "GUMBEL", "gumbel_m": 8,
+                        "root_tactics_nodes": 100, "max_inflight": 2, "max_plies": 225, "profile": "OMOKDOJANG_DAN",
+                        "start": "mixed", "prefix_prob": 0.5, "record_opening": True, "league_fraction": 0.5,
+                        "opponent_sims": 4},
+           "league": {"pfsp_eps": 0.05, "past_best": 1,
+                      "fixed": [{"name": "heuristic", "spec": "heuristic"}, {"name": "init", "spec": f"engine:{ck}"}]},
+           "replay": {"window": 2, "capacity": 10000},
+           "train": {"steps_per_generation": 3, "batch_size": 16, "lr": 0.001, "weight_decay": 0.0001,
+                     "betas": [0.9, 0.999], "grad_clip": 5.0, "tactical_mix": 0.25, "tactical_data": str(data),
+                     "loss": {"policy": 1.0, "value": 1.0, "aux": 0.5, "opening": 1.0}},
+           "eval": {"openings": "prefix", "sims": 4, "pairs_per_round": 2, "min_pairs": 2, "max_pairs": 2, "elo0": 0,
+                    "elo1": 30, "alpha": 0.05, "beta": 0.05, "anchor_pairs": 1}}
+    reg = loop.run(cfg, quiet=True)
+    g = reg.data["generations"][0]
+    assert g["games"] == 4 and g["positions"] > 0
+    assert "opening" in g["train"] and g["opening"]["games"] >= 0
+    assert (root / "loop7" / "opening_db.json").exists()
+    assert reg.data["best_history"][0]["version"] == 0
+    assert sum(e["games"] for e in reg.data["league"].values()) == sum(e["games"] for e in g["league"].values())
 
 
 def test_openings_are_distinct_and_terminate():

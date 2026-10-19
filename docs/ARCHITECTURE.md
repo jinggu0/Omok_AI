@@ -1,6 +1,6 @@
 # DojoZero — ARCHITECTURE.md
 
-Status: **Draft v0.1** · 2026-10-18
+Status: **Draft v0.2** · 2026-10-19 (v0.2: §3.12 Protocol · External evaluation)
 규칙 의미는 [RULES.md](RULES.md), 학습은 [TRAINING.md](TRAINING.md), 평가는 [EVALUATION.md](EVALUATION.md)가 규범이다.
 이 문서는 모듈 경계, 인터페이스, 데이터 흐름, 파일 포맷, 아직 벤치마크로 결정해야 할 설계 선택(ADR)을 정의한다.
 
@@ -59,17 +59,21 @@ Status: **Draft v0.1** · 2026-10-18
 │  ├─ nn/         evaluator.h, uniform_eval.cpp, heuristic_eval.cpp, onnx_eval.cpp
 │  ├─ search/     node.h, puct.{h,cpp}, gumbel.{h,cpp}, search.{h,cpp}, batcher.{h,cpp}
 │  ├─ selfplay/   worker.{h,cpp}, writer.{h,cpp}
+│  ├─ protocol/   piskvork_adapter.{h,cpp}, gomocup_process.{h,cpp}, external_engine.{h,cpp}   (E1, §3.12)
 │  ├─ bindings/   module.cpp
-│  └─ cli/        main.cpp, commands/*.cpp
+│  └─ cli/        main.cpp, commands/*.cpp, pbrain_main.cpp (E3)
 ├─ python/dojozero/
 │  ├─ model/ trainer/ replay/ league/ evaluation/ tools/ cli.py
 ├─ tests/
 │  ├─ rules/ forbidden/ opening/ tactics/ search/ features/ python/
 │  └─ compatibility/omokdojang/*.json
 ├─ benchmarks/   rules/ forbidden/ tactical/ vcf/ vct/ opening/ endgame/ adversarial/  (JSON)
+│                openings/ renju_external_v1.json renju_development_v1.json taraguchi_full_v1.json (E1)
+├─ external_engines/  <engine_id>.json 메타데이터만 (바이너리·local_paths.json은 git 제외)
+├─ configs/evaluation/ ladder.yaml, tiers.yaml (E2)
 ├─ scripts/  checkpoints/  runs/  docs/
 ```
-`checkpoints/`, `runs/`는 git 추적 제외(.gitignore). 대용량 산출물은 해시로 참조.
+`checkpoints/`, `runs/`는 git 추적 제외(.gitignore). 대용량 산출물은 해시로 참조. Strength DB는 `runs/evaluation/results.sqlite`(git 제외, 정기 백업은 사용자 결정).
 
 ---
 
@@ -260,6 +264,47 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 - 모델 갱신: `runs/<run>/models/manifest.json`(현재 best/candidate 버전, hash) 폴링. 기보에 사용 모델 hash 기록.
 - 초기 분산: 파일시스템 큐(단일 머신). 확장(gRPC/MQ)은 Future Work.
 
+### 3.12 Protocol · External evaluation (v0.2, 구현은 PRD §33 E1–E3)
+
+목적: Gomocup/Piskvork 엔진과의 자동 대국(FR-20..FR-22)과 DojoZero의 Piskvork 호환 실행 파일(FR-21b). **프로토콜 코드는 규칙을 재구현하지 않는다** — 착수 합법성·금수·종국은 언제나 canonical `GameState`가 판정한다.
+
+```
+ cpp/protocol/                                   python/dojozero/evaluation/
+ ┌───────────────────────────┐                   ┌──────────────────────────────────────────┐
+ │ piskvork_adapter.*        │  (순수 코덱)       │ tournament.py   TournamentRunner         │
+ │  메시지 파싱/직렬화,       │◀──── bindings ────│   paired 배정, 심판(GameState), 실패 사유 │
+ │  좌표 변환(경계 1곳),      │                   │ ladder.py       adaptive opponent 선택    │
+ │  engine-side 명령 루프     │                   │ strength_db.py  MatchDatabase (SQLite)    │
+ │ gomocup_process.*         │  (OS 프로세스)     │ report.py       EvaluationReporter        │
+ │  launch/pipes/timeout/kill │                   │ corpus.py       opening corpus 로드·해시   │
+ │ external_engine.*         │  (클라이언트)      │ loss_analysis.py 패배 분류·reanalysis 큐   │
+ │  = process + adapter       │                   └──────────────────────────────────────────┘
+ └──────────┬────────────────┘                         │ uses: match.Player(DojoZero in-process),
+            │ depends on game/ (Point, Action,          │       _core.ExternalEngine, _core.GameState
+            ▼ GameState for BOARD 구성) only            ▼
+ cli/pbrain_main.cpp ── protocol/ + search/ + Evaluator(ADR-08) ──▶ pbrain-DojoZero.exe
+```
+
+모듈 경계(MUST):
+| 모듈 | 책임 | 의존 허용 | 금지 |
+|---|---|---|---|
+| `protocol/piskvork_adapter` | Gomocup 명령/응답 코덱(START, RECTSTART, BEGIN, TURN, BOARD…DONE, INFO key value, END, ABOUT, RESTART, TAKEBACK), `x,y`(왼쪽 위 원점, Gomocup) ↔ `Point`(row 아래 0) 변환 **단 한 곳**, engine-side 상태 머신(명령 → `EngineHost` 호출) | `board/coord`, `game/action` | search/, nn/, 규칙 판정, 프로세스 I/O |
+| `protocol/gomocup_process` | 외부 프로세스 기동(Windows CreateProcess/POSIX), stdin/stdout 줄 단위 I/O, 응답 timeout, 종료·강제 종료, stderr 수집 | OS API만 | 게임 지식 |
+| `protocol/external_engine` | `ExternalEngine`: metadata(engine_id, sha256 검증), `start(rule, size)`, `set_position(GameState)`(BOARD), `play(opponent_move)`(TURN)/`begin()`, 시간 INFO 전달 → `Move | Failure{CRASH, TIMEOUT, MALFORMED_RESPONSE, PROTOCOL_ERROR}` | adapter, process, `game/`(읽기 전용) | 합법성 판정(호출자 몫), search/ |
+| `evaluation/tournament.py` TournamentRunner | opening 배정(§EVALUATION 15), paired 역할/색 교환, **심판 = `GameState.apply`**(거부 → `ILLEGAL_MOVE` / 금수 → `FORBIDDEN_MOVE`), 시간 계측, 기보·search 통계 수집, DB 기록 | `_core`, `match.Player`, `strength_db` | 규칙 재구현 |
+| `evaluation/strength_db.py` MatchDatabase | EVALUATION §17 스키마, 스키마 버전 마이그레이션, import(기존 JSON), 조회 | sqlite3 | 대국 실행 |
+| `evaluation/report.py` EvaluationReporter | DB → EVALUATION §22 Markdown+JSON, `UNKNOWN` 표기 | `strength_db` | DB 외 데이터 소스 |
+| `evaluation/ladder.py` | §EVALUATION 14 adaptive selection, rating 적합(최대우도) | `strength_db`, `tournament` | |
+| `cli/pbrain_main.cpp` | Piskvork 엔진 실행 파일: adapter 명령 루프 + `AIEngine::search` | protocol/, search/, nn/ | 프로토콜 파싱 로직 중복 |
+
+세부 규칙:
+- **Renju 규칙 전달**: `INFO rule` 비트마스크에서 Renju 값(가정 A-P1, 엔진별 적합성 검사 §EVALUATION 12.2로 확인). RECTSTART는 15×15 외 미지원 → pbrain은 `ERROR` 응답(명시적 비지원). Taraguchi action은 프로토콜에 없음 → 외부 대국은 Standard Renju 시작 국면만.
+- **색 결정**: 시작 국면은 `BOARD`로 전달(own=1, opponent=2). Renju에서 흑/백은 돌 수로 정해지므로 어댑터는 `GameState.side_to_move`와 돌 수 일관성을 검사해 불일치 시 `PROTOCOL_ERROR`.
+- **좌표**: 프로젝트 좌표계는 하나(RULES §1). Gomocup `x,y`는 어댑터 내부에서만 존재하며 변환 함수는 D4·경계 property 테스트로 고정.
+- **시간**: `INFO timeout_turn / timeout_match / time_left / max_memory` + 엔진별 `extra_info`(예: 스레드 수, 엔진이 지원할 때만). DojoZero 측 시간 기반 `SearchLimits`는 E1에서 구현(현재 sims 기반만).
+- **동시성**: TournamentRunner는 동시 대국 수를 match 메타에 기록(Tier C = 1). 외부 프로세스는 대국마다 새로 기동(기본) 또는 RESTART 재사용(config).
+- **신뢰 경계**: 외부 출력은 신뢰하지 않는 입력(PRD §27): 줄 길이 상한, 정수 파싱 검증, 응답 없는 프로세스 kill.
+
 ---
 
 ## 4. Python
@@ -269,7 +314,7 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 - `trainer/`: 학습 루프, 체크포인트, ONNX export + manifest, NaN 감지(손실·그래디언트 non-finite 시 즉시 중단 + 직전 배치 덤프; silent NaN 금지).
 - `replay/`: SQLite 인덱스(게임 id, 모델 버전, profile hash, opening key, 결과, 길이, canonical hash 집합) + chunk 파일. 샘플링(FIFO window, 감쇠, prioritized 옵션), 중복 제거, reanalysis 큐.
 - `league/`: opponent pool, PFSP 가중치, 모델 레지스트리.
-- `evaluation/`: 대국 스케줄러(paired), 외부 엔진 어댑터(Gomocup/piskvork 프로토콜 클라이언트), Elo/SPRT 통계, 벤치마크 러너, 리포트 생성.
+- `evaluation/`: 대국 스케줄러(paired, `match.py`), Elo/SPRT 통계, 벤치마크 러너, opening 진단(`opening.py`, Phase 7). 외부 평가(E1–E3): `tournament.py`(TournamentRunner), `ladder.py`, `strength_db.py`(MatchDatabase), `report.py`(EvaluationReporter), `corpus.py`, `loss_analysis.py` — 경계는 §3.12. Gomocup 프로토콜 코덱·프로세스는 C++ `protocol/`에 있고 Python은 바인딩으로만 사용(코덱 이중 구현 금지).
 - `tools/`: 기보 변환, 국면 시각화, 호환성 테스트 JSON 작성 보조.
 - 학습 장치: **ADR-04** PyTorch XPU(Intel Arc) vs CPU vs 외부 GPU — Phase 4 벤치마크. 코드는 `device` 추상화로 장치 무관.
 
@@ -314,6 +359,9 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 | `dojozero benchmark` | C++/Py | 고정 벤치마크 + 성능 측정 |
 | `dojozero train` | Python | 학습 |
 | `dojozero evaluate` | Python | paired match, Elo/SPRT, 리포트 |
+| `dojozero tournament` | Python + C++ protocol | `--engine-a --engine-b --openings <set> --pairs N --time <ms/turn> --threads --tier A/B/C --output`; 외부 엔진 대국, DB 기록 (E1) |
+| `dojozero report` | Python | Strength DB → Strength Report (E1 v0, E2–E4 확장) |
+| `pbrain-DojoZero.exe` | C++ | Piskvork 프로토콜 엔진(외부 tournament manager용, E3, ADR-08) |
 
 `dojozero`는 Python console script 하나로 노출하고 C++ 명령은 `dojozero_engine.exe`로 위임한다.
 
@@ -357,5 +405,7 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 | ADR-03 | PUCT vs Gumbel (self-play/대국 각각) | Phase 5–6 → **미결**: 둘 다 구현·정확성 검증, 매치는 PUCT만 수행. Phase 6에서 동일 compute 비교 | 동일 compute Elo |
 | ADR-04 | 학습 장치 | **결정(Phase 4)**: Intel Arc 140V XPU + bf16 autocast + `AdamW(foreach=False)`. 측정(B6C64, b256): CPU fp32 0.18 step/s, XPU fp32 0.74–1.7, XPU bf16 3.4 step/s(측정 편차 큼). XPU foreach AdamW는 간헐적으로 잘못된 업데이트를 내므로 사용 금지 | step/s, 안정성 |
 | ADR-05 | Python 빌드 방식 | **결정(Phase 4)**: CMake가 pybind11(v2.13.6) 확장 `_core`를 빌드해 `python/dojozero/`로 복사, `pyproject.toml`은 순수 Python 패키지(setuptools). scikit-build-core는 배포 단계까지 보류 | Windows 재현성 |
-| ADR-06 | 10제안 정책 방식 (top-k vs autoregressive vs beam) | Phase 7 | 제안 품질(regret) + Elo |
-| ADR-07 | ResNet vs Hybrid attention | Phase 6–8 | Elo/compute |
+| ADR-06 | 10제안 정책 방식 (top-k vs autoregressive vs beam) | Phase 7 → **부분**: 순차(autoregressive) PROPOSE action을 매번 MCTS로 탐색하는 방식만 구현·학습. top-k(Approach B)·beam은 미구현; 네트워크 가치 기준 regret 진단만 있음 | 제안 품질(regret) + Elo |
+| ADR-07 | ResNet vs Hybrid attention | Phase 6–8 | Elo/compute (fixed time 기준, EVALUATION §18) |
+| ADR-08 | `pbrain-DojoZero.exe` 추론 호스트: C++ 추론(ONNX Runtime/OpenVINO, ADR-02에 종속) vs Python(PyTorch XPU) 프로세스를 감싸는 런처 | E3 (PRD OQ-15) | 프로토콜 응답 지연, 설치 용이성, fixed-time Elo |
+| ADR-09 | Strength DB 저장소: SQLite(WAL) 단일 파일 vs JSONL + 인덱스 | E1 → **잠정 SQLite** (요구사항 FR-24 예시, 표준 라이브러리만으로 접근) | 동시 쓰기 안전성, 조회 편의 |

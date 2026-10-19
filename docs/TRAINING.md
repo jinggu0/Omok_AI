@@ -60,7 +60,7 @@ Status: **Draft v0.1** · 2026-10-18
 - 기록: gzip JSONL(action 수순 + 기록 위치별 정책/actor/루트 값 + 메타: 모델 sha256, 세대, 시드, 결과). 바이너리 `.dzg`는 미구현.
 - Replay: 수순을 C++로 재생하며 기록 검증(actor·합법성·정책 타깃 합법성·최종 결과 일치, 불일치 시 `RecordError`), feature/aux 재계산. 최근 4세대 창, 상한 20만 위치, (seed, step) 기반 무상태 샘플링 + D4 증강.
 - 학습: learner는 세대를 넘어 계속 학습(AdamW, XPU에서 foreach 끔), 배치의 25%는 Stage A 전술 데이터(망각 방지), 세대당 150 step.
-- 승격: candidate vs best 쌍대국 SPRT(elo0=0, elo1=30, α=β=0.05, 20쌍 단위, 최소 20·최대 80쌍), H1일 때만 승격. 매 세대 best vs 휴리스틱 앵커 20쌍(외부 기준).
+- 승격: candidate vs best 쌍대국 SPRT(elo0=0, elo1=30, α=β=0.05, 20쌍 단위, 최소 20·최대 80쌍), H1일 때만 승격. 매 세대 best vs 휴리스틱 앵커 20쌍(고정 기준 봇 = **내부 anchor**, `dojo_internal_elo` — 외부 엔진이 아님). 이 세대 승격은 EVALUATION §5·§13의 **Tier A 성격 내부 게이트**(compute 제약으로 축소한 표본)이며 기능 채택(Tier B)과 외부 강도(External Ladder, EVALUATION §12)를 대신하지 않는다.
 
 ### 2.5 Stage F — Taraguchi-10
 - 모든 opening action을 self-play에서 학습: swap 결정(1,2,3수 후, 4수 후, 직접 5수 후), 2/3/4수, Choice 1/2, 직접 5수, 10제안, 제안 선택.
@@ -80,6 +80,16 @@ Status: **Draft v0.1** · 2026-10-18
 - 상대 선택: PFSP(prioritized fictitious self-play) — 현재 모델이 이기기 어려운 상대에 가중. 비율(config): self 50% / pool 50% 시작.
 - League 대국 기록도 replay에 들어가되 `opponent_type` 메타데이터로 비율 제어. 정책 target은 학습 대상 모델 측 수만 사용.
 - 순환 전략(rock-paper-scissors) 감지: pool 내 승률 행렬의 비이행성(intransitivity) 지표를 세대별 기록.
+
+### 2.7 Phase 7 구현 상태 (Stage F + G 최소 구현)
+- 설정: `configs/training/stage_f_taraguchi.yaml` (`python -m dojozero.rl.loop --config ...`).
+- 시작: `selfplay.start` = `empty`(빈 보드) / `random_opening`(Phase 6 방식) / `mixed`(확률 `prefix_prob`로 무작위 오프닝을 1..len-1 수에서 자른 prefix, 나머지는 빈 보드).
+- `record_opening: true`: 모든 opening 결정(배치·swap·branch·10제안의 각 1개·선택)에 Gumbel 개선 정책 target을 기록. 기록 position에 `phase` 저장, replay가 C++ 재생으로 phase·actor·target 합법성(legal_actions + legal mask)을 검증. 한 target 안에 서로 다른 헤드 action이 섞이면 거부.
+- Target → 헤드: swap/keep → `swap`[0/1], direct5/offer10 → `branch`[0/1], `propose:P` → `propose`, `select:P` → `select`, 점/PASS → `policy`. `L_opening` = 네 헤드의 masked CE 합(가중 `loss.opening`).
+- 10제안은 **순차 action 방식(Approach A의 탐색 버전)**: 매 PROPOSE_FIFTH가 일반 탐색 노드(`propose` 헤드 prior). Approach B/C는 미구현 — 제안 품질은 §EVALUATION 7의 regret 진단으로만 측정(ADR-06 미결).
+- League: `league_fraction` 비율의 게임은 learner(현재 best) 한쪽 + pool 상대 한쪽(역할 무작위). Pool = `league.fixed`(heuristic, Stage B v0, Phase 6 best) + 이 실행의 직전 best `past_best`개(같은 checkpoint는 1회만). 상대 선택 PFSP-hard: `w = (1-p)^2 + eps`, p = 누적 learner 점수(prior 0.5 한 판). 상대 수는 기록하지 않음(learner 수만 target). 상대 엔진도 Gumbel 노이즈 탐색(`opponent_sims`).
+- 세대별 로그: decision 분포(prefix로 정해진 결정 제외), P0 / 최종 흑 holder 점수, NORMAL 진입 국면 수·엔트로피, Opening DB(`runs/<run>/opening_db.json`: canonical hash:phase → n, z 합, root value 합, top action, model version), 제안 regret.
+- 기록 무결성: meta `final_hash`(최종 국면 Zobrist) — replay 결과 국면과 다르면 거부.
 
 ---
 

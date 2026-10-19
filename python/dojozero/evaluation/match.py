@@ -1,9 +1,10 @@
 """Paired matches with confidence intervals (EVALUATION.md §4, §5).
 
 Every opening is played twice with the roles swapped: game 1 has player A as P0, game 2 has
-player B as P0. Openings are random Taraguchi-10 openings (heuristic placements near the centre,
-random swap/branch decisions) played until NORMAL_RENJU, so both players face the same colours
-and positions from each start. The unit of statistics is the pair (pentanomial).
+player B as P0. Openings are random Taraguchi-10 openings (placements near the centre, random swap/branch
+decisions) played until NORMAL_RENJU, so both players face the same colours and positions from
+each start; or (Phase 7, --openings prefix) random opening prefixes after which the players make
+the remaining opening decisions themselves. The unit of statistics is the pair (pentanomial).
 
     python -m dojozero.evaluation.match --a engine:runs/.../step_6000.pt:sims=64 --b heuristic --pairs 50
 Player specs: "heuristic", "random", "policy:<ckpt>", "engine:<ckpt>[:sims=N][:root=PUCT|GUMBEL]".
@@ -28,6 +29,26 @@ from ..search.driver import NetEvaluator, SearchSettings, search_many
 PROFILE = "OMOKDOJANG_DAN"
 
 
+def _random_opening(rng, profile: str) -> tuple[list[str], object]:
+    """One random Taraguchi-10 opening played to NORMAL_RENJU (or a terminal state)."""
+    g = _core.GameState(profile)
+    actions = []
+    while g.phase != "NORMAL_RENJU" and not g.is_terminal:
+        legal = g.legal_actions()
+        near = []
+        for a in legal:
+            pt = a.split(":")[-1]
+            if pt[:1].isalpha() and pt[1:].isdigit():
+                p = _core.str_to_point(pt)
+                if max(abs(p // 15 - 7), abs(p % 15 - 7)) <= 3:
+                    near.append(a)
+        pool = near or legal
+        a = pool[int(rng.integers(len(pool)))]
+        g.apply(a)
+        actions.append(a)
+    return actions, g
+
+
 def make_openings(n: int, seed: int, profile: str = PROFILE, max_attempts_per_opening: int = 50) -> list[list[str]]:
     """n distinct random Taraguchi-10 openings (distinct by canonical D4 hash), played up to
     NORMAL_RENJU. Placements are uniform over legal points within Chebyshev distance 3 of H8 when
@@ -40,25 +61,37 @@ def make_openings(n: int, seed: int, profile: str = PROFILE, max_attempts_per_op
         attempts += 1
         if attempts > n * max_attempts_per_opening:
             raise RuntimeError(f"could only build {len(out)} distinct openings out of {n}")
-        g = _core.GameState(profile)
-        actions = []
-        while g.phase != "NORMAL_RENJU" and not g.is_terminal:
-            legal = g.legal_actions()
-            near = []
-            for a in legal:
-                pt = a.split(":")[-1]
-                if pt[:1].isalpha() and pt[1:].isdigit():
-                    p = _core.str_to_point(pt)
-                    if max(abs(p // 15 - 7), abs(p % 15 - 7)) <= 3:
-                        near.append(a)
-            pool = near or legal
-            a = pool[int(rng.integers(len(pool)))]
-            g.apply(a)
-            actions.append(a)
+        actions, g = _random_opening(rng, profile)
         if g.is_terminal or g.canonical_hash() in seen:
             continue
         seen.add(g.canonical_hash())
         out.append(actions)
+    return out
+
+
+def make_prefix_openings(n: int, seed: int, profile: str = PROFILE, max_attempts_per_opening: int = 50) -> list[list[str]]:
+    """n distinct random opening PREFIXES (Phase 7): a random opening cut after 1..len-1 actions, so
+    the players themselves still make the remaining Taraguchi-10 decisions (swaps, branch, ten
+    proposals, selection). Distinct by (canonical hash, phase); the empty board is not included."""
+    rng = np.random.default_rng([seed, 29])
+    seen, out = set(), []
+    attempts = 0
+    while len(out) < n:
+        attempts += 1
+        if attempts > n * max_attempts_per_opening:
+            raise RuntimeError(f"could only build {len(out)} distinct opening prefixes out of {n}")
+        actions, _ = _random_opening(rng, profile)
+        if len(actions) < 2:
+            continue
+        cut = actions[: int(rng.integers(1, len(actions)))]
+        g = _core.GameState(profile)
+        for a in cut:
+            g.apply(a)
+        key = (g.canonical_hash(), g.phase)
+        if g.is_terminal or key in seen:
+            continue
+        seen.add(key)
+        out.append(cut)
     return out
 
 
@@ -214,15 +247,17 @@ def main() -> int:
     ap.add_argument("--pairs", type=int, default=50)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--device", default="xpu" if hasattr(torch, "xpu") and torch.xpu.is_available() else "cpu")
+    ap.add_argument("--openings", choices=("full", "prefix"), default="full",
+                    help="full: random openings to NORMAL_RENJU; prefix: players make opening decisions")
     ap.add_argument("--out")
     args = ap.parse_args()
     cache: dict = {}
     a = make_player(args.a, args.device, cache)
     b = make_player(args.b, args.device, cache)
-    openings = make_openings(args.pairs, args.seed)
+    openings = (make_prefix_openings if args.openings == "prefix" else make_openings)(args.pairs, args.seed)
     t0 = time.time()
     results = play(a, b, openings, args.seed)
-    summary = {"a": args.a, "b": args.b, "seed": args.seed, "profile": PROFILE, "seconds": time.time() - t0,
+    summary = {"a": args.a, "b": args.b, "seed": args.seed, "openings": args.openings, "profile": PROFILE, "seconds": time.time() - t0,
                "torch": torch.__version__, "device": args.device} | summarize(results)
     print(json.dumps(summary, indent=2))
     if args.out:

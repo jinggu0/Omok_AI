@@ -32,6 +32,13 @@ Status: **Draft v0.1** · 2026-10-18
 | A-T6 | 영역 경계 포함 (Central(N)은 N×N 정사각형 전체) | 일반 해석 | — | 없음 | OPEN (C-20) |
 | A-T7 | 6수 이후 swap 없음, 7수부터 일반 Renju | RIF-T10 | — | — | VERIFIED(RIF-T10) |
 
+### 1.1 외부 프로토콜 가정 (Gomocup/Piskvork, v0.2 추가)
+| ID | 가정 | 근거 | 대안 | 영향 | 상태 |
+|---|---|---|---|---|---|
+| A-P1 | `INFO rule`은 비트마스크이며 Renju 값을 받은 엔진은 흑 금수(3-3·4-4·장목)를 RIF와 같게 처리 | Gomocup 프로토콜 관행 | 엔진별 해석 차이(재귀 거짓금수 미구현, 장목 처리 차이) | 외부 대국 결과 오염 | OPEN — 엔진마다 적합성 검사(EVALUATION §12.2)로 확인, 심판은 항상 canonical `GameState` |
+| A-P2 | Gomocup 좌표 `x,y`는 왼쪽 위 원점(x = 열, y = 행, 아래로 증가) | Gomocup 프로토콜 문서 관행 | 다른 원점 | 모든 외부 착수 | OPEN — 어댑터 1곳에서만 변환, 실제 엔진과 왕복 테스트로 VERIFIED 처리 예정(E1) |
+| A-P3 | Renju 시작 국면을 `BOARD`로 주면 엔진은 돌 수로 자기 색을 판단 | Renju는 흑 선수 | 엔진이 색을 별도로 가정 | 색 혼동 | OPEN — E1 적합성 검사 |
+
 ---
 
 ## 2. Compatibility Matrix — `OMOKDOJANG_DAN` vs RIF
@@ -106,6 +113,7 @@ Status: **Draft v0.1** · 2026-10-18
 | E-07 | CMake | 4.3.2 | |
 | E-08 | Python | 3.11.9, numpy 2.4.6, pytest 8.4.2 설치됨, **PyTorch 미설치** | Phase 4 전에 설치 필요 (XPU 빌드) |
 | E-09 | 저장소 | 빈 git 저장소 (`main`, 커밋 없음) | 기존 코드 제약 없음 |
+| E-10 | 평가 하드웨어 | 외부 엔진 평가도 같은 노트북(E-01..E-08)에서 수행한다고 가정. 학습·self-play와 동시 실행 시 CPU/GPU 경합으로 시간 통제 대국 결과가 달라짐 | Tier B/C 외부 대국은 다른 무거운 작업과 동시에 실행하지 않음, match에 hardware_id·동시 작업 기록 (PRD OQ-12) |
 
 ### 3.1 자원 가정에서 나오는 핵심 리스크 (PRD Risks R-01)
 AlphaZero 계열의 "최상급" 기력은 통상 수백~수천 GPU-일 규모 self-play를 필요로 한다. 노트북 내장 GPU 한 대로는
@@ -123,6 +131,7 @@ AlphaZero 계열의 "최상급" 기력은 통상 수백~수천 GPU-일 규모 se
 | D-02 | 자체 solver·자체 엔진 생성 기보는 자유롭게 사용 | 확정 |
 | D-03 | 타 엔진(Rapfi 등, GPL-3.0) 은 **별도 프로세스로 대국 상대/평가 기준**으로만 사용, 코드·가중치 미포함 | OPEN — 타 엔진 생성 기보를 학습 데이터로 쓸지 사용자 결정 필요 (PRD OQ-05) |
 | D-04 | 오목도장 앱 데이터(기보·스크린샷)는 사용자가 직접 수집한 규칙 검증용 소량만 사용, 학습 데이터로 대량 수집하지 않음 | 확정 |
+| D-05 | 외부 엔진(KataGomo, AlphaGomoku, JAX, Embryo, Gomocup 구버전 등)의 라이선스·재배포 조건은 엔진별로 다르며 확인 전까지 `UNVERIFIED`. 바이너리는 저장소에 포함하지 않고 사용자가 제공·승인한 것만 실행. 외부 대국 기보는 평가 전용(학습 사용은 OQ-05) | OPEN |
 
 ---
 
@@ -131,3 +140,4 @@ AlphaZero 계열의 "최상급" 기력은 통상 수백~수천 GPU-일 규모 se
 |---|---|---|
 | 2026-10-18 | 전체 | 초안 작성 |
 | 2026-10-18 | A-R3, A-R4, A-T3 | Phase 2 열거 결과로 갱신 (docs/PROGRESS.md) |
+| 2026-10-19 | A-P1..A-P3, E-10, D-05 | 외부 Strength Evaluation System(PRD v0.2) 가정 추가 |

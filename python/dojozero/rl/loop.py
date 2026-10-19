@@ -8,6 +8,11 @@ Each generation:
   3. continue training the learner on replay (+ optional Stage A tactical mix) -> models/gen_NNN.pt
   4. paired SPRT match: candidate vs best; promote on H1 (registry.json is the single source of truth)
   5. anchor match vs the heuristic bot for the best model (external reference, echo-chamber watch)
+Phase 7 (TRAINING.md §2.5-§2.6): self-play may start from the empty board / opening prefixes and
+record every Taraguchi-10 decision; a share of games is played against a league pool (fixed
+anchors + past best models) chosen by PFSP; matches can start from opening prefixes so the
+engines make the opening decisions; opening statistics, an opening value DB and the ten-proposal
+regret diagnostic are logged per generation.
 Components talk through files only (chunks, checkpoints, registry), so self-play / training /
 evaluation can later run as separate workers (filesystem queue, ARCHITECTURE.md §3.11).
 """
@@ -25,19 +30,20 @@ import numpy as np
 import torch
 import yaml
 
-from ..evaluation.match import make_openings, make_player, play
+from ..evaluation.match import make_openings, make_player, make_prefix_openings, play
+from ..evaluation.opening import OpeningDB, opening_stats, proposal_regret
 from ..evaluation.sprt import sprt
 from ..features import FeatureSpec
 from ..model.load import load_model, model_sha
 from ..search.driver import NetEvaluator
-from ..selfplay.generate import SelfPlaySettings, play_games
+from ..selfplay.generate import Opponent, SelfPlaySettings, play_games
 from ..selfplay.records import write_chunk
 from ..trainer import checkpoint
 from ..trainer.data import TacticalDataset
 from ..trainer.losses import LossWeights, total_loss
 from ..trainer.train import REPO, environment, git, pick_device
 
-KEYS = ("x", "legal", "policy", "has_policy", "value", "has_value", "aux")
+KEYS = ("x", "legal", "policy", "has_policy", "value", "has_value", "aux", "head", "tgt2")
 
 
 def rel(p: Path) -> str:
@@ -113,6 +119,64 @@ def save_model(path: Path, model, opt, spec: FeatureSpec, mcfg: dict, cfg: dict,
                     feature_spec=spec.to_dict(), model_config=mcfg, env=env, metrics=metrics)
 
 
+def eval_openings(ecfg: dict, n: int, seed: int) -> list[list[str]]:
+    return (make_prefix_openings if ecfg.get("openings", "full") == "prefix" else make_openings)(n, seed)
+
+
+def pfsp_weights(stats: dict, names: list[str], eps: float = 0.05) -> list[float]:
+    """Prioritized fictitious self-play, "hard" variant: weight (1 - p)^2 + eps where p is the
+    learner's score against the opponent (prior 0.5 from one pseudo-game per opponent)."""
+    out = []
+    for n in names:
+        e = stats.get(n, {"score": 0.0, "games": 0})
+        p = (e["score"] + 0.5) / (e["games"] + 1)
+        out.append((1.0 - p) ** 2 + eps)
+    return out
+
+
+def league_results(games: list[dict]) -> dict:
+    """Learner score per league opponent from this generation's league games."""
+    out: dict[str, dict] = {}
+    for g in games:
+        m = g["meta"]
+        if m.get("opponent", "self") == "self":
+            continue
+        e = out.setdefault(m["opponent"], {"score": 0.0, "games": 0})
+        e["games"] += 1
+        e["score"] += 0.5 if m["winner"] is None else float(m["winner"] == m["main_player"])
+    return out
+
+
+def league_members(cfg: dict, best_history: list[dict]) -> list[dict]:
+    """Fixed league members from the config plus the most recent past best models (the current
+    best is the learner side, so it is excluded). Names are unique."""
+    lc = cfg.get("league") or {}
+    members = [dict(m) for m in lc.get("fixed", [])]
+    k = int(lc.get("past_best", 0))
+    if k > 0:
+        members += [{"name": f"best_v{h['version']}", "spec": f"engine:{h['checkpoint']}"} for h in best_history[:-1][-k:]]
+    seen, out = set(), []
+    for m in members:
+        if m["name"] not in seen and m["spec"] not in seen:  # same model under two names: keep the first
+            seen.update((m["name"], m["spec"]))
+            out.append(m)
+    return out
+
+
+def build_league(members: list[dict], device, cache: dict) -> list[Opponent]:
+    out = []
+    for m in members:
+        kind, _, ckpt = m["spec"].partition(":")
+        if kind in ("heuristic", "random"):
+            out.append(Opponent(m["name"], kind))
+            continue
+        if ckpt not in cache:  # each model is loaded once per run
+            model, fspec, _ = load_model(str(REPO / ckpt), device)
+            cache[ckpt] = (NetEvaluator(model, device), fspec.core())
+        out.append(Opponent(m["name"], "engine", *cache[ckpt]))
+    return out
+
+
 def evaluate_pair(cand_ckpt: str, best_ckpt: str, ecfg: dict, device: str, seed: int, log) -> dict:
     cache: dict = {}
     sims = ecfg["sims"]
@@ -122,7 +186,7 @@ def evaluate_pair(cand_ckpt: str, best_ckpt: str, ecfg: dict, device: str, seed:
     rnd = 0
     res = sprt(scores, ecfg["elo0"], ecfg["elo1"], ecfg["alpha"], ecfg["beta"])
     while len(scores) < ecfg["max_pairs"]:
-        openings = make_openings(ecfg["pairs_per_round"], seed * 1000 + rnd)
+        openings = eval_openings(ecfg, ecfg["pairs_per_round"], seed * 1000 + rnd)
         results = play(a, b, openings, seed * 1000 + rnd, verbose=False)
         by_open: dict[int, list[float]] = {}
         for r in results:
@@ -141,7 +205,7 @@ def anchor_match(ckpt: str, ecfg: dict, device: str, seed: int) -> dict:
     cache: dict = {}
     a = make_player(f"engine:{ckpt}:sims={ecfg['sims']}", device, cache)
     b = make_player("heuristic", device, cache)
-    s = summarize(play(a, b, make_openings(ecfg["anchor_pairs"], 900_000 + seed), seed, verbose=False))
+    s = summarize(play(a, b, eval_openings(ecfg, ecfg["anchor_pairs"], 900_000 + seed), seed, verbose=False))
     return {k: s[k] for k in ("score", "score_ci95", "elo", "elo_ci95", "a_score_as_black", "a_score_as_white")}
 
 
@@ -184,7 +248,13 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
     step = ck["step"] if reg.data["generations"] else 0
     if reg.data["best"] is None:
         reg.data["best"] = {"version": 0, "checkpoint": cfg["init_checkpoint"], "sha": model_sha(learner)}
+        reg.data["best_history"] = [dict(reg.data["best"])]
+        reg.data["league"] = {}
         reg.save()
+    reg.data.setdefault("best_history", [dict(reg.data["best"])])
+    reg.data.setdefault("league", {})
+    league_cache: dict = {}
+    opening_db = OpeningDB(run_dir / "opening_db.json")
 
     from ..replay import ReplayBuffer
     replay = ReplayBuffer(spec, window=cfg["replay"]["window"], capacity=cfg["replay"]["capacity"])
@@ -206,9 +276,16 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
         # 1. self-play with the best model
         best_model, _, _ = load_model(str(REPO / best["checkpoint"]), device)
         t0 = time.time()
-        games = play_games(NetEvaluator(best_model, device), spec.core(), sp, seed=cfg["seed"] * 1000 + gen,
+        best_eval = NetEvaluator(best_model, device)
+        league = build_league(league_members(cfg, reg.data["best_history"]), device, league_cache) \
+            if sp.league_fraction > 0 else []
+        names = [o.name for o in league]
+        weights_l = pfsp_weights(reg.data["league"], names, float((cfg.get("league") or {}).get("pfsp_eps", 0.05)))
+        if league:
+            log("  league: " + ", ".join(f"{n} w={w:.2f}" for n, w in zip(names, weights_l)))
+        games = play_games(best_eval, spec.core(), sp, seed=cfg["seed"] * 1000 + gen,
                            meta={"generation": gen, "model_version": best["version"], "model_sha": best["sha"]},
-                           verbose=not quiet)
+                           verbose=not quiet, opponents=league, opponent_weights=weights_l)
         chunk = run_dir / "selfplay" / f"gen_{gen:03d}.jsonl.gz"
         write_chunk(chunk, games)
         winners = [g["meta"]["winner"] for g in games]
@@ -217,7 +294,20 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
         n_pos = replay.ingest(chunk, gen)
         log(f"  self-play: {len(games)} games, {n_pos} target positions in {t_sp:.0f}s; black wins "
             f"{black_wins}/{len(games)}, draws {winners.count(None)}; mean plies "
-            f"{np.mean([g['meta']['plies'] for g in games]):.1f}; replay {len(replay)} positions {replay.value_balance()}")
+            f"{np.mean([g['meta']['plies'] for g in games]):.1f}; replay {len(replay)} positions {replay.value_balance()} "
+            f"heads {replay.head_counts()}")
+        lres = league_results(games)
+        for n, e in lres.items():
+            tot = reg.data["league"].setdefault(n, {"score": 0.0, "games": 0})
+            tot["score"] += e["score"]
+            tot["games"] += e["games"]
+        if lres:
+            log("  league results (learner score): " + ", ".join(f"{n} {e['score']:.1f}/{e['games']}" for n, e in lres.items()))
+        ostats = opening_stats([g for g in games if g["meta"].get("opponent", "self") == "self"])
+        opening_db.add_games(games, best["version"])
+        opening_db.save()
+        regret = proposal_regret(best_eval, spec.core(), games, max_positions=int(cfg.get("regret_positions", 20)))
+        log(f"  opening: {ostats}; db {opening_db.summary()}; proposal regret {regret}")
         # 2. train the learner
         t0 = time.time()
         learner.train()
@@ -230,6 +320,8 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
                 rng = np.random.default_rng([cfg["seed"], step, 11])
                 tb = tactical.batch(tactical_pool[rng.integers(0, len(tactical_pool), n_tac)],
                                     rng.integers(0, 8, n_tac), device)
+                tb["head"] = torch.zeros(n_tac, dtype=torch.int64, device=device)  # HEAD_POLICY
+                tb["tgt2"] = torch.zeros(n_tac, 2, dtype=torch.float32, device=device)
                 b = {key: torch.cat([b[key], tb[key]]) for key in KEYS}
             ctx = torch.autocast(device_type="xpu", dtype=torch.bfloat16) if amp else torch.autocast("cpu", enabled=False)
             with ctx:
@@ -260,6 +352,7 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
         if promoted:
             reg.data["best"] = {"version": best["version"] + 1, "checkpoint": str(cand_rel).replace("\\", "/"),
                                 "sha": cand_sha, "generation": gen}
+            reg.data["best_history"].append(dict(reg.data["best"]))
         # 4. anchor vs heuristic (external reference)
         anchor = None
         if cfg["eval"].get("anchor_pairs", 0) > 0:
@@ -270,9 +363,10 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
             "candidate": str(cand_rel).replace("\\", "/"), "candidate_sha": cand_sha, "selfplay_model": best["sha"],
             "games": len(games), "positions": n_pos, "black_wins": black_wins, "draws": winners.count(None),
             "train": train_metrics, "step": step, "eval": ev, "promoted": promoted, "anchor": anchor,
+            "league": lres, "opening": ostats, "proposal_regret": regret,
             "seconds": time.time() - t_gen})
         reg.save()
-        del best_model
+        del best_model, best_eval
     return reg
 
 

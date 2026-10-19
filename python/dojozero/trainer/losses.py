@@ -28,6 +28,12 @@ class LossWeights:
     policy: float = 1.0
     value: float = 1.0
     aux: float = 0.5
+    opening: float = 1.0  # swap / branch / propose / select heads (Phase 7)
+
+
+# Head ids of a training position (which head its policy target belongs to).
+HEAD_POLICY, HEAD_SWAP, HEAD_BRANCH, HEAD_PROPOSE, HEAD_SELECT = 0, 1, 2, 3, 4
+HEAD_NAMES = ["policy", "swap", "branch", "propose", "select"]
 
 
 def masked_policy_loss(logits: torch.Tensor, legal: torch.Tensor, target: torch.Tensor,
@@ -67,11 +73,25 @@ def aux_loss(aux_logits: torch.Tensor, aux_target: torch.Tensor) -> torch.Tensor
 
 
 def total_loss(out: dict, batch: dict, w: LossWeights) -> tuple[torch.Tensor, dict]:
-    lp = masked_policy_loss(out["policy"], batch["legal"], batch["policy"], batch["has_policy"])
+    """batch["policy"] holds point/pass targets [N, 226] for the policy, propose and select heads
+    (selected by batch["head"]); batch["tgt2"] holds swap/branch targets [N, 2]. Batches without
+    "head" are plain policy batches (Stage A data)."""
+    head = batch.get("head")
+    has_policy = batch["has_policy"] if head is None else batch["has_policy"] & (head == HEAD_POLICY)
+    lp = masked_policy_loss(out["policy"], batch["legal"], batch["policy"], has_policy)
     lv = value_loss(out["wdl"], batch["value"], batch["has_value"])
     la = aux_loss(out["aux"], batch["aux"])
-    loss = w.policy * lp + w.value * lv + w.aux * la
-    parts = {"loss": loss.detach(), "policy": lp.detach(), "value": lv.detach(), "aux": la.detach()}
+    lo = la.new_zeros(())
+    if head is not None:
+        legal_pts = batch["legal"][:, :225]
+        ones2 = torch.ones_like(batch["tgt2"], dtype=torch.uint8)
+        lo = (masked_policy_loss(out["propose"], legal_pts, batch["policy"][:, :225], head == HEAD_PROPOSE)
+              + masked_policy_loss(out["select"], legal_pts, batch["policy"][:, :225], head == HEAD_SELECT)
+              + masked_policy_loss(out["swap"], ones2, batch["tgt2"], head == HEAD_SWAP)
+              + masked_policy_loss(out["branch"], ones2, batch["tgt2"], head == HEAD_BRANCH))
+    loss = w.policy * lp + w.value * lv + w.aux * la + w.opening * lo
+    parts = {"loss": loss.detach(), "policy": lp.detach(), "value": lv.detach(), "aux": la.detach(),
+             "opening": lo.detach()}
     for k, v in parts.items():
         if not torch.isfinite(v):
             raise NonFiniteLoss(f"non-finite {k} loss")

@@ -1,6 +1,6 @@
 # DojoZero — Product Requirements Document
 
-Status: **Draft v0.1 — 리뷰 대기** · 2026-10-18 · Owner: Jinggu0_
+Status: **Draft v0.2 — 리뷰 대기** · 2026-10-19 (v0.1 2026-10-18) · Owner: Jinggu0_
 관련 문서: [RULES](RULES.md) (규칙 규범) · [ARCHITECTURE](ARCHITECTURE.md) · [TRAINING](TRAINING.md) · [EVALUATION](EVALUATION.md) · [ASSUMPTIONS](ASSUMPTIONS.md)
 
 규범 우선순위: RULES.md > PRD.md > 나머지. 충돌 시 상위 문서를 따르고 하위 문서를 고친다.
@@ -34,8 +34,9 @@ DojoZero는 **정확성이 검증된 규칙 엔진** 위에 전술 solver와 신
 | G4 | 신경망+탐색 엔진이 기준 봇들을 결정적으로 이김 | paired SPRT 통과 (heuristic, solver bot) |
 | G5 | Taraguchi-10 opening 결정을 학습 | opening regret 지표 감소, Elo |
 | G6 | 하이브리드(전술+신경망) > 순수 신경망 | 통계적으로 유의한 paired 결과 |
-| G7 | 외부 기준 엔진 대비 기력 위치 측정 | Rapfi 대비 시간 budget별 Elo 곡선 (목표치는 OQ-03 결정 후 설정) |
+| G7 | **버전 고정된 External Strength Ladder**에서 기력 위치를 지속적으로 측정 (Rapfi 단일 anchor → 내부 checkpoint · 약/중 외부 엔진 · Embryo · JAX · AlphaGomoku · KataGomo · Rapfi 사다리) | `dojo_external_elo` ± CI, ladder 위치(50% 경계 상대), 상대·budget별 score 곡선 (EVALUATION §12–§18). 절대 목표치는 OQ-03 결정 후 설정 |
 | G8 | 완전 재현 가능한 릴리스 | 체크포인트로 결과 재현, resume 일치 테스트 |
+| G9 | **Strength-driven development**: 기능 채택은 구현 완료가 아니라 측정된 강도로 결정 | 변경마다 paired A/B 결과 `ACCEPT / REJECT / INCONCLUSIVE` 기록 (EVALUATION §19) |
 
 ## 5. Non-goals
 - 오목도장 앱(또는 어떤 온라인 서비스) 자동 조작, 화면 인식 봇, 온라인 대국 부착 — **구현하지 않는다**.
@@ -78,11 +79,19 @@ DojoZero는 **정확성이 검증된 규칙 엔진** 위에 전술 solver와 신
 | FR-12 | Self-play: game-parallel 워커, 기보 기록(TRAINING §3), 모델 hash 기록, 원자적 파일 쓰기 |
 | FR-13 | Replay: 디스크 기반, window/감쇠, prioritized 옵션, 균형 메타데이터, canonical dedupe, reanalysis |
 | FR-14 | 학습: Stage A–G, 손실(TRAINING §4), AdamW/SGD, warmup+cosine, 체크포인트 resume |
-| FR-15 | 평가: paired match, Taraguchi role-paired protocol, SPRT/Elo CI, 외부 엔진 어댑터, 리포트 |
+| FR-15 | 평가(내부): paired match, Taraguchi role-paired protocol, SPRT/Elo CI, 리포트. 외부 엔진 평가는 FR-20..FR-27로 분리 |
 | FR-16 | 고정 벤치마크 A–H 러너, 버전 간 diff |
 | FR-17 | CLI: play, analyze, selfplay, train, evaluate, benchmark, rules-test (ARCHITECTURE §6) |
 | FR-18 | 호환성 테스트 JSON 자동 수집·실행 |
 | FR-19 | Python은 규칙을 재구현하지 않고 pybind11 바인딩만 사용 |
+| FR-20 | **ExternalEngine 레지스트리**: `external_engines/<engine_id>.json` 메타(engine_id, name, version, executable sha256, source, license, supported_rules, protocol, search/time 설정, public reference rating = 참고 메타만). 바이너리는 저장소에 포함하지 않고 사용자가 제공·승인한 경로만 사용, 실행 전 sha256 대조 (EVALUATION §12) |
+| FR-21 | **Piskvork/Gomocup 프로토콜** (v1 요구사항): (a) 외부 엔진 클라이언트 — 프로세스 기동, START/RECTSTART(미지원 명시)/BEGIN/TURN/BOARD/INFO/END/ABOUT; (b) DojoZero 엔진 측 — tournament manager가 쓸 수 있는 `pbrain-DojoZero.exe`. Renju 규칙 전달(`INFO rule`), 좌표 변환은 어댑터 경계 1곳에서만. 프로토콜 파서는 AI/search와 분리되고 규칙 판정은 canonical `GameState`만 사용 (ARCHITECTURE §3.12) |
+| FR-22 | **TournamentRunner** (`dojozero tournament`): paired opening 배정, 프로세스 수명·timeout·crash·malformed 응답·illegal/금수 착수 감지, 기보 기록, 결과 집계. 외부 실패는 일반 패배와 별도 `termination_reason`으로 기록 |
+| FR-23 | **버전 관리된 opening corpus** `benchmarks/openings/*.json`(opening_id, 수순, profile, source/version, expected legality, approximate balance, 생성 방법) + 세트 해시를 모든 match report에 기록, 학습 데이터 누출 검사(§15) 연동 |
+| FR-24 | **Strength Database** `runs/evaluation/results.sqlite`: Engine / Match / Game / RatingSnapshot / Experiment 테이블. 모든 평가 결과를 누적 (EVALUATION §17) |
+| FR-25 | **3-tier 평가 + adaptive opponent selection**: Tier A regression / Tier B development / Tier C reference, 점수 구간에 따라 ladder 상대 자동 선택(임계값 config) (EVALUATION §13–§14) |
+| FR-26 | **자동 Strength Report** (Markdown + JSON): internal / external ladder / tactical / performance / opening / regression / diagnosis / recommendation 섹션. 측정하지 않은 항목은 `UNKNOWN` (EVALUATION §22) |
+| FR-27 | **패배 분석 + match reanalysis 큐**: 패배 기보의 원인 분류(첫 큰 평가 급변, 놓친 즉시 전술·VCF/VCT, 금수 문제, opening 불리, timeout, value 오판, policy 후보 누락)와 고-budget 재분석. 실전 결과와 재분석 결과는 별도 저장 (EVALUATION §21) |
 
 ## 10. Non-functional Requirements
 | ID | 요구사항 |
@@ -94,6 +103,7 @@ DojoZero는 **정확성이 검증된 규칙 엔진** 위에 전술 solver와 신
 | NFR-05 안정성 | 불법 action·크래시·NaN·타임아웃 0 (스트레스 테스트로 확인) |
 | NFR-06 관측성 | 구조화 로그, TensorBoard, 평가 리포트 |
 | NFR-07 유지보수 | 모듈 의존 단방향, 규칙 단일 구현, 문서-코드 ID 상호참조 |
+| NFR-08 compute 기록 | 모든 대국 평가에 wall time, CPU threads, GPU device·사용률, 메모리, nodes, MCTS sims, NN evals·batch·eval/s, nodes/s, 동시 대국 수를 기록. 모델 선택은 파라미터 수·validation loss가 아니라 Elo/compute로 (EVALUATION §18) |
 
 ## 11. AI Requirements
 - 어떤 profile·phase에서도 illegal action을 선택하지 않는다(legal mask, 런타임 assert).
@@ -124,6 +134,7 @@ DojoZero는 **정확성이 검증된 규칙 엔진** 위에 전술 solver와 신
 - 학습 데이터: solver 생성(Stage A), 자체 self-play, (선택) 라이선스 확인된 외부 기보.
 - 모든 샘플: source, license, generator/model version, seed, profile hash.
 - 벤치마크 세트는 학습 데이터와 해시로 분리·누출 검사.
+- 평가용 opening corpus(`benchmarks/openings/*`, FR-23)도 같은 누출 검사 대상: 학습 데이터에 corpus 시작 국면(canonical hash)이 시작점으로 들어가면 실패. 외부 엔진 대국 기보는 OQ-05 결정 전까지 학습에 쓰지 않는다.
 - 기보는 action 수순으로 저장, 국면은 엔진 재생으로 복원(ARCHITECTURE §5.1).
 
 ## 16. Model Architecture
@@ -138,7 +149,12 @@ PUCT 기본 + Gumbel root(Sequential Halving) 옵션, MCTS-solver, actor-aware b
 1 trainer + N self-play + M evaluation 워커, 파일시스템 큐, 버전·해시된 ONNX 모델 배포, 디스크 replay + SQLite 인덱스. 세부: [TRAINING.md](TRAINING.md).
 
 ## 19. Evaluation Methodology
-paired games(pentanomial), Taraguchi role-paired protocol, SPRT 승격, Elo±95% CI, 외부 anchor(Rapfi), 고정 벤치마크 A–H, ablation A–H. 세부: [EVALUATION.md](EVALUATION.md).
+paired games(pentanomial), Taraguchi role-paired protocol, SPRT 승격, Elo±95% CI, 고정 벤치마크 A–H, ablation A–H. 세부: [EVALUATION.md](EVALUATION.md). 추가 원칙(v0.2):
+- **3-tier 평가**: Tier A regression(빠름, 변경마다) / Tier B development(채택 결정의 주 기준, DojoZero와 비슷한 강도의 ladder 상대 2–4개) / Tier C reference(milestone·release candidate, 최상위 엔진, 엄격히 고정된 조건).
+- **External Strength Ladder**: 외부 anchor는 Rapfi 하나가 아니라 버전 고정된 사다리. 정보량이 큰 대국(점수 25–75%)에 compute를 집중하고, 0–2% 같은 최상위 상대 결과만으로 개발 판단을 하지 않는다.
+- **두 개의 강도 보고를 섞지 않는다**: Standard Renju(외부 엔진 비교, balanced Renju 시작 국면) vs Taraguchi-10 full-game(DojoZero opening 능력). 외부 엔진이 Taraguchi action을 지원하지 않으면 Taraguchi rating에 포함하지 않는다.
+- **세 종류의 rating 이름을 혼용하지 않는다**: `gomocup_reference_elo`(공개 수치, 메타데이터) / `dojo_external_elo`(동일 환경 직접 대국으로 추정한 외부 사다리 Elo) / `dojo_internal_elo`(self-play·checkpoint·내부 봇 Elo). 공개 Elo를 우리 척도로 동일시하지 않는다. Taraguchi-10 full-game 강도는 별도 `dojo_taraguchi_elo`(EVALUATION §16).
+- **Strength-driven decision**: 기능은 baseline vs candidate paired A/B로 `ACCEPT / REJECT / INCONCLUSIVE` 판정. INCONCLUSIVE는 성공이 아니다.
 
 ## 20. Performance Requirements
 측정 환경과 잠정 목표는 [EVALUATION.md §8](EVALUATION.md). 목표는 Phase 2–5 실측 후 갱신하며 갱신 이력을 남긴다. NN 추론은 반드시 배치 지원.
@@ -150,7 +166,7 @@ paired games(pentanomial), Taraguchi role-paired protocol, SPRT 승격, Elo±95%
 C++ API(ARCHITECTURE §3.6, §3.7, §3.9, §3.10): `GameState{apply, undo, legal_actions, result, forbidden}`, `AIEngine::search(state, limits) → SearchResult`, `OpeningEngine{legal_opening_actions, evaluate_opening, generate_ten_fifths}`, `Evaluator`. Python 바인딩 `dojozero_core`.
 
 ## 23. CLI
-`dojozero play | analyze | selfplay | train | evaluate | benchmark | rules-test`. analyze 출력: best move, top-N(P, Q, visits, W/D/L), tactical status, PV, 금수점 + 이유.
+`dojozero play | analyze | selfplay | train | evaluate | benchmark | rules-test | tournament | report`. analyze 출력: best move, top-N(P, Q, visits, W/D/L), tactical status, PV, 금수점 + 이유. 별도 실행 파일 `pbrain-DojoZero.exe`(Piskvork 프로토콜 엔진, FR-21b).
 
 ## 24. File Formats
 기보 chunk `.dzg`(action 수순 + 탐색 레코드), 체크포인트 `.pt`(format_version 포함), 추론 모델 ONNX + manifest(sha256), 벤치마크/호환성 JSON(schema_version), config(JSON: 규칙·탐색 / YAML: 학습·모델). 세부: ARCHITECTURE §5.
@@ -166,18 +182,20 @@ C++ API(ARCHITECTURE §3.6, §3.7, §3.9, §3.10): `GameState{apply, undo, legal
 ## 27. Security / Integrity
 - 앱·온라인 서비스 자동화 없음.
 - 체크포인트 로드 시 `torch.load(weights_only=True)`, ONNX/체크포인트 sha256 검증. 신뢰할 수 없는 pickle 로드 금지.
-- 외부 엔진은 별도 프로세스, 표준 입출력 프로토콜만, 사용자 승인된 바이너리만.
+- 외부 엔진은 별도 프로세스, 표준 입출력 프로토콜만, 사용자 승인된 바이너리만. 실행 전 메타데이터의 sha256과 대조해 다르면 실행 거부(버전 drift 방지). 외부 바이너리는 저장소·릴리스에 자동 포함하지 않는다.
+- 외부 엔진 출력은 신뢰하지 않는 입력: 모든 착수는 canonical `GameState`로 합법성 검사, 응답 길이·형식 검증, 프로세스별 timeout.
 - 입력(국면 JSON, CLI) 검증, malformed state 거부. 기보 파일 손상 감지(길이·magic·버전).
 
 ## 28. Legal / Data License Considerations
 - 공개 기보 DB는 라이선스 확인 전 사용 금지(D-01).
-- GPL 엔진(Rapfi 등)은 코드·가중치를 포함하지 않고 별도 프로세스로만 사용(D-03). 타 엔진 생성 기보를 학습에 쓸지는 OQ-05.
+- GPL 엔진(Rapfi 등)은 코드·가중치를 포함하지 않고 별도 프로세스로만 사용(D-03). 타 엔진 생성 기보를 학습에 쓸지는 OQ-05 — 결정 전까지 외부 대국 기보는 **평가 전용**(replay 투입 금지).
+- 외부 엔진별 라이선스·배포 조건은 각 `external_engines/*.json`의 `license`에 기록하며, 확인 전에는 `UNVERIFIED`(D-05).
 - 오목도장 앱: 이용약관 준수 — 자동화·스크래핑 없음, 사용자가 수동으로 얻은 소량의 규칙 검증 증거만 사용(D-04).
 - 문헌 문제 국면은 좌표만 사용, 출처 기록.
 - 프로젝트 자체 라이선스는 OQ-10.
 
 ## 29. Observability
-구조화 JSON 로그, TensorBoard 메트릭(TRAINING §9), 평가 리포트(Markdown+JSON), 벤치마크 결과 버전별 저장, self-play 통계(게임 길이, 결정 분포, 흑/백 승률), 장시간 프로세스의 명령·플래그·PID 기록.
+구조화 JSON 로그, TensorBoard 메트릭(TRAINING §9), 평가 리포트(Markdown+JSON), 벤치마크 결과 버전별 저장, self-play 통계(게임 길이, 결정 분포, 흑/백 승률), 장시간 프로세스의 명령·플래그·PID 기록. **장기 strength history**: 모든 내부·외부 대국과 rating snapshot을 Strength DB(FR-24)에 누적, PROGRESS.md의 Current Strength Snapshot(측정 안 한 항목은 UNKNOWN), 외부 대국의 실패 사유(crash/timeout/malformed/illegal) 통계.
 
 ## 30. Failure Modes
 | 실패 | 감지 | 대응 |
@@ -195,6 +213,12 @@ C++ API(ARCHITECTURE §3.6, §3.7, §3.9, §3.10): `GameState{apply, undo, legal
 | echo chamber (내부 Elo만 상승) | 외부 anchor 정기 대국 | 학습 방향 재검토 |
 | 중복 워커 실행 | PID 파일, 프로세스 조회 | 재시작 전 정리 |
 | 파일 손상/부분 쓰기 | magic/길이 검사 | tmp→rename 원자적 쓰기 |
+| 외부 프로토콜 실패(crash, timeout, malformed 응답, illegal·금수 착수) | TournamentRunner 감지, canonical GameState 검증 | 일반 패배와 다른 `termination_reason`으로 기록, 실패율 별도 보고, 실패율이 임계 초과인 상대·설정은 ladder에서 제외 |
+| 외부 바이너리 version drift | 실행 전 sha256 대조 | 불일치 시 실행 거부, 새 버전은 새 engine_id로 등록 |
+| benchmark opening drift | opening set hash를 모든 report·DB에 기록 | 해시가 다른 결과끼리 비교 금지 |
+| rating 척도 혼동 | 보고서 필드 이름 강제(`gomocup_reference_elo` / `dojo_external_elo` / `dojo_internal_elo`) | 공개 Elo는 메타데이터로만 |
+| 특정 상대 과적합 | ladder 전체·보지 않은 상대(held-out)의 점수 추이 | 상대 다양화, Tier C로 교차 확인 |
+| 정보 없는 매치(점수 <5% 또는 >95%만 반복) | adaptive selection 로그 | 점수 25–75% 상대에 compute 집중 |
 
 ## 31. Risks
 | ID | 리스크 | 영향 | 가능성 |
@@ -207,6 +231,8 @@ C++ API(ARCHITECTURE §3.6, §3.7, §3.9, §3.10): `GameState{apply, undo, legal
 | R-06 | opening 10제안 action space가 커서 학습 신호 희소 | opening 기력 저하 | 중간 |
 | R-07 | 자체 테스트가 자체 정의를 순환 검증 | 숨은 규칙 오류 | 중간 |
 | R-08 | 범위 과대(Phase 0–8 전체) | 일정 지연 | 높음 |
+| R-09 | 외부 최상위 엔진과 compute 조건이 불공정(CPU 멀티스레드 엔진 vs GPU 배치 엔진, 동시 대국 수, 시간 관리 차이) → 잘못된 강도 결론 | 개발 방향 오판 | 높음 |
+| R-10 | 외부 엔진의 Renju 규칙 구현 차이(금수·장목 처리) → 대국 결과 오염 | ladder 신뢰도 저하 | 중간 |
 
 ## 32. Mitigations
 | 리스크 | 완화 |
@@ -219,6 +245,8 @@ C++ API(ARCHITECTURE §3.6, §3.7, §3.9, §3.10): `GameState{apply, undo, legal
 | R-06 | top-k 방식 기본(이론적 근거), Opening Value DB, opening 전용 커리큘럼 |
 | R-07 | 독립 출처 테스트 의무화, 교차 엔진 차등 비교 |
 | R-08 | Phase 게이트, 각 Milestone이 단독으로 유용한 산출물(규칙 엔진 → 분석기 → 엔진) |
+| R-09 | compute 기록 의무(NFR-08), fixed-time과 fixed-visits 결과를 분리 보고, Tier C는 대국 1개씩 순차·고정 하드웨어, 여러 budget의 scaling curve로 결론 |
+| R-10 | ladder 등록 전 규칙 적합성 사전 검사(금수 국면 세트, 흑 금수 착수 0건 확인), 금수 착수는 `FORBIDDEN_MOVE` 실패로 기록 |
 
 ## 33. Milestones
 | Milestone | Phase | 내용 |
@@ -232,6 +260,16 @@ C++ API(ARCHITECTURE §3.6, §3.7, §3.9, §3.10): `GameState{apply, undo, legal
 | M6 | 8 | 하이브리드 vs 순수 비교, 최적화, 패키징 |
 | Final | — | 재현 가능한 릴리스 |
 
+**Evaluation infrastructure 트랙(v0.2 추가)**: 아래 E1–E4는 Phase 순서에 끼워 넣어 순차 구현한다(한 번에 전부 구현하지 않음). M2–M4는 이 트랙 이전에 완료되었으므로 해당 strength gate는 **소급(backfill)** 항목으로 E1에서 수행한다.
+
+| 단계 | 시점 | 내용 | 선행 조건 |
+|---|---|---|---|
+| E0 | Phase 7 (현재) | 문서·아키텍처 준비만. Taraguchi-10 full-game 보고를 Standard Renju 보고와 분리 기록(이미 prefix-opening 매치로 측정 중) | — |
+| E1 | Phase 8 착수 직후 (Ablation 전) | `cpp/protocol/`(Gomocup 클라이언트·좌표 변환·프로세스), ExternalEngine 메타 + sha256 검증, 시간 기반 SearchLimits, TournamentRunner, failure reason, opening corpus v1, `results.sqlite`, report v0, **첫 external calibration(M3 소급 gate)** | OQ-04 승인, OQ-11 버전 고정, OQ-13 시간 규정 |
+| E2 | Phase 8 중 | Tier A/B 자동화, adaptive opponent selection, compute 기록 전 항목, FAST/STANDARD/STRONG scaling curve, M4 소급(세대별 internal vs external 상관) | E1 |
+| E3 | Phase 8 말 | `pbrain-DojoZero.exe`(ADR-08), 패배 원인 분류 + reanalysis 큐, Diagnosis 자동 연결 | E2, ADR-02 |
+| E4 | Final | Tier C reference evaluation, 최종 Strength Report | E3 |
+
 ## 34. Acceptance Criteria
 - **M1**: 규칙 엔진 완성; exact-five / overline / 3-3 / 4-4 정확; 재귀 거짓금수 테스트 완비(재귀 1·2·3단 포함); Taraguchi-10 상태 머신 완성; 규칙 테스트 100%; 퍼징 ≥10⁷ 불일치 0; 1차원 전수 열거 통과; A-R3/A-R4 검증 결과 문서화.
 - **M2**: VCF solver 동작; 고정 전술 벤치마크 통과(기준치는 세트 확정 시 설정), WIN 오답 0.
@@ -240,6 +278,16 @@ C++ API(ARCHITECTURE §3.6, §3.7, §3.9, §3.10): `GameState{apply, undo, legal
 - **M5**: Taraguchi-10 opening 전체 학습 가능; swap/제안/선택 action 지원; opening regret 감소.
 - **M6**: 하이브리드 전술+신경망 탐색이 순수 baseline을 paired 통계로 유의하게 이김.
 - **Final**: 재현 가능한 릴리스, 독립 엔진, 분석기, 학습된 체크포인트, 벤치마크 리포트, 완전한 문서.
+
+**Strength gates (v0.2 추가, 위 기준에 더해짐)** — 절대 외부 Elo 목표는 정하지 않는다(OQ-03). 각 단계가 실제 대국 능력으로 무엇을 보여야 하는지만 정한다.
+| Milestone | Strength gate | 현재 상태 |
+|---|---|---|
+| M2 | 전술 solver 기능 완성, 고정 전술 benchmark; external match infra skeleton 시작 | 전술 부분 충족(PROGRESS Phase 3), infra는 **미충족 → E1에서 소급** |
+| M3 | 첫 neural/search engine; Gomocup 어댑터 + TournamentRunner 동작; external ladder 첫 calibration을 baseline으로 저장 | 엔진 충족, 어댑터·calibration **미충족 → E1 소급** |
+| M4 | 의미 있는 세대마다 internal promotion; 정기 external ladder 비교; internal Elo와 external strength가 함께 오르는지 확인 | promotion 충족(내부 휴리스틱 anchor만), external 비교 **미충족 → E2 소급** |
+| M5 | Taraguchi-10 full-game 별도 rating/report; opening 지표와 Standard Renju 강도를 둘 다 추적 | 부분 충족(Phase 7): prefix 오프닝 +123 [+22, +224] vs 무작위 오프닝 +7 [−88, +102]로 분리 측정. Strength DB·외부 비교는 E1 이후 |
+| M6 | hybrid가 baseline보다 유의하게 강함; 주요 external anchor 대비 최종 격차 측정; top-engine comparison report | 미착수 |
+| Final | report에 external ladder 위치, top anchor W/D/L, Elo delta + CI, compute 설정, tactical score, Taraguchi score, scaling curve, ablation 포함 | 미착수 |
 
 ## 35. Deliverables
 C++ 라이브러리·`dojozero_engine.exe`, Python 패키지 `dojozero`(+`dojozero_core` 확장), 문서 6종 + 갱신 이력, 테스트 스위트, `benchmarks/` 고정 세트, 학습된 체크포인트 + ONNX + manifest, 평가·벤치마크 리포트, 재현 스크립트.
@@ -250,13 +298,18 @@ C++ 라이브러리·`dojozero_engine.exe`, Python 패키지 `dojozero`(+`dojoze
 | OQ-01 | 오목도장 유단자 규칙이 실제로 RIF Renju + Taraguchi-10인가? 앱에서 C-01..C-20 증거를 수집할 수 있는가? | 없음(기본값 진행) / 호환성 확정은 M1 이후 |
 | OQ-02 | 4수 후 Choice 1/2 결정자와 직접 5수 전 swap 결정자(A-T1, A-T2) — 앱 UI에서 누구에게 선택지가 뜨는가? | M5 정책 구조 (상태 머신은 profile로 양쪽 지원) |
 | OQ-03 | 목표 기력과 compute 예산: "최상급"을 무엇으로 측정할까(예: Rapfi 대비 동일 시간 승률)? 외부(클라우드) GPU 사용 가능한가? | M3 이후 계획 |
-| OQ-04 | 외부 기준 엔진(Rapfi 등) 바이너리 다운로드·평가 사용 허용? | M3 평가 |
+| OQ-04 | 외부 기준 엔진(Rapfi, KataGomo, AlphaGomoku, JAX, Embryo, Gomocup 구버전 등) 바이너리를 어떻게 확보하는가(사용자 제공 vs 사용자 승인 후 다운로드)? 엔진별 라이선스 확인 주체 | E1 |
 | OQ-05 | 타 엔진이 생성한 기보를 학습 데이터로 써도 되는가(Stage C)? | M3 |
 | OQ-06 | compute 제약이 심할 경우 AlphaZero 대신(또는 병행) CPU 친화 alpha-beta + 경량 NN(NNUE류) 아키텍처를 검토할 것인가? 권장: 명세대로 AlphaZero로 진행하되 M3 실측 후 재평가 | M3 |
 | OQ-07 | ~~PyTorch XPU(Intel GPU) 빌드 설치 허용?~~ **해결**: 사용자 승인으로 torch 2.14.1+xpu 설치(Phase 4). XPU 백엔드 우회 3건은 PROGRESS 참조 | — |
 | OQ-08 | `pass_allowed` 기본값(C-06) | 없음 |
 | OQ-09 | 10제안 대칭 모드 기본값 E1 vs E3 (C-10) | 없음(옵션) |
 | OQ-10 | 프로젝트 라이선스 | Final |
+| OQ-11 | reference engine **버전 고정** 정책: 각 엔진의 어느 버전(공개 날짜·sha256)을 ladder 기준으로 고정하고 언제 갱신하는가? 갱신 시 이전 버전도 유지하는가? | E1 |
+| OQ-12 | 평가 하드웨어: 개발 노트북(E-01..E-08)에서 학습·self-play와 동시에 평가해도 되는가, 평가 전용 시간대를 둘 것인가? Tier C를 다른 머신에서 할 것인가? | E1 |
+| OQ-13 | tournament 시간 규정: 수당 고정 시간(예: 50ms/100ms/500ms/1s/5s) vs 대국당 시간(Gomocup식 timeout_match), CPU 스레드 수, 동시 대국 수 | E1 |
+| OQ-14 | Standard Renju opening corpus 출처: 자체 생성(다중 엔진 평가로 균형 판정) vs 공개 세트(RIF 26 + 대표 5수, 라이선스 확인) | E1 |
+| OQ-15 | `pbrain-DojoZero.exe`의 추론 호스트: C++ ONNX/OpenVINO 추론(ADR-02) vs Python(PyTorch XPU) 프로세스를 감싸는 런처 (ADR-08) | E3 |
 
 ## 37. Research Questions
 | 질문 | 대응 실험 |
@@ -268,12 +321,21 @@ C++ 라이브러리·`dojozero_engine.exe`, Python 패키지 `dojozero`(+`dojoze
 | aux tactical heads의 sample efficiency | Ablation D |
 | reanalysis의 동일 compute Elo 개선 | Ablation H |
 | league의 순환 전략 감소 효과 | Ablation G + 비이행성 지표 |
+| RQ-01 fixed visits와 fixed time에서 모델 순위가 달라지는가 | EVALUATION §23 |
+| RQ-02 NN 규모 증가가 Elo/compute를 실제로 개선하는가 | EVALUATION §23 (Ablation A 확장) |
+| RQ-03 tactical solver가 강한 외부 엔진 상대에서 어떤 유형의 패배를 줄이는가 | EVALUATION §21, §23 (Ablation C 확장) |
+| RQ-04 solver 호출 임계값의 최적점이 상대 강도에 따라 달라지는가 | EVALUATION §23 |
+| RQ-05 search budget이 커질수록 DojoZero의 상대 Elo는 어떻게 변하는가 | EVALUATION §18 scaling curve |
+| RQ-06 self-play internal Elo와 external ladder Elo의 상관 | EVALUATION §23 |
+| RQ-07 학습 세대가 진행되며 특정 외부 엔진에 과적합하는가 | EVALUATION §23 (held-out 상대) |
+| RQ-08 Taraguchi-10 opening 개선이 balanced midgame Renju 강도를 희생하는가 | EVALUATION §15, §23 |
 
 ## 38. Future Work
-GUI/웹 분석 보드, Gomocup 프로토콜 서버 모드(타 GUI 연동), gRPC/MQ 분산, NPU(OpenVINO) 추론, TensorRT(외부 GPU 시), 다른 opening rule(Soosõrv-8, Swap2, Super Taraguchi-10), 다른 보드 크기, Opening DB 공개 포맷, 앙상블 불확실성.
+GUI/웹 분석 보드, Gomocup 대회 실제 출전(대회 규정 대응; 프로토콜 엔진 자체는 v1 FR-21로 이동), gRPC/MQ 분산, NPU(OpenVINO) 추론, TensorRT(외부 GPU 시), 다른 opening rule(Soosõrv-8, Swap2, Super Taraguchi-10), 다른 보드 크기, Opening DB 공개 포맷, 앙상블 불확실성.
 
 ---
 ### 변경 이력
 | 날짜 | 버전 | 변경 |
 |---|---|---|
 | 2026-10-18 | 0.1 | 초안 |
+| 2026-10-19 | 0.2 | 지속적 Strength Evaluation System: G7 확장(External Strength Ladder), G9, FR-20..FR-27, NFR-08, §19 원칙, 실패 모드 6종, R-09/R-10, E0–E4 트랙과 strength gate, OQ-11..OQ-15, RQ-01..RQ-08. Gomocup 프로토콜을 Future Work에서 v1으로 이동 |

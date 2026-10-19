@@ -5,6 +5,78 @@ and what is still open. Newest phase first.
 
 ---
 
+## Current Strength Snapshot (갱신: 2026-10-19, PRD v0.2 / EVALUATION §16 이름 규칙)
+
+측정하지 않은 항목은 `UNKNOWN`. 추정값을 실측처럼 쓰지 않는다. 외부 엔진 평가 인프라(E1)는 아직 없다.
+
+| 항목 | 값 |
+|---|---|
+| version | Phase 7 best = `taraguchi_v1` registry v1 (Phase 6 best `selfplay_v2` v2에서 이어 학습) |
+| best checkpoint | `runs/taraguchi_v1/models/gen_001.pt` |
+| external calibration date | UNKNOWN (외부 엔진 대국 0회) |
+| strongest opponent with score ≥ 50% | 내부: Phase 6 best `selfplay_v2` v2 (prefix 오프닝 0.67, 전체 무작위 오프닝 0.51) — 외부: UNKNOWN |
+| weakest opponent with score < 50% | UNKNOWN (점수 50% 미만 상대 미측정) |
+| Rapfi / KataGomo / AlphaGomoku / JAX / Embryo score | UNKNOWN / UNKNOWN / UNKNOWN / UNKNOWN / UNKNOWN |
+| `dojo_external_elo` (CI) | UNKNOWN |
+| `dojo_internal_elo` | taraguchi v1 vs selfplay v2: +7 [−88, +102] (무작위 오프닝을 NORMAL까지 진행한 시작점, 50쌍, 64 sims); selfplay v2 vs v0 +210 [+97, +322]; heuristic 대비 0.95–0.975 (20쌍 앵커) |
+| `dojo_taraguchi_elo` | taraguchi v1 vs selfplay v2: **+123 [+22, +224]** (prefix 오프닝 50쌍, 64 sims, 엔진이 opening 결정) — 절대 척도 아님(기준점 = selfplay v2) |
+| tactical score | 네트워크 단독 83.6%, 탐색 포함 91.8% (102문제, Phase 4–5; 이후 모델은 미측정) |
+| primary known weakness | 측정 근거 있는 것: 탐색 속도(EVALUATION §8.2 미달 항목), opening 결정 붕괴(2·3수 후 swap 100%, offer10 98%), 색 편향(흑으로 0.74–0.83 / 백으로 0.28–0.35). 외부 상대 기준 약점은 UNKNOWN |
+
+---
+
+## Phase 7 — Taraguchi-10 opening RL + league (2026-10-19)
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| opening 헤드 손실(swap/branch/propose/select, `L_opening`) | `python/dojozero/trainer/losses.py` |
+| replay: 모든 head의 target 기록·검증(phase, 합법 action, legal mask, 헤드 혼합 거부), `final_hash` 무결성 검사 | `python/dojozero/replay/buffer.py` |
+| self-play: 시작 모드(empty / random_opening / mixed prefix), opening 결정 기록, league 상대(엔진·heuristic·random) 그룹 탐색, learner 수만 기록 | `python/dojozero/selfplay/generate.py` |
+| PFSP-hard league(고정 멤버 + 직전 best, 같은 checkpoint 중복 제거), prefix 오프닝 평가, 세대별 opening 통계·Opening DB·제안 regret | `python/dojozero/rl/loop.py`, `python/dojozero/evaluation/opening.py` |
+| prefix 오프닝 생성기(서로 다른 (canonical hash, phase)), `--openings prefix` | `python/dojozero/evaluation/match.py` |
+| 설정 | `configs/training/stage_f_taraguchi.yaml` |
+| 문서 v0.2(지속적 Strength Evaluation System 명세 — 코드 없음) | PRD / EVALUATION Part II / ARCHITECTURE §3.12 / ASSUMPTIONS / TRAINING / 이 파일 Snapshot |
+
+### Verified
+| 검증 | 결과 |
+|---|---|
+| `pytest tests/python` | **41/41** (신규 8: opening target 기록·헤드 도달·손실, 잘못된 헤드 target 거부, league 기록 범위, PFSP·league 구성, prefix 오프닝, opening 통계/DB/regret, Phase 7 1세대 루프) |
+| C++ | Phase 7에서 C++ 변경 없음 → 재실행 안 함(Phase 6 기준 246 + 1 skip) |
+| `taraguchi_v1` (3세대, 73분, XPU, 단일 프로세스 확인·LOCK) | 세대1 **승격**(prefix 오프닝 SPRT 40쌍 0.688); 세대2·3 **INCONCLUSIVE**(각 80쌍 0.588, LLR 2.14 < 2.94 → v1 유지). 세대2·3의 최종 수치가 소수점까지 같아 확인: 라운드별 경로가 다름(0.550/0.600/0.600 vs 0.650/0.613/0.608) — 독립 평가가 같은 pentanomial 개수로 끝난 우연 |
+| v1 vs selfplay v2, **prefix 오프닝** 50쌍 64 sims (`runs/phase7_eval/t1_vs_v2_prefix.json`) | **0.67, +123 [+22, +224]** — opening 결정까지 포함한 강도 개선(CI 하한 > 0) |
+| v1 vs selfplay v2, **NORMAL까지 진행한 무작위 오프닝** 50쌍 (`..._full.json`) | 0.51, +7 [−88, +102] — **INCONCLUSIVE**: 중반 강도 변화는 감지되지 않음(희생 증거도, 개선 증거도 없음; RQ-08 예비 결과) |
+| 앵커(best vs heuristic, prefix 20쌍) | 0.975 / 0.95 / 0.95 |
+
+세대별 opening 지표(self-play, prefix로 정해진 결정 제외):
+| 세대 | 흑 승 | P0 점수 / 흑 holder 점수 | swap@1 / @2 / @3 | offer10 | 제안 regret(평균, 20국면) | NORMAL 시작 국면 서로 다름 |
+|---|---|---|---|---|---|---|
+| 1 (v0) | 144/256 | 0.544 / 0.578 | 0.19 / 1.00 / 0.74 | 0.97 | 0.54 | 204/204 |
+| 2 (v1) | 127/256 | 0.514 / 0.519 | 0.93 / 1.00 / 1.00 | 0.98 | 0.26 | 185/185 |
+| 3 (v1) | 147/256 | 0.426 / 0.568 | 0.90 / 1.00 / 1.00 | 0.99 | 0.26 | 188/188 |
+Opening DB 5,324 항목(`runs/taraguchi_v1/opening_db.json`), 세대당 학습 타깃 ~6.5k(opening head ~2k).
+
+### 사고·발견 (중요)
+1. **opening 결정 붕괴**: 2·3수 후 swap이 100%, Choice는 offer10 97–99%. Gumbel 노이즈만으로는 다양성이 유지되지 않음(PRD §30 "self-play 다양성 붕괴"). swap 확률이 정말 최적인지, 학습 신호 부족으로 굳은 것인지는 **미판정** — 분석 탐색 기준(EVALUATION §7)이 아직 없다.
+2. **제안 regret 0.54 → 0.26**은 같은 네트워크의 value로 같은 네트워크의 제안을 잰 값 — 내부 일관성 지표이지 절대 품질이 아니다.
+3. **League 점수는 강도 지표가 아니다**: learner 쪽은 64/16 sims, 상대는 32 sims라 같은 모델(selfplay_v2_best = 초기 best)에게도 0.76(세대1). PFSP 가중치가 이 compute 차이로 왜곡될 수 있음.
+4. **self-play 시간 증가 미해명**: 같은 256판에 688 → 858 → 1,097초(Phase 6: 134–212초). Phase 6 대비 증가는 빈 보드 시작(opening 전 과정 탐색)·league 상대 탐색 그룹 추가로 설명되지만 세대 간 증가 원인(발열·메모리·모델 캐시)은 측정하지 않았다.
+5. 기록 손상 테스트(action) 실패 → 원인은 코드가 아니라 테스트: OFFER 단계에서 `"A1"`은 `propose:A1`로 해석되어 **다른 합법 게임**이 된다. 테스트를 불법 착수(점유된 점)로 바꾸고, 기록 무결성을 위해 meta `final_hash` 검증을 추가.
+6. replay `_Block` 생성 시 위치 인자 순서 오류(root value가 head 자리로)를 실행 전 발견·수정(키워드 인자).
+
+### Milestone 5 판정
+- opening 전체 학습 가능, swap/branch/제안/선택 action 지원 — **충족**.
+- "opening regret 감소" — 네트워크 기준 regret은 감소(0.54 → 0.26), 분석 탐색 기준 regret은 **미측정**.
+- Strength gate(PRD v0.2): Taraguchi-10 full-game 보고를 Standard 보고와 분리 — prefix(+123) vs 무작위 오프닝(+7)으로 분리 측정은 **충족**, 별도 rating DB·외부 비교는 E1 이후.
+
+### Open
+- opening 결정 탐험(swap/branch에 별도 노이즈·온도), 분석 탐색 기준 regret, Approach B(top-k) 비교(ADR-06).
+- 세대2·3 연속 INCONCLUSIVE → 세대당 데이터·학습량 또는 SPRT 상한(80쌍) 재검토(§19: INCONCLUSIVE는 성공 아님).
+- PFSP를 compute 대칭 조건으로 측정, 비이행성 지표 미구현.
+- 외부 Strength Evaluation 인프라(E1)는 Phase 8 착수 시.
+
+---
+
 ## Phase 6 — Self-play RL, replay buffer, promotion (2026-10-19)
 
 ### Delivered
