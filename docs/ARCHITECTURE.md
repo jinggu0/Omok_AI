@@ -254,6 +254,8 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 - 트리 재사용, 루트 Dirichlet 노이즈, 시간 기반 탐색 한도는 **아직 없음**(Phase 6 self-play에서 추가).
 
 ### 3.11 Self-play runtime (Phase 6)
+
+**Phase 6 구현**: self-play는 C++ 바이너리가 아니라 Python(`dojozero.selfplay`)이 `SearchBatch`로 여러 게임을 묶어 구동한다(네트워크가 Python/PyTorch에 있으므로). 기록은 gzip JSONL(§5.1의 `.dzg`는 미구현). 모델 레지스트리는 `runs/<run>/registry.json`(best 버전·체크포인트·sha256), 단일 머신 순차 루프(`dojozero.rl.loop`)가 self-play/학습/평가를 파일로만 주고받는다. 같은 실행 디렉터리에 두 루프가 붙지 못하도록 `LOCK`(PID) 파일을 쓴다.
 - `dojozero_engine selfplay --config ... --model <manifest>`: G개 동시 게임, 결과를 chunk 파일로 기록(§5.1). 파일은 `tmp → rename` 원자적 쓰기.
 - 모델 갱신: `runs/<run>/models/manifest.json`(현재 best/candidate 버전, hash) 폴링. 기보에 사용 모델 hash 기록.
 - 초기 분산: 파일시스템 큐(단일 머신). 확장(gRPC/MQ)은 Future Work.

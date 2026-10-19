@@ -1,0 +1,43 @@
+# Stage D/E self-play RL from random Taraguchi-10 openings (TRAINING.md §2.4, §5).
+# Initial values; revise from measurements.
+run_name: selfplay_v2
+run_dir: runs
+seed: 1
+device: auto
+amp_bf16: true
+init_checkpoint: runs/stage_b_b6c64_v1/checkpoints/step_6000.pt
+generations: 3
+selfplay:
+  games: 256
+  sims_full: 64
+  sims_fast: 16
+  p_full: 0.75
+  root: GUMBEL
+  gumbel_m: 16
+  root_tactics_nodes: 2000
+  max_inflight: 8
+  max_plies: 225
+  profile: OMOKDOJANG_DAN
+replay:
+  window: 4          # generations kept
+  capacity: 200000
+train:
+  steps_per_generation: 150   # ~29k samples per generation for ~2-3k new positions (avoid overfitting)
+  batch_size: 256
+  lr: 0.0005
+  weight_decay: 0.0001
+  betas: [0.9, 0.999]
+  grad_clip: 5.0
+  tactical_mix: 0.25           # fraction of each batch from Stage A solver labels (anti-forgetting)
+  tactical_data: data/stage_a_v1
+  loss: {policy: 1.0, value: 1.0, aux: 0.5}
+eval:
+  sims: 64
+  pairs_per_round: 20
+  min_pairs: 20
+  max_pairs: 80
+  elo0: 0
+  elo1: 30
+  alpha: 0.05
+  beta: 0.05
+  anchor_pairs: 20

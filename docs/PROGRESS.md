@@ -5,6 +5,46 @@ and what is still open. Newest phase first.
 
 ---
 
+## Phase 6 — Self-play RL, replay buffer, promotion (2026-10-19)
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| Self-play 생성(게임 병렬, Gumbel+노이즈, playout cap randomization) | `python/dojozero/selfplay/generate.py` |
+| 기록 형식(gzip JSONL, action 수순 + 위치별 개선 정책/actor/루트값 + 메타, 원자적 쓰기) | `python/dojozero/selfplay/records.py` |
+| Replay(C++ 재생·기록 검증·feature 재계산, 세대 창, D4 증강) | `python/dojozero/replay/buffer.py` |
+| SPRT(pentanomial 정규근사) | `python/dojozero/evaluation/sprt.py` |
+| 세대 루프(self-play → replay → 학습 → SPRT 승격 → 휴리스틱 앵커), 레지스트리, **실행 잠금** | `python/dojozero/rl/loop.py`, `configs/training/stage_d_selfplay.yaml` |
+| Gumbel 루트 정체 수정, 탐색 진단 덤프 | `cpp/search/search.*`, `cpp/bindings/module.cpp` |
+
+### Verified
+| 검증 | 결과 |
+|---|---|
+| `dojozero_tests` Release / Debug(탐색) | 247개 중 246 통과 + 1 skip / 12/12 |
+| `pytest tests/python` | 33/33: 기록 왕복, 손상 기록 4종(action·정책·결과·actor) 거부, z 부호, 창 축출, 증강 후 정책 합법성, SPRT, 오프닝 중복 없음, 실행 잠금, 1세대 루프 + 재개 |
+| `selfplay_v2` (3세대, 23분, XPU) | 세대1 승격(SPRT 60쌍 0.633), 세대2 미승격(80쌍 0.513, 결론 없음 → 유지), 세대3 승격(40쌍 0.638) |
+| 공정 비교(새 오프닝 세트, 50쌍씩) | v0 vs 휴리스틱 0.88 (+346 [+202, +497]); **v2 vs 휴리스틱 0.97 (+604 [+346, …])**; **v2 vs v0 0.77 (+210 [+97, +322])** |
+| 재현성 | 같은 시드의 1세대 self-play가 별도 실행에서 동일한 통계(256판, 타깃 3,460, 흑 148승) |
+
+Self-play 통계: 세대당 256판, 학습 타깃 3.5–4.1k, 평균 36수, **흑 승률 58–66%**, 무승부 0. 세대당 self-play 134–212초, 학습 150 step 14–54초, 승격 판정 93–264초.
+
+### 사고·발견 (중요)
+1. **중복 실행 사고**: 루프가 처음 "exit 127로 종료"된 것처럼 보였으나 실제로는 bash 래퍼만 종료되고 Python 프로세스가 살아 있었다. 다시 시작한 루프와 **두 프로세스가 같은 실행 디렉터리의 청크·체크포인트·레지스트리를 덮어썼다**(로그 모든 줄 중복, 노트북 절전까지 겹쳐 self-play 40,845초). 해당 실행은 `runs/selfplay_v1_INVALID_duplicate_processes`로 격리하고 결과를 쓰지 않았다. 대응: `runs/<run>/LOCK`(살아 있는 PID면 시작 거부, 죽은 PID면 인수) + 테스트, 재시작 전 프로세스 확인.
+2. **오프닝 생성기 무한 루프**: 중앙 탐욕형 오프닝은 서로 다른 오프닝이 적어 256개 요청 시 끝나지 않았다(50·96개는 됐음). 중앙 7×7 균등 무작위로 바꾸고 시도 상한 초과 시 예외. → Phase 5 매치 수치(이전 오프닝)와 Phase 6 수치(새 오프닝)는 직접 비교 불가: **같은 v0가 휴리스틱 상대로 0.69(이전) vs 0.88(새)** — 평가 결과가 오프닝 분포에 크게 좌우된다.
+3. **Gumbel 루트 정체 수정은 원인 확정이 아니다**: 후보 집합이 전부 증명된 패배일 때 다른 수가 남아도 선택 불가한 경로를 고쳤고, 수정 후 같은 시드의 self-play가 완주했지만, 새 스트레스 테스트는 수정 전 코드에서도 정체를 재현하지 못했다. 재발 시 원인 파악을 위해 정체 트리 덤프를 예외 메시지에 포함.
+4. 메타데이터에 `TorchVersion` 객체를 넣어 안전 로딩(`weights_only=True`)이 거부 → 문자열로 저장(안전 로딩 정책이 의도대로 작동).
+5. 데이터량 대비 학습량: 처음 설정(96판·p_full 0.35)은 판당 타깃 4.4개라 세대당 600 step이면 과적합 → 256판·0.75·150 step으로 조정.
+
+### Milestone 4 판정 (self-play 안정 / 승격 동작 / 세대별 Elo 상승)
+- 승격: 동작(승격 2회, 결론 없음 1회 유지). Elo 상승: v2가 v0 대비 +210 [+97, +322], 외부 앵커(휴리스틱)도 상승.
+- **"24시간 연속 실행 실패 0"은 미검증** — 3세대(23분)만 실행. 오프닝 정책(swap/branch/proposal) 학습 없음(Phase 7).
+
+### Open
+- 흑 승률 58–66%: 무작위 Taraguchi 오프닝이 흑에 유리할 가능성 — Phase 7 오프닝 학습/평가에서 측정.
+- 장시간 실행(수십 세대), 재분석(reanalysis), 우선순위 샘플링 미구현.
+
+---
+
 ## Phase 5 — MCTS / Gumbel search and search verification (2026-10-18)
 
 ### Delivered

@@ -95,6 +95,7 @@ struct SearchResult {
   std::vector<Action> pv;
   int simulations = 0;
   int nodes = 0;
+  bool stalled = false;              // synchronous run stopped with nothing selectable (must never happen)
   double elapsed_ms = 0;
 };
 
@@ -120,6 +121,8 @@ class Tree {
   // visits == 1 + sum(child visits) (+ re-visits of solved nodes), the root has `completed` visits,
   // priors sum to 1, and no node has negative in-flight counts.
   bool check_invariants(std::string* why) const;
+  // Root diagnostics (state, flags, Gumbel set, per-child visits/inflight/proven/state).
+  std::string debug_string() const;
 
  private:
   static constexpr int8_t kUnknown = 2;
@@ -175,6 +178,7 @@ class Tree {
   std::mt19937_64 rng_;
   std::chrono::steady_clock::time_point start_;
   int root_proven_by_tactics_ = kUnknown;  // root actor perspective
+  bool stalled_ = false;
   std::optional<Action> root_tactics_move_;
 
   // Gumbel root state

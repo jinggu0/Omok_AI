@@ -111,7 +111,7 @@ Intel Core Ultra 7 258V (4P+4LPE), 32 GB, Intel Arc 140V iGPU, Windows 11, MSVC 
 | batched NN eval/s | 실측 후 설정 | B6C64, PyTorch: CPU fp32 ≤ ~316/s(b512), XPU bf16 ≤ ~5.6k/s(b512), b1은 10–31/s (측정 편차 큼) | `runs/bench_device_b6c64.json`. 배치 1이 매우 느려 MCTS는 배치 추론 필수 |
 | 학습 step/s (B6C64, b256) | — | CPU 0.18, XPU fp32 0.74–1.7, XPU bf16 3.4(벤치) / 실제 학습 1.2–2.0(foreach 끔, 데이터 준비 포함) | ADR-04 |
 | 평균 탐색 지연 (FAST/STANDARD) | 실측 후 설정 | 50트리 동시 64 sims ≈ 2.5–7s(망 워밍업 상태에 따라) | 시간 기반 한도 미구현 |
-| self-play games/hour | 실측 후 설정 | (Phase 6) | Stage별 compute 계획의 입력 |
+| self-play games/hour | 실측 후 설정 | ~4,300–6,900 games/h (256판 134–212초, Gumbel full 64/fast 16 sims, p_full 0.75, 평균 36수, B6C64 XPU) | 짧은 대국(무작위 오프닝 이후 ~25수) 기준 |
 | 메모리 (트리·TT·replay 인덱스) | 실측 | — | |
 | GPU 사용률 | 실측 | — | |
 

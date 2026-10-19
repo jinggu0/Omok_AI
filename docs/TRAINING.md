@@ -54,6 +54,14 @@ Status: **Draft v0.1** · 2026-10-18
 - Playout cap randomization(KataGo): 일부 수만 full search로 정책 target 기록, 나머지는 fast search로 진행 — target 기록 여부 플래그.
 - Resign: 비활성 기본. 활성화 시 검증용으로 일정 비율(예 10%) 게임은 resign 금지하고 false-resign rate 측정(목표 <5%).
 
+**Phase 6 구현 (`python/dojozero/selfplay`, `replay`, `rl/loop.py`, `configs/training/stage_d_selfplay.yaml`)**
+- 시작 국면: 무작위 Taraguchi-10 오프닝(중앙 7×7 안 균등 착수, 결정 균등, canonical hash로 중복 제거)을 NORMAL_RENJU까지 진행. 오프닝 수는 학습 타깃에서 제외(Phase 7).
+- 탐색: Gumbel 루트 + 노이즈(m=16), full 64 sims / fast 16 sims, playout cap randomization p_full=0.75 — full 탐색 수만 개선 정책(top-48 재정규화)과 루트 가치를 기록. 루트 전술 2,000 노드. 기권 없음.
+- 기록: gzip JSONL(action 수순 + 기록 위치별 정책/actor/루트 값 + 메타: 모델 sha256, 세대, 시드, 결과). 바이너리 `.dzg`는 미구현.
+- Replay: 수순을 C++로 재생하며 기록 검증(actor·합법성·정책 타깃 합법성·최종 결과 일치, 불일치 시 `RecordError`), feature/aux 재계산. 최근 4세대 창, 상한 20만 위치, (seed, step) 기반 무상태 샘플링 + D4 증강.
+- 학습: learner는 세대를 넘어 계속 학습(AdamW, XPU에서 foreach 끔), 배치의 25%는 Stage A 전술 데이터(망각 방지), 세대당 150 step.
+- 승격: candidate vs best 쌍대국 SPRT(elo0=0, elo1=30, α=β=0.05, 20쌍 단위, 최소 20·최대 80쌍), H1일 때만 승격. 매 세대 best vs 휴리스틱 앵커 20쌍(외부 기준).
+
 ### 2.5 Stage F — Taraguchi-10
 - 모든 opening action을 self-play에서 학습: swap 결정(1,2,3수 후, 4수 후, 직접 5수 후), 2/3/4수, Choice 1/2, 직접 5수, 10제안, 제안 선택.
 - 탐색 트리는 opening 결정 노드를 포함(actor-aware backup, ARCHITECTURE §3.10).

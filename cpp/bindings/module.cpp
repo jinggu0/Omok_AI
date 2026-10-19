@@ -139,6 +139,14 @@ class SearchBatch {
         }
       }
     }
+    if (pending_.empty() && !done()) {
+      // Nothing selectable although some tree is unfinished: report the stuck trees.
+      std::string msg = "search stalled; stuck trees:\n";
+      for (size_t i = 0; i < trees_.size(); ++i) {
+        if (!trees_[i]->done() && trees_[i]->inflight() == 0) msg += "tree " + std::to_string(i) + ":\n" + trees_[i]->debug_string();
+      }
+      throw std::runtime_error(msg);
+    }
     const py::ssize_t n = static_cast<py::ssize_t>(pending_.size());
     py::array_t<uint8_t> out({n, static_cast<py::ssize_t>(fcfg_.num_planes()), static_cast<py::ssize_t>(kBoardSize),
                               static_cast<py::ssize_t>(kBoardSize)});

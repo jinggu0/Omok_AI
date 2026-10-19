@@ -9,6 +9,17 @@ from ..trainer import checkpoint
 from .net import ModelConfig, PolicyValueNet
 
 
+def model_sha(model: torch.nn.Module) -> str:
+    """SHA-256 of the parameters and buffers (key order), recorded with every self-play game."""
+    import hashlib
+
+    h = hashlib.sha256()
+    for k, v in model.state_dict().items():
+        h.update(k.encode())
+        h.update(v.detach().cpu().contiguous().numpy().tobytes())
+    return h.hexdigest()
+
+
 def load_model(path: str, device: torch.device | str = "cpu") -> tuple[PolicyValueNet, FeatureSpec, dict]:
     ck = checkpoint.load(path)
     fs = ck["feature_spec"]

@@ -248,6 +248,33 @@ TEST(Search, AnyPhaseProducesALegalAction) {
   }
 }
 
+// Regression: Gumbel candidate set made only of proven-losing moves stalled self-play.
+// Every search must finish its budget (or prove the root) without stalling, in tactical midgames.
+TEST(Search, NeverStallsInTacticalPositions) {
+  std::mt19937_64 rng(13);
+  UniformEvaluator u;
+  int stalled = 0, searched = 0;
+  for (int i = 0; i < 300; ++i) {
+    GameState g = tools::random_midgame(rng, make_profile(i % 2 ? RuleProfile::renju_rif() : RuleProfile::omokdojang_dan()),
+                                        10, 70);
+    if (g.is_terminal()) continue;
+    for (RootMode mode : {RootMode::PUCT, RootMode::GUMBEL}) {
+      SearchConfig c = cfg(64, mode);
+      c.gumbel_m = 4;  // small candidate sets make the all-losing case likely
+      Tree t(g, c);
+      const SearchResult r = t.run(u);
+      ++searched;
+      if (r.stalled || !t.done()) {
+        ++stalled;
+        ADD_FAILURE() << "stalled in mode " << static_cast<int>(mode) << "\n" << g.to_string() << dump(r);
+      }
+      ASSERT_TRUE(g.is_legal(r.action));
+    }
+  }
+  EXPECT_EQ(stalled, 0);
+  EXPECT_GT(searched, 400);
+}
+
 TEST(Bots, HeuristicTakesWinsAndBlocks) {
   std::mt19937_64 rng(1);
   GameState win = setup({"F8", "G8", "H8", "I8"}, {"B15", "E15", "H15", "K15"}, Color::BLACK);

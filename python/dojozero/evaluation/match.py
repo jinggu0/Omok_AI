@@ -28,17 +28,33 @@ from ..search.driver import NetEvaluator, SearchSettings, search_many
 PROFILE = "OMOKDOJANG_DAN"
 
 
-def make_openings(n: int, seed: int, profile: str = PROFILE) -> list[list[str]]:
+def make_openings(n: int, seed: int, profile: str = PROFILE, max_attempts_per_opening: int = 50) -> list[list[str]]:
+    """n distinct random Taraguchi-10 openings (distinct by canonical D4 hash), played up to
+    NORMAL_RENJU. Placements are uniform over legal points within Chebyshev distance 3 of H8 when
+    such points exist (else over all legal points); swap/branch/proposal/selection decisions are
+    uniform. Raises instead of looping forever when distinct openings run out."""
+    rng = np.random.default_rng([seed, 17])
     seen, out = set(), []
-    i = 0
+    attempts = 0
     while len(out) < n:
+        attempts += 1
+        if attempts > n * max_attempts_per_opening:
+            raise RuntimeError(f"could only build {len(out)} distinct openings out of {n}")
         g = _core.GameState(profile)
         actions = []
         while g.phase != "NORMAL_RENJU" and not g.is_terminal:
-            a = _core.heuristic_action(g, seed * 7919 + i * 131 + len(actions))
+            legal = g.legal_actions()
+            near = []
+            for a in legal:
+                pt = a.split(":")[-1]
+                if pt[:1].isalpha() and pt[1:].isdigit():
+                    p = _core.str_to_point(pt)
+                    if max(abs(p // 15 - 7), abs(p % 15 - 7)) <= 3:
+                        near.append(a)
+            pool = near or legal
+            a = pool[int(rng.integers(len(pool)))]
             g.apply(a)
             actions.append(a)
-        i += 1
         if g.is_terminal or g.canonical_hash() in seen:
             continue
         seen.add(g.canonical_hash())
@@ -59,11 +75,16 @@ class Player:
 
 
 def make_player(spec: str, device: str, cache: dict) -> Player:
-    parts = spec.split(":")
-    kind = parts[0]
+    kind, _, rest = spec.partition(":")
     if kind in ("heuristic", "random"):
         return Player(spec, kind)
-    ckpt = parts[1]
+    # Options are trailing ":key=value" segments; the checkpoint path may itself contain ':' (C:\...).
+    segs = rest.split(":")
+    opts = []
+    while segs and "=" in segs[-1] and segs[-1].split("=")[0] in ("sims", "root", "tactics"):
+        opts.insert(0, segs.pop())
+    ckpt = ":".join(segs)
+    parts = [kind, ckpt] + opts
     if ckpt not in cache:
         model, fspec, _ = load_model(ckpt, device)
         cache[ckpt] = (NetEvaluator(model, device), fspec.core())

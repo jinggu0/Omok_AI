@@ -224,6 +224,37 @@ int Tree::choose_root_gumbel() {
       if (e.child >= 0 && nodes_[e.child].state == NodeState::PENDING) any_pending = true;
     }
     if (any_pending) return -1;  // wait for evaluations before ranking
+    // Every candidate is a proven loss: refill the set with the remaining non-losing root moves
+    // (best g + logit first), otherwise the search would stall with legal alternatives left.
+    bool all_losing = true;
+    for (int i : gumbel_set_) {
+      const Edge& e = edges_[root.edge_begin + i];
+      if (!(e.child >= 0 && nodes_[e.child].proven != kUnknown &&
+            static_cast<float>(nodes_[e.child].proven) * sign_of(actor) < -0.5f)) {
+        all_losing = false;
+      }
+    }
+    if (all_losing) {
+      std::vector<int> rest;
+      for (int i = 0; i < static_cast<int>(root.edge_count); ++i) {
+        if (std::find(gumbel_set_.begin(), gumbel_set_.end(), i) != gumbel_set_.end()) continue;
+        const Edge& e = edges_[root.edge_begin + i];
+        if (e.child >= 0 && nodes_[e.child].proven != kUnknown &&
+            static_cast<float>(nodes_[e.child].proven) * sign_of(actor) < -0.5f) {
+          continue;
+        }
+        rest.push_back(i);
+      }
+      if (rest.empty()) return choose_edge(0);
+      std::stable_sort(rest.begin(), rest.end(), [&](int x, int y) {
+        return gumbel_[x] + edges_[root.edge_begin + x].logit > gumbel_[y] + edges_[root.edge_begin + y].logit;
+      });
+      rest.resize(std::min<size_t>(rest.size(), static_cast<size_t>(std::max(1, cfg_.gumbel_m))));
+      gumbel_set_ = rest;
+      const int per = std::max(1, gumbel_phase_budget_ / static_cast<int>(gumbel_set_.size()));
+      for (int i : gumbel_set_) gumbel_target_[i] = (gumbel_target_[i] > 0 ? gumbel_target_[i] : 0) + per;
+      continue;
+    }
     if (gumbel_set_.size() > 1) {
       std::stable_sort(gumbel_set_.begin(), gumbel_set_.end(), [&](int x, int y) { return score(x) > score(y); });
       gumbel_set_.resize((gumbel_set_.size() + 1) / 2);
@@ -388,7 +419,10 @@ SearchResult Tree::run(Evaluator& eval) {
     Evaluation ev;
     const int t = descend([&](const GameState& g, Pending&) { ev = eval.evaluate(g); });
     if (t >= 0) complete(t, ev);
-    else if (t == -2) break;
+    else if (t == -2) {
+      stalled_ = true;  // nothing selectable although not done: a search bug, surfaced in result()
+      break;
+    }
   }
   return result();
 }
@@ -440,6 +474,31 @@ int Tree::final_root_edge() const {
   return best;
 }
 
+std::string Tree::debug_string() const {
+  std::string s = root_state_.to_string();
+  const Node& root = nodes_[0];
+  s += "done=" + std::to_string(done()) + " completed=" + std::to_string(completed_) + " pending=" +
+       std::to_string(pending_.size()) + " root_state=" + std::to_string(static_cast<int>(root.state)) +
+       " root_proven=" + std::to_string(root.proven) + " root_inflight=" + std::to_string(root.inflight) +
+       " edges=" + std::to_string(root.edge_count) + " gumbel_ready=" + std::to_string(gumbel_ready_) + "\n";
+  if (gumbel_ready_) {
+    s += "gumbel_set:";
+    for (int i : gumbel_set_) s += " " + to_string(edges_[root.edge_begin + i].action) + "(t=" + std::to_string(gumbel_target_[i]) + ")";
+    s += "\n";
+  }
+  for (uint32_t i = 0; i < root.edge_count && i < 40; ++i) {
+    const Edge& e = edges_[root.edge_begin + i];
+    s += "  " + to_string(e.action) + " p=" + std::to_string(e.prior);
+    if (e.child >= 0) {
+      const Node& c = nodes_[e.child];
+      s += " n=" + std::to_string(c.visits) + " inflight=" + std::to_string(c.inflight) + " proven=" +
+           std::to_string(c.proven) + " state=" + std::to_string(static_cast<int>(c.state));
+    }
+    s += "\n";
+  }
+  return s;
+}
+
 bool Tree::check_invariants(std::string* why) const {
   auto fail = [&](const std::string& m) {
     if (why) *why = m;
@@ -472,6 +531,7 @@ bool Tree::check_invariants(std::string* why) const {
 
 SearchResult Tree::result() const {
   SearchResult r;
+  r.stalled = stalled_;
   r.simulations = completed_;
   r.nodes = static_cast<int>(nodes_.size());
   r.elapsed_ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start_).count();
