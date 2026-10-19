@@ -327,6 +327,7 @@ stdout으로 끝내지 않고 모든 평가를 누적한다(SQLite, WAL, 스키�
 | value misprediction | 실전 value와 재분석 value 차이 큼 |
 | policy candidate miss | 재분석 최선수가 실전 policy 상위 k 밖 |
 - 결과 요약 예: "20패 중 VCF 탐지 실패 7, opening 5, long-horizon value 6, timeout 2" → §20으로 다음 과제 선택.
+- **구현(Phase 8 E2c)**: `python -m dojozero.evaluation.loss_analysis` — 범주 `tactical_blunder / strategic_loss(lost_from_start) / missed_win / unclassified`, 솔버(건전한 증명)로 착수 전후 판정, policy 상위 10수 중 반박되지 않은 대안 탐색, 네트워크 value 과신 표시. 결과는 DB `analysis`(kind `loss_category`). 사람 표본 검수는 아직 없음.
 
 ### 21.2 Reanalysis queue
 - 우선순위: 예상 밖 패배 > 고신뢰 blunder > 외부 엔진과의 불일치 > solver 불일치 > 후보 모델 regression.

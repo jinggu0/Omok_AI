@@ -21,7 +21,53 @@ and what is still open. Newest phase first.
 | `dojo_internal_elo` | taraguchi v1 vs selfplay v2: +7 [−88, +102] (무작위 오프닝을 NORMAL까지 진행한 시작점, 50쌍, 64 sims); selfplay v2 vs v0 +210 [+97, +322]; heuristic 대비 0.95–0.975 (20쌍 앵커) |
 | `dojo_taraguchi_elo` | taraguchi v1 vs selfplay v2: **+123 [+22, +224]** (prefix 오프닝 50쌍, 64 sims, 엔진이 opening 결정) — 절대 척도 아님(기준점 = selfplay v2) |
 | tactical score | 네트워크 단독 83.6%, 탐색 포함 91.8% (102문제, Phase 4–5; 이후 모델은 미측정) |
-| primary known weakness | **외부 강도 전반**(사다리 최하위). 원인 미분리 — 후보: fixed-time 탐색량(수당 수십 sims), 가치망 품질. 그 외: opening 결정 붕괴, 색 편향 |
+| primary known weakness | **방어 전술**: 패배의 87%가 상대에게 솔버가 증명하는 강제승(VCF/VCT)을 허용한 한 수, value망은 그 직전 평균 +0.52로 과신. 탐색량 10배로도 개선 없음(Phase 8 E2c). 흑에서 더 약함(Pela 상대 흑 ~0.12 / 백 ~0.41) |
+
+---
+
+## Phase 8 (E2c) — Weakness diagnosis: scaling, fixed visits, loss classification (2026-10-20)
+
+질문: DojoZero(taraguchi v1)가 외부 사다리 최하위인 원인이 탐색량(performance)인가, 평가/탐색 품질인가 (EVALUATION §20).
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| 시간 scaling / fixed-visits 실험 러너 | `python/dojozero/evaluation/diagnose.py` |
+| 패배 분류기(솔버 증명 + 네트워크 value/policy, EVALUATION §21.1 1차판) | `python/dojozero/evaluation/loss_analysis.py` |
+
+### 실험 (균형 corpus 첫 12개 opening, 조건마다 12쌍 = 24판, 모든 조건 같은 opening — 조건 간 paired)
+시간 scaling (양쪽 같은 수당 시간; 외부 엔진 단일 스레드 CPU):
+| 상대 | 0.5 s | 1 s | 2 s | 5 s |
+|---|---|---|---|---|
+| Pela 2023 | 0.250 (134 sims) | 0.292 (286) | 0.292 (604) | 0.333 (1,418) |
+| Yixin 2018 | 0.042 (158) | 0.000 (248) | 0.125 (637) | 0.042 (1,570) |
+
+Fixed visits (DojoZero 고정 sims, 상대는 0.5 s 고정):
+| 상대 | 64 | 256 | 1024 |
+|---|---|---|---|
+| Pela 2023 | 0.125 | 0.250 | 0.250 |
+| Yixin 2018 | 0.000 | 0.083 | 0.083 |
+모든 CI가 넓고 서로 겹친다(12쌍). 색별(Pela, 7조건 합산 84판씩): **흑 ~0.12, 백 ~0.41**.
+
+패배 분류(비승리 284판, 솔버 예산 VCF 200k / VCT 100k / LOSS 50k 노드, 1 s):
+| 범주 | 판 수 | 비고 |
+|---|---|---|
+| tactical_blunder | **247 (87%)** | 착수 전 솔버가 패를 증명하지 못한 국면 → 착수 후 상대 강제승 증명. 흑 142/151, 백 105/133 |
+| strategic_loss | 31 (11%) | 이미 증명된 패(솔버 시야 밖에서 짐). 백 24, 흑 7. opening 직후 패 0 |
+| missed_win | 6 (2%) | 증명된 승리를 놓침 |
+- 결정적 수 직전 **네트워크 value(DojoZero 관점) 평균 +0.52**, 247건 중 196건이 +0.2 이상 — 상대의 강제승을 전혀 예상하지 못함.
+- tactical_blunder 247건 중 **123건은 policy 상위 10수 안에 솔버가 반박하지 못한 대안**이 있었고(43건은 policy 1순위 수가 대안), 둔 수가 policy 1순위인 경우 99건.
+- 분포는 compute에 거의 무관(0.5 s: 전술 33·전략 6·놓친 승 2 / 5 s: 34·5·0 / 64 sims: 41·4 / 1024 sims: 35·5).
+
+### 결론 (측정 근거와 한계를 함께)
+1. **탐색량 부족은 주원인이 아니다**: 수당 sims를 ~10배(134→1,418, 52→797) 늘려도 점수 변화가 CI 안. EVALUATION §20의 "performance problem"은 기각(이 상대·이 표본 범위에서).
+2. **주원인은 방어 전술**: 패배의 87%가 "상대에게 솔버가 보는 강제승을 허용한 한 수". 우리 C++ 솔버는 그 국면을 ~1 s 안에 증명하지만 DojoZero 탐색은 루트 후보마다 "이 수 뒤 상대에게 VCF/VCT가 있는가"를 확인하지 않는다(루트 전술은 자기 승리/증명된 패만, 리프 전술은 즉시 5·단일 방어만). value망도 그 위협을 보지 못한다(+0.52).
+3. **흑에서 더 약함**: 흑 패배의 94%가 전술 실수(백 79%). 흑은 금수 때문에 막을 수 없는 점이 있어 방어가 더 어렵다는 것과 맞지만, 원인 확정은 아님.
+4. 한계: 분류는 솔버 예산에 의존(UNKNOWN은 "안전"이 아님), 첫 결정적 사건만 1차 범주로 셈, 표본 12쌍/조건. 분류 정확도의 사람 검수는 아직 안 함. 이번 실행의 요약 저장 단계가 JSON 버그(튜플 키)로 실패해 요약은 DB `analysis` 행에서 다시 계산(분류 자체는 정상 저장; 버그 수정 + 회귀 테스트).
+
+### 다음 후보 (가설 — §19 A/B로 검증해야 함)
+- **루트 방어 필터**: 루트 상위 k 후보마다 "착수 후 상대 강제승?"을 시간 예산 안에서 솔버로 확인, 대안이 있으면 그런 수를 배제(기존 최선 유지 + 확실할 때만 이탈하는 하한 원칙과 같은 구조). 근거: 실수 123건에 반박되지 않은 대안 존재.
+- 학습: 상대 위협(VCF/VCT) 인지를 value/aux target에 반영, 위협 국면 비중 확대.
 
 ---
 
