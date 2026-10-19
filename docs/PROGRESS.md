@@ -25,6 +25,35 @@ and what is still open. Newest phase first.
 
 ---
 
+## Phase 8 (E3a) — Root defense filter: implementation and paired A/B (2026-10-20)
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| 루트 방어 필터(탐색 후 방문 수 상위 k 후보를 순서대로 솔버로 확인, 상대 강제승이 증명된 수는 반박되지 않은 대안이 있을 때만 건너뜀; 모두 반박·증명된 승리·opening 단계면 원래 선택 유지). 시간 제한 시 수당 시간의 `defense_share`를 필터에 할당, 후보 검사는 병렬 스레드 | `python/dojozero/search/driver.py` (`defend`, `SearchSettings.defense_*`), 스펙 옵션 `:defense=k:defshare=x:defthreads=n` |
+| paired A/B 러너(같은 opening·상대·시간, opening마다 두 arm 교대, 사전 등록 판정, DB `experiment`) | `python/dojozero/evaluation/ab.py` |
+
+### Verified
+| 검증 | 결과 |
+|---|---|
+| 단위 테스트 | 필터 4 + A/B 판정 1 (반박된 선택 교체, 전부 반박 시 유지, 증명된 승리·opening 불변, 시간 제한 안 동작; ACCEPT/REJECT/INCONCLUSIVE) |
+| 전술 benchmark 회귀(§19 조건 2; 승리 문제 73개, 64 sims) | 필터 없이 0.945 / 필터 k=8 0.945 — **회귀 없음** |
+| 메커니즘 확인(기록된 tactical_blunder 국면 247개 재생, 500 ms/수, 1 s 솔버로 판정) | 필터 없음: 같은 실수 187 / k=8·30%·4스레드: 163 / k=8·50%·8스레드: 149(안전 98) / k=16·50%·8스레드: 157. 놓친 원인 대부분 **예산 부족**(필터의 짧은 솔버 시간으로는 증명 못 하는 VCT; 116–143건), 상위 k 전부 반박 16–33건 |
+
+**A/B (사전 등록, Tier B)**: baseline = taraguchi v1, candidate = 같은 모델 + 필터(k=8, 수당 시간의 50%, 8 스레드). 500 ms/수, `renju_balanced_v1` opening 24–63(진단·calibration에 쓰지 않은 것), 상대 Pela 2023·Yixin 2018 각 40쌍, arm 교대. 판정 규칙: 쌍대 차이 95% 구간 하한 > 0 이고 candidate 실패 0이면 ACCEPT.
+| 상대 | baseline | candidate | 쌍대 차이 [95%] |
+|---|---|---|---|
+| Pela 2023 | 0.250 | 0.225 | −0.025 [−0.125, +0.075] |
+| Yixin 2018 | 0.050 | 0.037 | −0.013 [−0.068, +0.043] |
+| **합산 80쌍** | | | **−0.019 [−0.075, +0.038] → INCONCLUSIVE** |
+쌍 차이 분포: −0.5 ×12, 0 ×59, +0.5 ×9. candidate 실패 0. DojoZero 평균 sims/수: baseline 135.5 → candidate 64.0.
+
+### 결론
+- **채택하지 않음**(§19: INCONCLUSIVE는 성공이 아님). 기본값은 필터 끔(`defense_k = 0`); 코드는 실험 옵션으로 남김.
+- 해석(가설): 필터가 일부 실수를 막지만(메커니즘 확인 +38/247) 탐색 시간을 절반으로 줄인 비용과 상쇄. **진짜 병목은 솔버 속도** — 500 ms 안에서 상대 VCT를 증명하지 못한다(EVALUATION §8.2: VCT 13.5–14k nodes/s, VCF 70–78k, 목표 대비 크게 미달). 다음 후보: 증분 위협 추적 등 솔버 가속(ADR-01 C안), 필터를 탐색 트리 안(MCTS-solver의 루트 자식 증명)으로 옮겨 시간 재분배, 가치망이 위협을 보도록 학습.
+
+---
+
 ## Phase 8 (E2c) — Weakness diagnosis: scaling, fixed visits, loss classification (2026-10-20)
 
 질문: DojoZero(taraguchi v1)가 외부 사다리 최하위인 원인이 탐색량(performance)인가, 평가/탐색 품질인가 (EVALUATION §20).

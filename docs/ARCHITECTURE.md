@@ -415,5 +415,6 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 | ADR-05 | Python 빌드 방식 | **결정(Phase 4)**: CMake가 pybind11(v2.13.6) 확장 `_core`를 빌드해 `python/dojozero/`로 복사, `pyproject.toml`은 순수 Python 패키지(setuptools). scikit-build-core는 배포 단계까지 보류 | Windows 재현성 |
 | ADR-06 | 10제안 정책 방식 (top-k vs autoregressive vs beam) | Phase 7 → **부분**: 순차(autoregressive) PROPOSE action을 매번 MCTS로 탐색하는 방식만 구현·학습. top-k(Approach B)·beam은 미구현; 네트워크 가치 기준 regret 진단만 있음 | 제안 품질(regret) + Elo |
 | ADR-07 | ResNet vs Hybrid attention | Phase 6–8 | Elo/compute (fixed time 기준, EVALUATION §18) |
+| ADR-10 | 루트 방어 필터(탐색 후 솔버로 후보 검사) | Phase 8 E3a → **미채택**(A/B INCONCLUSIVE, −0.019 [−0.075, +0.038]); 옵션으로 유지, 기본 끔. 솔버 가속 후 재측정 | 쌍대 A/B 점수, 전술 benchmark |
 | ADR-08 | `pbrain-DojoZero.exe` 추론 호스트: C++ 추론(ONNX Runtime/OpenVINO, ADR-02에 종속) vs Python(PyTorch XPU) 프로세스를 감싸는 런처 | E3 (PRD OQ-15) | 프로토콜 응답 지연, 설치 용이성, fixed-time Elo |
 | ADR-09 | Strength DB 저장소: SQLite(WAL) 단일 파일 vs JSONL + 인덱스 | E1 → **잠정 SQLite** (요구사항 FR-24 예시, 표준 라이브러리만으로 접근) | 동시 쓰기 안전성, 조회 편의 |

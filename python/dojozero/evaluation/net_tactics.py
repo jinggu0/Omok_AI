@@ -57,7 +57,8 @@ def solves(g, move: int, budget: int) -> bool:
     return d["result"] == "LOSS"
 
 
-def evaluate_model(model, spec: FeatureSpec, problems: list[dict], device, budget: int, sims: int = 0) -> dict:
+def evaluate_model(model, spec: FeatureSpec, problems: list[dict], device, budget: int, sims: int = 0,
+                   defense_k: int = 0) -> dict:
     """sims == 0: network policy only. sims > 0: MCTS with that many simulations, root tactics OFF
     (otherwise the C++ solver, not the network+search, would answer)."""
     model.eval()
@@ -65,7 +66,7 @@ def evaluate_model(model, spec: FeatureSpec, problems: list[dict], device, budge
     states = [_core.GameState.from_spec(json.dumps(p["position"]), p.get("profile", "RENJU_RIF")) for p in problems]
     if sims > 0:
         from ..search.driver import NetEvaluator, SearchSettings, search_many
-        settings = SearchSettings(simulations=sims, root_tactics_nodes=0)
+        settings = SearchSettings(simulations=sims, root_tactics_nodes=0, defense_k=defense_k)
         res = search_many(states, NetEvaluator(model, device), settings, spec.core())
         moves = [_core.str_to_point(r["action"]) if r["action"] not in ("pass",) else 225 for r in res]
     else:

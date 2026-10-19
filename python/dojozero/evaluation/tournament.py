@@ -103,7 +103,7 @@ class InProcessPlayer:
         warm_up(self.player)
         from ..model.load import model_sha
         self.model_hash = model_sha(self.player.evaluator.model)
-        self.engine_id = f"dojo-{self.model_hash[:12]}"
+        self.engine_id = f"dojo-{self.model_hash[:12]}" + (f"-def{s.defense_k}" if s.defense_k else "")
 
     def start_game(self):
         return None
@@ -138,7 +138,8 @@ class InProcessPlayer:
             return {"kind": self.kind}
         s = self.player.settings
         return {"kind": "dojo", "spec": self.spec, "root": s.root, "simulations": s.simulations, "max_ms": s.max_ms,
-                "root_tactics_nodes": s.root_tactics_nodes, "model_hash": self.model_hash}
+                "root_tactics_nodes": s.root_tactics_nodes, "defense_k": s.defense_k,
+                "defense_share": s.defense_share, "model_hash": self.model_hash}
 
 
 class ProcessPlayer:

@@ -31,6 +31,15 @@ class SearchSettings:
     max_inflight: int = 8
     seed: int = 1
     max_ms: float = 0.0           # wall-clock limit per move (0 = simulations only; then a cap)
+    # Root defense filter (PROGRESS Phase 8 E2c/E3): after the search, the defense_k most-visited
+    # root moves are checked in order with the C++ solver; a move after which the opponent has a
+    # proven forced win (VCF/VCT) is skipped when an unrefuted candidate exists. 0 = off.
+    defense_k: int = 0
+    defense_share: float = 0.3    # with max_ms: share of the move time reserved for the filter
+    defense_ms: float = 300.0     # without max_ms: wall-clock cap per candidate check
+    defense_vcf: int = 100000
+    defense_vct: int = 50000
+    defense_threads: int = 4
 
 
 def make_config(s: SearchSettings) -> "_core.SearchConfig":
@@ -46,7 +55,7 @@ def make_config(s: SearchSettings) -> "_core.SearchConfig":
     c.root_tactics_nodes = s.root_tactics_nodes
     c.max_inflight = s.max_inflight
     c.seed = s.seed
-    c.max_ms = s.max_ms
+    c.max_ms = s.max_ms * (1.0 - s.defense_share) if (s.defense_k > 0 and s.max_ms > 0) else s.max_ms
     return c
 
 
@@ -105,4 +114,48 @@ def search_many(states: list, evaluator, settings: SearchSettings, feature_confi
         idle = 0
         out = evaluator(feats)
         sb.apply(out["policy"], out["wdl"], out["swap"], out["branch"], out["propose"], out["select"])
-    return [sb.result(i) for i in range(len(states))]
+    results = [sb.result(i) for i in range(len(states))]
+    if settings.defense_k > 0:
+        results = [defend(g, r, settings) for g, r in zip(states, results)]
+    return results
+
+
+def defend(state, result: dict, s: SearchSettings) -> dict:
+    """Root defense filter: keep the search's choice unless the solver proves that it gives the
+    opponent a forced win while a lower-ranked candidate (by visits) is not refuted. Proofs come from
+    the sound C++ solver (WIN = proven); UNKNOWN counts as not refuted. If every candidate is
+    refuted, or the root is already a proven win, the search's choice stands."""
+    import time
+    from concurrent.futures import ThreadPoolExecutor
+    info = {"checked": 0, "refuted": [], "changed": False, "ms": 0.0}
+    result["defense"] = info
+    if state.phase != "NORMAL_RENJU" or result.get("proven") == 1 or not result.get("children"):
+        return result
+    t0 = time.perf_counter()
+    kids = sorted(result["children"], key=lambda c: c["visits"], reverse=True)
+    order = [result["action"]] + [c["action"] for c in kids if c["action"] != result["action"]]
+    cands = [a for a in order if a != "pass"][: s.defense_k]
+    threads = max(1, min(s.defense_threads, len(cands)))
+    rounds = -(-len(cands) // threads)  # checks run in parallel rounds; split the reserved time over them
+    ms = (s.max_ms * s.defense_share / rounds) if s.max_ms > 0 else s.defense_ms
+
+    def refuted(a: str) -> bool:
+        g = state.copy()
+        if not g.apply(a):
+            return True
+        if g.is_terminal:
+            return g.winner is not None and g.winner != state.actor
+        d = _core.analyze_tactics(g, s.defense_vcf, s.defense_vct, 0, ms)  # opponent to move: WIN = proven
+        return d["result"] == "WIN"
+
+    with ThreadPoolExecutor(max_workers=threads) as ex:
+        verdicts = list(ex.map(refuted, cands))
+    info["checked"] = len(cands)
+    info["refuted"] = [a for a, v in zip(cands, verdicts) if v]
+    pick = next((a for a, v in zip(cands, verdicts) if not v), None)
+    if pick is not None and pick != result["action"]:
+        info["changed"] = True
+        info["original"] = result["action"]
+        result["action"] = pick
+    info["ms"] = (time.perf_counter() - t0) * 1000
+    return result
