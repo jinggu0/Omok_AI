@@ -100,13 +100,26 @@ def select_opponents(probe: dict[str, float], lo: float = 0.25, hi: float = 0.75
     return {"primary": primary, "reason": reason, "lo": lo, "hi": hi}
 
 
-def games_from_db(db: StrengthDB, match_ids: list[str]) -> list[tuple[str, str, float]]:
+DECIDED = ("NORMAL_WIN", "DRAW", "FORBIDDEN_MOVE")  # FORBIDDEN_MOVE is a rule-defined loss (RIF)
+
+
+def games_from_db(db: StrengthDB, match_ids: list[str], decided_only: bool = False) -> list[tuple[str, str, float]]:
+    """decided_only drops games that ended by a process / protocol failure (no-result), e.g. when
+    failures come from the test environment rather than the engine's play."""
     out = []
     for mid in match_ids:
         m = db.match(mid)
         for g in db.games(mid):
+            if decided_only and g["termination_reason"] not in DECIDED:
+                continue
             out.append((m["engine_a"], m["engine_b"], g["score_a"]))
     return out
+
+
+def refit(db: StrengthDB, match_ids: list[str], anchor: str, prior_sd: float, decided_only: bool) -> dict:
+    games = games_from_db(db, match_ids, decided_only)
+    return {"anchor": anchor, "decided_only": decided_only, "games": len(games),
+            "ratings": fit_ratings(games, anchor, prior_sd)}
 
 
 def calibrate(cfg: dict, dojo_spec: str, device: str, db_path: str, log=print) -> dict:
@@ -133,6 +146,10 @@ def calibrate(cfg: dict, dojo_spec: str, device: str, db_path: str, log=print) -
                              reuse_process=True)
 
     probe, matches = {}, []
+    extra = []  # engine-vs-engine matches (round robin) that connect the ladder (EVALUATION §14)
+    if cfg.get("include_matches"):
+        extra = json.loads(Path(cfg["include_matches"]).read_text(encoding="utf-8"))["match_ids"]
+        log(f"  including {len(extra)} engine-vs-engine matches from {cfg['include_matches']}")
     # Probe pairs use the last openings of the set so they do not overlap the main match openings.
     probe_set = corpus_mod.OpeningSet(s.set_id, s.profile, s.openings[-cfg["probe_pairs"]:], s.set_hash, s.status, s.path)
     for eid, meta in eligible:
@@ -154,13 +171,20 @@ def calibrate(cfg: dict, dojo_spec: str, device: str, db_path: str, log=print) -
         su = res["summary"]
         log(f"  main {eid}: score {su['score']:.3f} [{su['score_ci95'][0]:.3f}, {su['score_ci95'][1]:.3f}] "
             f"Δelo {su['elo']:+.0f} [{su['elo_ci95'][0]:+.0f}, {su['elo_ci95'][1]:+.0f}] failures {res['failures']}")
-    games = games_from_db(db, matches)
-    anchor = cfg.get("anchor") if cfg.get("anchor") in probe else (sel["primary"] or list(probe))[0]
+    games = games_from_db(db, matches + extra)
+    counts: dict[str, int] = {}
+    for a, b, _ in games:
+        for p in (a, b):
+            if p != dojo.engine_id:
+                counts[p] = counts.get(p, 0) + 1
+    anchor = cfg.get("anchor", "auto")
+    if anchor == "auto" or anchor not in counts:
+        anchor = max(counts, key=counts.get)  # best-connected external engine
     ratings = fit_ratings(games, anchor, cfg.get("prior_sd", 600.0))
     for eid, r in ratings.items():
-        db.add_rating("dojo_external_elo", eid, r["rating"], r["lo"], r["hi"], r["games"], anchor, matches)
+        db.add_rating("dojo_external_elo", eid, r["rating"], r["lo"], r["hi"], r["games"], anchor, matches + extra)
     return {"dojo": dojo.engine_id, "anchor": anchor, "probe": probe, "selection": sel, "ratings": ratings,
-            "matches": matches, "opening_set": {"id": s.set_id, "hash": s.set_hash, "status": s.status},
+            "matches": matches, "engine_matches": extra, "opening_set": {"id": s.set_id, "hash": s.set_hash, "status": s.status},
             "time_ms": time_ms, "tier": tier}
 
 
@@ -173,9 +197,27 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--device", default="xpu")
     c.add_argument("--db", default="runs/evaluation/results.sqlite")
     c.add_argument("--out")
+    r = sub.add_parser("refit", help="re-fit ratings from stored matches (no new games)")
+    r.add_argument("--calibration", required=True, help="calibrate output JSON (matches + engine_matches)")
+    r.add_argument("--anchor", required=True)
+    r.add_argument("--prior-sd", type=float, default=600.0)
+    r.add_argument("--decided-only", action="store_true")
+    r.add_argument("--db", default="runs/evaluation/results.sqlite")
+    r.add_argument("--out")
     args = ap.parse_args(argv)
+    if args.cmd == "refit":
+        cal = json.loads(Path(args.calibration).read_text(encoding="utf-8"))
+        res = refit(StrengthDB(args.db), cal["matches"] + cal.get("engine_matches", []), args.anchor, args.prior_sd,
+                    args.decided_only)
+        for eid, v in sorted(res["ratings"].items(), key=lambda kv: kv[1]["rating"]):
+            print(f"  {eid:20s} {v['rating']:+7.0f} [{v['lo']:+6.0f}, {v['hi']:+6.0f}] games {v['games']}")
+        if args.out:
+            Path(args.out).write_text(json.dumps(res, indent=1), encoding="utf-8")
+        return 0
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
-    res = calibrate(cfg, args.dojo, args.device, args.db, log=lambda m: print(m, flush=True))
+    from .tournament import keep_awake
+    with keep_awake():
+        res = calibrate(cfg, args.dojo, args.device, args.db, log=lambda m: print(m, flush=True))
     print(json.dumps({k: v for k, v in res.items()}, indent=1, default=str))
     if args.out:
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)

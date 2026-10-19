@@ -58,3 +58,43 @@ def test_conformance_traps_are_consistent_with_the_rules():
     for t in ts:
         mv = board_moves(t["black"], t["white"])
         assert len(mv) == len(t["black"]) + len(t["white"])
+
+
+def test_five_stone_candidates_are_distinct_white_to_move():
+    from dojozero import _core
+    from dojozero.evaluation.engine_games import five_stone_candidates
+    cands = five_stone_candidates(30, 3)
+    hashes = set()
+    for c in cands:
+        assert len(c) == 5
+        g = _core.GameState("RENJU_GOMOCUP")
+        assert all(g.apply(m) for m in c)
+        assert g.side_to_move == "WHITE" and not g.is_terminal
+        hashes.add(g.canonical_hash())
+    assert len(hashes) == 30
+
+
+def test_balance_filter_keeps_only_colour_neutral_results(monkeypatch):
+    from dojozero.evaluation import engine_games
+
+    def fake_jobs(jobs, time_ms, concurrency, log=None):
+        # candidate k: 0 -> black wins both, 1 -> split, 2 -> white wins both, 3 -> failure, 4 -> split
+        out = []
+        for j in jobs:
+            k = j["pair_id"]
+            black_is_a = not j["a_first"]  # a_first: A plays the side to move (white)
+            if k == 0:
+                w = "BLACK"
+            elif k == 2:
+                w = "WHITE"
+            else:
+                w = "BLACK" if black_is_a else "WHITE"  # engine A wins both games
+            rec = {"winner": w, "termination_reason": "TIMEOUT" if k == 3 else "NORMAL_WIN", "plies": 30,
+                   "a_color": "BLACK" if black_is_a else "WHITE", "failed_side": "B" if k == 3 else None}
+            out.append((j, rec))
+        return out
+    monkeypatch.setattr(engine_games, "play_jobs", fake_jobs)
+    d = engine_games.build_balanced(5, 3, ("x", "y"), 100, 1, 10, "t")
+    assert len(d["openings"]) == 2
+    assert all(o["approx_balance"]["value_black"] == 0 for o in d["openings"])
+    assert "'black_twice': 1" in d["status"] and "'white_twice': 1" in d["status"] and "'failure': 1" in d["status"]

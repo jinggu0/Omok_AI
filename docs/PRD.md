@@ -308,7 +308,7 @@ C++ 라이브러리·`dojozero_engine.exe`, Python 패키지 `dojozero`(+`dojoze
 | OQ-11 | reference engine **버전 고정** 정책: 각 엔진의 어느 버전(공개 날짜·sha256)을 ladder 기준으로 고정하고 언제 갱신하는가? 갱신 시 이전 버전도 유지하는가? | E1 |
 | OQ-12 | 평가 하드웨어: 개발 노트북(E-01..E-08)에서 학습·self-play와 동시에 평가해도 되는가, 평가 전용 시간대를 둘 것인가? Tier C를 다른 머신에서 할 것인가? | E1 |
 | OQ-13 | tournament 시간 규정: 수당 고정 시간(예: 50ms/100ms/500ms/1s/5s) vs 대국당 시간(Gomocup식 timeout_match), CPU 스레드 수, 동시 대국 수 | E1 |
-| OQ-14 | Standard Renju opening corpus 출처: 자체 생성(다중 엔진 평가로 균형 판정) vs 공개 세트(RIF 26 + 대표 5수, 라이선스 확인) | E1 |
+| OQ-14 | ~~Standard Renju opening corpus 출처~~ **방법 결정(2026-10-19, 사용자)**: 5돌 백 차례 국면 + 강한 엔진 자체 대국 균형 필터 → `renju_balanced_v1`. 공개 세트(RIF 26) 병행 여부는 미정 | — |
 | OQ-15 | `pbrain-DojoZero.exe`의 추론 호스트: C++ ONNX/OpenVINO 추론(ADR-02) vs Python(PyTorch XPU) 프로세스를 감싸는 런처 (ADR-08) | E3 |
 
 ## 37. Research Questions

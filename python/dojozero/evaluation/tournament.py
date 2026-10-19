@@ -43,6 +43,24 @@ PROFILE = "RENJU_GOMOCUP"
 REPO = Path(__file__).resolve().parents[3]
 
 
+class keep_awake:
+    """Hold a per-process 'system required' request on Windows while a long, time-controlled
+    evaluation runs (an idle sleep once stretched a round robin by 3 hours, PROGRESS Phase 8).
+    Released on exit; no power setting is changed; a closed lid still sleeps."""
+
+    def __enter__(self):
+        if sys.platform == "win32":
+            import ctypes
+            ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001)  # CONTINUOUS | SYSTEM_REQUIRED
+        return self
+
+    def __exit__(self, *exc):
+        if sys.platform == "win32":
+            import ctypes
+            ctypes.windll.kernel32.SetThreadExecutionState(0x80000000)
+        return False
+
+
 class DojoZeroError(RuntimeError):
     """DojoZero itself produced an illegal move or crashed: a bug, never scored as a game."""
 
@@ -367,7 +385,8 @@ def main(argv: list[str] | None = None) -> int:
     a = make_tournament_player(args.engine_a, args.device, cache, args.time_ms, args.seed)
     b = make_tournament_player(args.engine_b, args.device, cache, args.time_ms, args.seed + 1)
     db = StrengthDB(args.db)
-    res = run_match(a, b, s, args.pairs, db, tier=args.tier, time_ms=args.time_ms, command=" ".join(sys.argv))
+    with keep_awake():
+        res = run_match(a, b, s, args.pairs, db, tier=args.tier, time_ms=args.time_ms, command=" ".join(sys.argv))
     out = {k: v for k, v in res.items() if k != "games"} | {"a": args.engine_a, "b": args.engine_b}
     print(json.dumps(out, indent=2, default=str))
     if args.out:

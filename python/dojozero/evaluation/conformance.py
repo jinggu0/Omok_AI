@@ -27,7 +27,7 @@ from pathlib import Path
 from .. import _core
 from . import corpus as corpus_mod
 from .external import ENGINE_DIR, engine_config, load_meta, local_path
-from .tournament import InProcessPlayer, ProcessPlayer, run_match
+from .tournament import InProcessPlayer, ProcessPlayer, keep_awake, run_match
 
 PROFILE = "RENJU_GOMOCUP"
 REPO = Path(__file__).resolve().parents[3]
@@ -154,7 +154,8 @@ def main(argv: list[str] | None = None) -> int:
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
     for eid in ids:
-        r = check_engine(eid, args.pairs, args.timeout_ms)
+        with keep_awake():
+            r = check_engine(eid, args.pairs, args.timeout_ms)
         (out / f"{eid}.json").write_text(json.dumps(r, indent=1), encoding="utf-8")
         if args.update_meta:
             update_meta(r)

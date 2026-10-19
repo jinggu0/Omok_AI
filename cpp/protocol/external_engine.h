@@ -34,6 +34,10 @@ struct EngineConfig {
   std::vector<std::pair<std::string, std::string>> extra_info;  // engine-specific INFO key value
   int start_timeout_ms = 10000;  // START -> OK (engines may load weights)
   int slack_ms = 1000;           // allowed beyond timeout_turn before TIMEOUT
+  // Extra allowance for the first move after START/RESTART: several engines load networks lazily on
+  // their first search (AlphaGomoku 2026 timed out there at 200 ms/move, PROGRESS Phase 8). The time
+  // still counts against time_left.
+  int first_move_slack_ms = 5000;
   bool crlf = true;
 };
 
@@ -77,6 +81,7 @@ class ExternalEngine {
   GomocupProcess proc_;
   bool started_ = false;
   long long match_ms_ = 0;
+  bool first_move_ = true;
   double used_ms_ = 0;
   bool send_time_left();
 };

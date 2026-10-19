@@ -442,6 +442,7 @@ PYBIND11_MODULE(_core, m) {
       .def_readwrite("extra_info", &protocol::EngineConfig::extra_info)
       .def_readwrite("start_timeout_ms", &protocol::EngineConfig::start_timeout_ms)
       .def_readwrite("slack_ms", &protocol::EngineConfig::slack_ms)
+      .def_readwrite("first_move_slack_ms", &protocol::EngineConfig::first_move_slack_ms)
       .def_readwrite("crlf", &protocol::EngineConfig::crlf);
 
   auto reply_dict = [](const protocol::EngineReply& r) {

@@ -82,7 +82,9 @@ def serve(think, fault: str | None = None, fault_after: int = 0, inp=None, out=N
             continue
         head = line.split(" ")[0].upper()
         wants_move = head in ("BEGIN", "TURN") or (head == "DONE")
-        if fault and wants_move and moves >= fault_after:
+        if fault == "slow-first" and wants_move and moves == 0:
+            time.sleep(1.5)  # lazy initialisation on the first search (e.g. AlphaGomoku 2026)
+        elif fault and fault != "slow-first" and wants_move and moves >= fault_after:
             if fault == "crash":
                 os._exit(3)
             if fault == "timeout":
@@ -114,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--think", default="heuristic")
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--seed", type=int, default=1)
-    ap.add_argument("--fault", choices=("crash", "timeout", "malformed", "error", "illegal", "start-crash"))
+    ap.add_argument("--fault", choices=("crash", "timeout", "malformed", "error", "illegal", "start-crash", "slow-first"))
     ap.add_argument("--fault-after", type=int, default=0)
     args = ap.parse_args(argv)
     return serve(make_think(args.think, args.device, args.seed), args.fault, args.fault_after)

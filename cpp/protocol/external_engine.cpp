@@ -37,6 +37,7 @@ Failure ExternalEngine::start(std::string* detail) {
   }
   started_ = true;
   bool ok = send("INFO timeout_turn " + std::to_string(cfg_.timeout_turn_ms));
+  first_move_ = true;
   match_ms_ = cfg_.timeout_match_ms > 0 ? cfg_.timeout_match_ms : 250LL * cfg_.timeout_turn_ms;
   used_ms_ = 0;
   ok &= send("INFO timeout_match " + std::to_string(match_ms_));
@@ -131,6 +132,8 @@ EngineReply ExternalEngine::await_move(double budget_ms) {
 }
 
 EngineReply ExternalEngine::timed_move(double budget_ms) {
+  if (first_move_) budget_ms += cfg_.first_move_slack_ms;
+  first_move_ = false;
   EngineReply r = await_move(budget_ms);
   used_ms_ += r.elapsed_ms;
   return r;
@@ -164,6 +167,7 @@ bool ExternalEngine::send_time_left() {
 
 Failure ExternalEngine::restart(std::string* detail) {
   used_ms_ = 0;
+  first_move_ = true;
   if (!started_ || !send("RESTART")) {
     if (detail) *detail = "could not write RESTART";
     return Failure::CRASH;

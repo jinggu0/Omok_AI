@@ -204,3 +204,16 @@ def test_process_reuse_restarts_between_games_and_is_dropped_after_failures(tmp_
                     verbose=False)
     assert res["failures"] == {} and len(set(pids)) == 1 and len(pids) == 4
     assert b.engine is None  # ended after the match
+
+
+def test_first_move_gets_an_initialisation_allowance(tmp_path):
+    """Engines that initialise lazily on their first search must not be scored as TIMEOUT for it
+    (AlphaGomoku 2026 at 200 ms/move, PROGRESS Phase 8); later moves keep the normal limit."""
+    b = mock(timeout_ms=300, fault="slow-first")
+    res = run_match(InProcessPlayer("heuristic", "cpu", {}, None, 5), b, SMOKE, 1, None, tier="A", time_ms=None,
+                    verbose=False)
+    assert res["failures"] == {}
+    b.config.first_move_slack_ms = 0
+    res = run_match(InProcessPlayer("heuristic", "cpu", {}, None, 5), b, SMOKE, 1, None, tier="A", time_ms=None,
+                    verbose=False)
+    assert res["failures"] == {"B:TIMEOUT": 2}

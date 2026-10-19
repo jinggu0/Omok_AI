@@ -222,6 +222,7 @@ lo ≤ score ≤ hi                   → primary calibration opponent
 - 임계값·후보 수·탐색 쌍 수(예: 첫 10쌍으로 구간 판정 후 본 매치)는 config(`configs/evaluation/ladder.yaml`).
 - 선택 로그(어떤 점수로 어떤 상대를 골랐는가)를 DB에 저장.
 - 최상위 엔진과의 대국은 Tier C로 유지하되, Rapfi 상대 0–2% 같은 결과만으로 개발 성능을 판단하지 않는다.
+- **ladder v1b(2026-10-19)**: 균형 corpus + 엔진 간 라운드로빈(쌍당 4쌍) + DojoZero 프로브·주 매치로 적합 — 결과는 PROGRESS Phase 8 (E2b). 엔진 간 대국은 병렬(동시 3판) 실행, 동시 실행 수 기록.
 - **구현(Phase 8 E2)**: `python -m dojozero.evaluation.ladder calibrate`(`configs/evaluation/ladder.yaml`). calibration v0의 교훈: (1) 프로브 4쌍은 흑 유리 opening에서 강도를 거의 구분하지 못함 → 균형 corpus 전에는 프로브를 늘리거나 생략, (2) DojoZero하고만 대국한 엔진들의 rating은 prior가 지배 → 사다리 순서를 내려면 **엔진 간 대국**이 필요, (3) anchor는 대국 수가 많은 엔진으로 정한다.
 - `dojo_external_elo` 추정: 사다리 전체 결과를 BayesElo/Ordo식 최대우도로 일괄 적합(§5), 외부 엔진 하나를 기준점(0)으로 고정하고 그 선택을 report에 명시.
 

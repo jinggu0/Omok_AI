@@ -13,15 +13,63 @@ and what is still open. Newest phase first.
 |---|---|
 | version | Phase 7 best = `taraguchi_v1` registry v1 (Phase 6 best `selfplay_v2` v2에서 이어 학습) |
 | best checkpoint | `runs/taraguchi_v1/models/gen_001.pt` |
-| external calibration date | 2026-10-19 (calibration v0: **임시** opening 세트, 500 ms/수, Tier A — 참고용) |
-| strongest opponent with score ≥ 50% | 내부: Phase 6 best `selfplay_v2` v2 (prefix 오프닝 0.67, 전체 무작위 오프닝 0.51) — 외부: **없음**(측정한 외부 엔진 모두 50% 미만) |
-| weakest opponent with score < 50% | 확정 불가(엔진 간 순서 미측정). 24쌍으로 유의하게 진 상대: Pela 2023 (0.188), Yixin 2018 (0.146) |
-| Rapfi / KataGomo / AlphaGomoku / JAX / Embryo score | 4쌍 프로브만(정보 적음): Rapfi 2025 0.25 / KataGomo 2026 0.125 / AlphaGomoku 2026 0.25 / JAX 사용 불가 / Embryo 2026 0.25 |
-| `dojo_external_elo` (CI) | UNKNOWN — v0 적합값(−182 vs Embryo 2026)은 anchor 8판·엔진 간 대국 없음으로 무의미. 유효한 것은 쌍대 ΔElo: Yixin 2018 −307 [−501, −119], Pela 2023 −255 [−426, −84], KataGomo 2021r −120 [−264, +23] |
+| external calibration date | 2026-10-19 (ladder v1b: 균형 corpus `renju_balanced_v1`, 500 ms/수, 엔진 간 라운드로빈 포함) |
+| strongest opponent with score ≥ 50% | 내부: Phase 6 best `selfplay_v2` v2 — 외부: **없음** (10개 엔진 모두 50% 미만) |
+| weakest opponent with score < 50% | Pela 2023 (사다리 최하위 엔진, −411; DojoZero 프로브 0.125) |
+| Rapfi / KataGomo / AlphaGomoku / JAX / Embryo score | 균형 corpus 4쌍 프로브: Rapfi 2025 0.0 / KataGomo 2026 0.0 / AlphaGomoku 2026 0.0 / JAX 사용 불가 / Embryo 2026 0.0 |
+| `dojo_external_elo` (CI) | **−491 [−634, −348]** (anchor Yixin 2018 = 0; Rapfi 2025 +357, Pela 2023 −411) — 500 ms/수 기준 |
 | `dojo_internal_elo` | taraguchi v1 vs selfplay v2: +7 [−88, +102] (무작위 오프닝을 NORMAL까지 진행한 시작점, 50쌍, 64 sims); selfplay v2 vs v0 +210 [+97, +322]; heuristic 대비 0.95–0.975 (20쌍 앵커) |
 | `dojo_taraguchi_elo` | taraguchi v1 vs selfplay v2: **+123 [+22, +224]** (prefix 오프닝 50쌍, 64 sims, 엔진이 opening 결정) — 절대 척도 아님(기준점 = selfplay v2) |
 | tactical score | 네트워크 단독 83.6%, 탐색 포함 91.8% (102문제, Phase 4–5; 이후 모델은 미측정) |
-| primary known weakness | 측정 근거 있는 것: 탐색 속도(EVALUATION §8.2 미달 항목), opening 결정 붕괴(2·3수 후 swap 100%, offer10 98%), 색 편향(흑으로 0.74–0.83 / 백으로 0.28–0.35). 외부 상대 기준 약점은 UNKNOWN |
+| primary known weakness | **외부 강도 전반**(사다리 최하위). 원인 미분리 — 후보: fixed-time 탐색량(수당 수십 sims), 가치망 품질. 그 외: opening 결정 붕괴, 색 편향 |
+
+---
+
+## Phase 8 (E2b) — Balanced corpus, engine round robin, calibration v1 (2026-10-19)
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| 균형 opening corpus `renju_balanced_v1`(120개): 무작위 Taraguchi 오프닝의 첫 5돌(백 차례), Rapfi 2025 vs AlphaGomoku 2026 색 교대 2판(200 ms)에서 **한 색이 두 판을 다 이기지 않은** 국면만 채택 (OQ-14 방법: 사용자 결정 2026-10-19) | `python/dojozero/evaluation/engine_games.py`, `benchmarks/openings/renju_balanced_v1.json` |
+| 외부 엔진 간 라운드로빈(병렬 스레드, 엔진별 프로세스) | `engine_games.py round-robin` |
+| ladder `refit`(저장된 대국으로 재적합, 실패 종료 대국 제외 옵션), `anchor: auto` | `python/dojozero/evaluation/ladder.py`, `configs/evaluation/ladder_v1.yaml` |
+| 첫 수 초기화 여유(`first_move_slack_ms`, 기본 5 s, time_left에는 포함) | `cpp/protocol/external_engine.*` |
+| 장시간 평가 중 유휴 절전 방지(`keep_awake`: 프로세스 단위 SetThreadExecutionState, 설정 변경 없음) | `tournament.py` 외 4개 진입점 |
+
+### Verified
+| 검증 | 결과 |
+|---|---|
+| `dojozero_tests` / `pytest` | 255 + 1 skip / **64/64** (신규: 5돌 후보 고유성, 균형 필터 판정, 첫 수 여유 회귀) |
+| 균형 필터 | 후보 500개 중 처리분: 흑 2승 89, 백 2승 53, 무승부 포함 6, 실패 4, **균형 120 채택** |
+| 라운드로빈 v1b (10엔진 × 45쌍 × 4쌍 = 360판, 500 ms/수, 동시 3판) | 실패 3(Rapfi 2021 CRASH 2, Yixin MALFORMED 1) + 금수 패 18(규칙상 패) |
+| calibration v1 (DojoZero 500 ms/수, 균형 corpus) | 프로브 4쌍: Yixin 0.25, Rapfi 2021·KataGomo 2021r·Pela 0.125, 나머지 6개 엔진 **0.0**. 주 매치 Yixin 24쌍: **0.062, −470 [−1600, −209]** |
+
+**Ladder v1b** (`dojo_external_elo`, anchor Yixin 2018 = 0; 500 ms/수, 외부 엔진 단일 스레드 CPU, `renju_balanced_v1` hash `1043ff68…`; DB rating_snapshot):
+| 엔진 | Elo [95% CI] |
+|---|---|
+| Rapfi 2025 | +357 [+223, +492] |
+| Embryo 2026 | +242 [+119, +364] |
+| Embryo 2021r | +208 [+88, +328] |
+| AlphaGomoku 2026 | +186 [+67, +305] |
+| KataGomo 2026 | +97 [−19, +213] |
+| Rapfi 2021 | +29 [−87, +145] |
+| AlphaGomoku 2023 | +18 [−98, +134] |
+| Yixin 2018 | 0 (anchor) |
+| KataGomo 2021r | −14 [−131, +103] |
+| Pela 2023 | −411 [−575, −247] |
+| **DojoZero (taraguchi v1)** | **−491 [−634, −348]** |
+전체 대국 적합과 실패 제외 적합의 차이는 35 Elo 이내. 외부 기준 확인: Gomocup 2025 Renju 1위 Rapfi가 1위(단 이 짧은 시간·단일 스레드에서는 AlphaGomoku 2026이 Embryo보다 아래 — 시간 규정이 다르면 순서가 바뀔 수 있음).
+
+### 사고·발견 (중요)
+1. **DojoZero는 사다리 최하위**: Pela 2023보다도 약 80 Elo 아래(CI 겹침). 내부 지표(heuristic 0.95+, 세대 간 승격)는 외부 강도를 전혀 대변하지 못했다(CLAUDE.md §1).
+2. **첫 라운드로빈(v1)은 폐기**: TIMEOUT 154건(KataGomo 2021r 65 등). 같은 설정을 keep-awake로 재실행(v1b)하니 TIMEOUT **0**. 노트북이 세션 유휴 중 약 3시간 절전에 들어간 구간과 겹쳤다 — 앱의 keep-awake는 세션이 유휴(백그라운드 대기)면 풀린다. "동시 실행 경합" 가설은 직접 비교(동시 3 vs 1, 각 8판, 모두 실패 0)로 **기각**. v1 데이터는 DB에 남기되 ladder에는 v1b만 사용.
+3. 균형 필터 첫 실행: 500개 중 278개가 실패 — AlphaGomoku 2026이 **첫 수**(신경망 지연 로딩)에서 200 ms+1 s를 넘김. 첫 수 초기화 여유 추가 후 실패 4.
+4. 엔진들의 금수 착수(규칙상 패)는 실제로 일어남(라운드로빈 18건, 주로 Rapfi 2021) — 적합성 함정 5종으로는 걸러지지 않는 수준. 패로 집계하되 사유를 분리 기록.
+5. 균형 필터는 근사(국면당 2판, 한 시간 규정, 두 엔진)이고 필터 엔진(Rapfi 2025, AlphaGomoku 2026)이 사다리에도 있어 그 두 엔진에 약간 유리/불리할 수 있음 — 미측정.
+
+### Open
+- DojoZero 열세 원인 분리: fixed-time scaling curve(0.5–5 s), fixed-visits 비교, 전술/가치 패배 분류(E3). 지금 수치로는 "performance"와 "value/search" 중 어느 쪽인지 판단 불가.
+- 시간 규정(OQ-13) 확정 시 사다리 재측정. 엔진 간 대국 쌍 수 확대(현재 쌍당 4쌍).
 
 ---
 
