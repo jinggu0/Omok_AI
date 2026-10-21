@@ -31,6 +31,7 @@ are the `pair_*` and `proofms_pair_*` files.
 | `results/background_load_rerun.csv` | CPU used by other processes during the rerun (every ~30 s) |
 | `results/differential/*` | ref vs live and switch on/off differentials (result and node count identical everywhere) |
 | `results/replay_247_k8_t8.json` | 247 blunder positions replayed through search + filter: none / A (ee1d011 solver) / B (optimized) at defense shares 10–50% (`python -m dojozero.tools.filter_replay`) |
+| `results/coverage_247.json` | Case C (Phase 8 E3c): every legal move at the 247 pre-blunder positions (and 154 earliest provably-lost decisions) judged by the solver (VCF 200k / VCT 100k nodes, no clock), with policy and 500 ms visit ranks (`python -m dojozero.tools.coverage_replay --earlier`) |
 | `results/ab/ab_e3b_fastsolver_k8_s30_rerun.json` | external paired A/B (Pela 2023, Yixin 2018, 40 pairs each): the run used for the verdict |
 | `results/ab/ab_e3b_fastsolver_k8_s30_INVALID_rapfi_load.json` | first A/B, invalid: a background Rapfi analysis engine starved DojoZero in the Yixin half |
 | `results/throttled/*` | early runs under power throttling (see caveat) |
