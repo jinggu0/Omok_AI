@@ -12,6 +12,7 @@ add_executable(dojozero_tests
   compatibility/test_compat.cpp
   tactics/test_threats.cpp
   tactics/test_solvers.cpp
+  tactics/test_accel.cpp
   search/test_search.cpp
   protocol/test_protocol.cpp
 )

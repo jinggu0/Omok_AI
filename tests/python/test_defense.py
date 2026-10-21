@@ -58,3 +58,25 @@ def test_filter_inside_a_time_limited_search():
     # whatever the uniform search picked, the filter left a move the solver does not refute
     if len(r["defense"]["refuted"]) < r["defense"]["checked"]:
         assert _core.analyze_tactics(after, 100000, 50000, 0, 1000)["result"] != "WIN"
+
+
+def test_reference_and_optimized_solvers_agree_and_checks_are_recorded():
+    # Phase 8 E3b: impl="ref" is the frozen ee1d011 solver; without a clock both give the same answer.
+    for impl, carry in (("ref", False), ("live", False), ("live", True)):
+        s = SearchSettings(defense_k=4, defense_ms=1000, defense_impl=impl, defense_carry=carry)
+        r = defend(open_three_position(), fake("A5", "O15", "K8"), s)
+        assert r["action"] == "K8" and set(r["defense"]["refuted"]) == {"A5", "O15"}
+        checks = {c["a"]: c for c in r["defense"]["checks"]}
+        assert checks["A5"]["result"] == "WIN" and checks["K8"]["result"] != "WIN"
+        assert all(c["nodes"] >= 0 and c["ms"] >= 0 for c in checks.values())
+    g = open_three_position()
+    g.apply("A5")
+    a = _core.analyze_tactics(g, 100000, 50000, 0, 0.0, "ref", False)
+    b = _core.analyze_tactics(g, 100000, 50000, 0, 0.0, "live", True)
+    assert (a["result"], a["nodes"], a["move"]) == (b["result"], b["nodes"], b["move"])
+
+
+def test_unknown_impl_is_rejected():
+    import pytest
+    with pytest.raises(ValueError):
+        _core.analyze_tactics(open_three_position(), 100, 100, 0, 0.0, "fast")

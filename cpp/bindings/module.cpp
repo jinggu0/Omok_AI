@@ -21,6 +21,7 @@
 #include "search/bots.h"
 #include "search/search.h"
 #include "tactics/engine.h"
+#include "tactics/reference/ref.h"
 
 namespace py = pybind11;
 using namespace dz;
@@ -400,11 +401,15 @@ PYBIND11_MODULE(_core, m) {
   });
 
   m.def("analyze_tactics", [](const GameState& g, uint64_t vcf_nodes, uint64_t vct_nodes, uint64_t loss_nodes,
-                              double max_ms) {
+                              double max_ms, const std::string& impl, bool carry_unused_time) {
+    if (impl != "live" && impl != "ref") throw py::value_error("impl must be 'live' or 'ref'");
     tactics::TacticalDecision d;
     {
       py::gil_scoped_release release;
-      d = tactics::analyze_tactics(g, {vcf_nodes, vct_nodes, loss_nodes, 40, max_ms});
+      tactics::TacticalLimits lim{vcf_nodes, vct_nodes, loss_nodes, 40, max_ms};
+      lim.carry_unused_time = carry_unused_time;
+      // impl="ref": the frozen ee1d011 solver (fixed 40/40/20 time split), for same-binary A/B runs.
+      d = impl == "ref" ? tactics::ref::analyze_tactics(g, lim) : tactics::analyze_tactics(g, lim);
     }
     py::dict out;
     out["result"] = tactics::proof_name(d.result);
@@ -417,7 +422,7 @@ PYBIND11_MODULE(_core, m) {
     out["elapsed_ms"] = d.elapsed_ms;
     return out;
   }, py::arg("state"), py::arg("vcf_nodes") = 100000, py::arg("vct_nodes") = 50000, py::arg("loss_nodes") = 20000,
-     py::arg("max_ms") = 0.0);
+     py::arg("max_ms") = 0.0, py::arg("impl") = "live", py::arg("carry_unused_time") = false);
 
   // ---- Gomocup / Piskvork protocol (ARCHITECTURE.md §3.12) ----
   m.def("gomocup_to_point", [](int x, int y) -> py::object {

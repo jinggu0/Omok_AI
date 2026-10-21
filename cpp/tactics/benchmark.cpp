@@ -18,6 +18,7 @@ std::optional<RuleProfile> profile_named(const std::string& name) {
   if (name == "RENJU_RIF") return RuleProfile::renju_rif();
   if (name == "TARAGUCHI10") return RuleProfile::taraguchi10();
   if (name == "OMOKDOJANG_DAN") return RuleProfile::omokdojang_dan();
+  if (name == "RENJU_GOMOCUP") return RuleProfile::renju_gomocup();
   return std::nullopt;
 }
 

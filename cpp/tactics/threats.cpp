@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "board/zobrist.h"
+#include "tactics/tprof.h"
 
 namespace dz::tactics {
 namespace {
@@ -63,7 +64,9 @@ uint64_t position_key(const Board& b, Color to_move) {
 
 bool is_legal_move(const Board& b, Point p, Color c, const Rules& r) {
   if (!b.empty_at(p)) return false;
-  return c == Color::WHITE || !is_forbidden(black_verdict(b, p, r.black));
+  if (c == Color::WHITE) return true;
+  DZ_TPROF_SCOPE(BLACK_VERDICT);
+  return !is_forbidden(black_verdict(b, p, r.black));
 }
 
 bool wins_with(const Board& b, Point p, Color c, const Rules& r) {
@@ -83,6 +86,7 @@ bool wins_with(const Board& b, Point p, Color c, const Rules& r) {
 }
 
 void five_points(const Board& b, Color c, const Rules& r, std::vector<Point>& out) {
+  DZ_TPROF_SCOPE(FIVE_POINTS);
   out.clear();
   const uint8_t* cells = b.cells().data();
   const uint8_t own = cell_of(c);
@@ -117,19 +121,21 @@ inline int line_five_points(const uint8_t* c, int idx, int step, uint8_t own, bo
 
 // New five points created by the stone at idx (cells must already contain it), deduplicated.
 // Black with non-default options re-checks each candidate with the full verdict.
-int new_five_points(Board::Cells& cells, int idx, Color c, const Rules& r, int* out) {
+// `cells` is read only; `scratch` (a mutable copy of the same cells) is needed only by the black
+// non-default-options re-check and may be null otherwise.
+int new_five_points(const uint8_t* cells, Board::Cells* scratch, int idx, Color c, const Rules& r, int* out) {
   const uint8_t own = cell_of(c);
   const bool white = c == Color::WHITE;
   int n = 0;
   int buf[8];
   for (int d = 0; d < kNumDirections; ++d) {
     const int step = Board::kStep[d];
-    if (window_count(cells.data(), idx, step, own) < 3) continue;  // fewer than 4 stones in any five
-    const int k = line_five_points(cells.data(), idx, step, own, white, buf);
+    if (window_count(cells, idx, step, own) < 3) continue;  // fewer than 4 stones in any five
+    const int k = line_five_points(cells, idx, step, own, white, buf);
     for (int j = 0; j < k; ++j) {
       if (std::find(out, out + n, buf[j]) != out + n) continue;
       if (!white && !default_black_options(r.black) &&
-          black_verdict_cells(cells, buf[j], r.black) != MoveVerdict::WIN_FIVE) {
+          black_verdict_cells(*scratch, buf[j], r.black) != MoveVerdict::WIN_FIVE) {
         continue;
       }
       out[n++] = buf[j];
@@ -141,10 +147,16 @@ int new_five_points(Board::Cells& cells, int idx, Color c, const Rules& r, int* 
 }  // namespace
 
 void five_points_near(const Board& b, Point center, Color c, const Rules& r, std::vector<Point>& out) {
+  DZ_TPROF_SCOPE(FIVE_POINTS_NEAR);
   out.clear();
-  Board::Cells cells = b.cells();
   int pts[32];
-  const int n = new_five_points(cells, Board::index_of(center), c, r, pts);
+  int n;
+  if (c == Color::WHITE || default_black_options(r.black)) {
+    n = new_five_points(b.cells().data(), nullptr, Board::index_of(center), c, r, pts);  // no copy needed
+  } else {
+    Board::Cells cells = b.cells();
+    n = new_five_points(cells.data(), &cells, Board::index_of(center), c, r, pts);
+  }
   for (int i = 0; i < n; ++i) out.push_back(Board::point_of_index(pts[i]));
 }
 
@@ -165,12 +177,16 @@ void moves_with_five_points(Board& b, Color c, const Rules& r, int min_points, s
     if (!window_has(cells.data(), idx, own, 3)) continue;
     if (wins_with(b, m, c, r)) continue;  // a win, not a four
     cells[idx] = own;
-    const int n = new_five_points(cells, idx, c, r, pts);
+    const int n = new_five_points(cells.data(), &cells, idx, c, r, pts);
     cells[idx] = EMPTY;
     if (n < min_points) continue;
-    if (c == Color::BLACK && is_forbidden(black_verdict_cells(cells, idx, r.black))) continue;
+    if (c == Color::BLACK) {
+      DZ_TPROF_SCOPE(BLACK_VERDICT);
+      if (is_forbidden(black_verdict_cells(cells, idx, r.black))) continue;
+    }
     scored.emplace_back(n, m);
   }
+  DZ_TPROF_SCOPE(CANDIDATE_SORT);
   std::stable_sort(scored.begin(), scored.end(), [](const auto& a, const auto& b2) { return a.first > b2.first; });
   for (const auto& [n, m] : scored) out.push_back(m);
 }
@@ -178,14 +194,17 @@ void moves_with_five_points(Board& b, Color c, const Rules& r, int min_points, s
 }  // namespace
 
 void four_moves(Board& b, Color c, const Rules& r, std::vector<Point>& out) {
+  DZ_TPROF_SCOPE(FOUR_MOVES);
   moves_with_five_points(b, c, r, 1, out);
 }
 
 void double_threat_moves(Board& b, Color c, const Rules& r, std::vector<Point>& out) {
+  DZ_TPROF_SCOPE(DOUBLE_THREATS);
   moves_with_five_points(b, c, r, 2, out);
 }
 
 void threat_moves(Board& b, Color c, const Rules& r, std::vector<Point>& out) {
+  DZ_TPROF_SCOPE(THREAT_MOVES);
   four_moves(b, c, r, out);
   const uint8_t own = cell_of(c);
   for (int i = 0; i < kNumPoints; ++i) {
@@ -194,7 +213,12 @@ void threat_moves(Board& b, Color c, const Rules& r, std::vector<Point>& out) {
     if (!window_has(b.cells().data(), Board::index_of(m), own, 2)) continue;
     if (std::find(out.begin(), out.end(), m) != out.end()) continue;
     if (wins_with(b, m, c, r) || !is_legal_move(b, m, c, r)) continue;
-    if (count_threes(b, m, c, r.black) >= 1) out.push_back(m);
+    int threes;
+    {
+      DZ_TPROF_SCOPE(COUNT_THREES);
+      threes = count_threes(b, m, c, r.black);
+    }
+    if (threes >= 1) out.push_back(m);
   }
 }
 

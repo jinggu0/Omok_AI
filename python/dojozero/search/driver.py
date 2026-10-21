@@ -40,6 +40,8 @@ class SearchSettings:
     defense_vcf: int = 100000
     defense_vct: int = 50000
     defense_threads: int = 4
+    defense_impl: str = "live"    # "ref" = frozen ee1d011 solver (same-binary A/B, Phase 8 E3b)
+    defense_carry: bool = True    # VCT may use time a fast VCF left unused (TacticalLimits)
 
 
 def make_config(s: SearchSettings) -> "_core.SearchConfig":
@@ -127,7 +129,7 @@ def defend(state, result: dict, s: SearchSettings) -> dict:
     refuted, or the root is already a proven win, the search's choice stands."""
     import time
     from concurrent.futures import ThreadPoolExecutor
-    info = {"checked": 0, "refuted": [], "changed": False, "ms": 0.0}
+    info = {"checked": 0, "refuted": [], "changed": False, "ms": 0.0, "checks": []}
     result["defense"] = info
     if state.phase != "NORMAL_RENJU" or result.get("proven") == 1 or not result.get("children"):
         return result
@@ -139,17 +141,22 @@ def defend(state, result: dict, s: SearchSettings) -> dict:
     rounds = -(-len(cands) // threads)  # checks run in parallel rounds; split the reserved time over them
     ms = (s.max_ms * s.defense_share / rounds) if s.max_ms > 0 else s.defense_ms
 
-    def refuted(a: str) -> bool:
+    def check(a: str) -> tuple[bool, dict]:
         g = state.copy()
         if not g.apply(a):
-            return True
+            return True, {"a": a, "result": "ILLEGAL"}
         if g.is_terminal:
-            return g.winner is not None and g.winner != state.actor
-        d = _core.analyze_tactics(g, s.defense_vcf, s.defense_vct, 0, ms)  # opponent to move: WIN = proven
-        return d["result"] == "WIN"
+            return g.winner is not None and g.winner != state.actor, {"a": a, "result": "TERMINAL"}
+        d = _core.analyze_tactics(g, s.defense_vcf, s.defense_vct, 0, ms, s.defense_impl, s.defense_carry)
+        # Opponent to move: WIN = proven forced win (refuted). UNKNOWN is never treated as refuted.
+        return d["result"] == "WIN", {"a": a, "result": d["result"], "reason": d["reason"], "nodes": d["nodes"],
+                                      "ms": d["elapsed_ms"]}
 
     with ThreadPoolExecutor(max_workers=threads) as ex:
-        verdicts = list(ex.map(refuted, cands))
+        checked = list(ex.map(check, cands))
+    verdicts = [v for v, _ in checked]
+    info["checks"] = [c for _, c in checked]
+    info["budget_ms"] = ms
     info["checked"] = len(cands)
     info["refuted"] = [a for a, v in zip(cands, verdicts) if v]
     pick = next((a for a, v in zip(cands, verdicts) if not v), None)

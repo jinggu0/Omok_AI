@@ -30,6 +30,14 @@ struct TacticalLimits {
   uint64_t loss_nodes = 20000;
   int max_depth = 40;
   double max_ms = 0;  // total wall-clock limit (split 40/40/20 over VCF/VCT/loss); 0 = node budgets only
+  // Phase 8 E3b: with max_ms, VCF stays capped at 40% but VCT then gets all time still left (minus a
+  // 20% reserve only when loss_nodes > 0) and the loss search gets the rest. false (default) = the
+  // fixed ee1d011 split, under which time unused by a fast VCF (or a disabled loss search) is lost.
+  // Only the root defense filter turns it on (SearchSettings.defense_carry); the MCTS root tactics
+  // keep the ee1d011 split, because carrying there would hand MCTS time to the solver.
+  // Changes only how much time a search may use: results can move from UNKNOWN to proven, never
+  // between WIN and LOSS.
+  bool carry_unused_time = false;
 };
 
 struct TacticalDecision {

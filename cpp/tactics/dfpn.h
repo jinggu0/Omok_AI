@@ -31,6 +31,11 @@ struct DfpnLimits {
   int max_depth = 40;       // plies from the root
   bool fours_only = false;  // restrict attacker to fours (proof-number VCF)
   double max_ms = 0;        // wall-clock limit, 0 = none (keep 0 for reproducible results)
+  // Exact accelerations (Phase 8 E3b). None changes the searched tree, the node count or any
+  // result; the switches exist for differential tests (on/off must agree bit for bit).
+  bool gen_cache = true;     // reuse a node's generated move list when df-pn re-enters it
+  bool lazy_legality = true; // AND nodes: run the (costly) legality check only on unrefuted moves
+  bool fast_refute = true;   // AND nodes: refutation test from per-node double-threat data (see dfpn.cpp)
 };
 
 struct DfpnResult {

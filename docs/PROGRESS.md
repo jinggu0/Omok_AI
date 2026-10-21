@@ -21,7 +21,129 @@ and what is still open. Newest phase first.
 | `dojo_internal_elo` | taraguchi v1 vs selfplay v2: +7 [−88, +102] (무작위 오프닝을 NORMAL까지 진행한 시작점, 50쌍, 64 sims); selfplay v2 vs v0 +210 [+97, +322]; heuristic 대비 0.95–0.975 (20쌍 앵커) |
 | `dojo_taraguchi_elo` | taraguchi v1 vs selfplay v2: **+123 [+22, +224]** (prefix 오프닝 50쌍, 64 sims, 엔진이 opening 결정) — 절대 척도 아님(기준점 = selfplay v2) |
 | tactical score | 네트워크 단독 83.6%, 탐색 포함 91.8% (102문제, Phase 4–5; 이후 모델은 미측정) |
-| primary known weakness | **방어 전술**: 패배의 87%가 상대에게 솔버가 증명하는 강제승(VCF/VCT)을 허용한 한 수, value망은 그 직전 평균 +0.52로 과신. 탐색량 10배로도 개선 없음(Phase 8 E2c). 흑에서 더 약함(Pela 상대 흑 ~0.12 / 백 ~0.41) |
+| primary known weakness | **방어 전술**: 패배의 87%가 상대에게 솔버가 증명하는 강제승(VCF/VCT)을 허용한 한 수, value망은 그 직전 평균 +0.52로 과신. 탐색량 10배로도 개선 없음(Phase 8 E2c). 흑에서 더 약함(Pela 상대 흑 ~0.12 / 백 ~0.41). E3b: 솔버를 5×(8스레드) 가속하자 남은 블런더 대부분이 "상위 8 후보가 모두 강제패"인 국면 → 후보 범위(policy coverage)·그 이전 수가 다음 병목 |
+
+---
+
+## Phase 8 (E3b) — Tactical solver profiling and acceleration, replay, paired A/B rerun (2026-10-21)
+
+질문: "모델은 그대로 두고 전술 솔버를 충분히 빠르게 만들면 실제 tactical blunder와 외부 성능이 개선되는가?"
+기준선 = `ee1d011`. 같은 바이너리에 ee1d011 솔버를 동결 복사(`dz::tactics::ref`)해 모든 비교를 같은 빌드에서 수행.
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| 동결 참조 솔버(ee1d011 threats/vcf/dfpn/engine 복사, 차분 oracle·같은 바이너리 기준선) | `cpp/tactics/reference/*` |
+| 구간 프로파일러(`DZ_TPROF` 빌드 전용 매크로, 일반 빌드에서는 빈 매크로) | `cpp/tactics/tprof.{h,cpp}`, 솔버 계측 |
+| 벤치·프로파일 도구(`dojozero_tbench`/`dojozero_tprof`, `--impl ref/live/pair`, 할당 수, 스레드, 스로틀링 해제) | `cpp/tools/tactics_profile.cpp`, CMake |
+| 성능 corpus 3종(벤치 문제 102 / 블런더 직후 247 / 필터 워크로드 1,976) | `python/dojozero/tools/tactics_corpus.py`, `benchmarks/perf/*.json` |
+| df-pn 정확 가속 3종(아래), 스위치로 on/off | `cpp/tactics/dfpn.{h,cpp}` |
+| `five_points_near` 셀 복사 제거(기본 흑 옵션·백) | `cpp/tactics/threats.cpp` |
+| analyze_tactics VCT 시간 이월(opt-in, 필터만 사용) | `cpp/tactics/engine.{h,cpp}` (`carry_unused_time`) |
+| 필터: 솔버 선택(`defimpl=ref/live`)·이월(`defcarry`)·후보별 결과 기록, 대국 기록에 수마다 필터 통계, 엔진 ID 구분(`-def8` = ee1d011 솔버, `-def8-fast`) | `search/driver.py`, `evaluation/{match,tournament}.py`, `bindings/module.cpp` |
+| 247 블런더 재생 도구(arm별, 결정적 노드 심판 + E3a 1초 심판) | `python/dojozero/tools/filter_replay.py` |
+| Windows 전원 스로틀링 해제(프로세스 단위: 벤치 도구, 평가 진입점, 외부 엔진 자식 프로세스) | `tournament.disable_power_throttling`, `protocol/gomocup_process.cpp` |
+| 정확성 테스트 9종 + Python 3종 | `tests/tactics/test_accel.cpp`, `tests/python/test_defense.py`, `tests/python/test_bindings.py` |
+
+### 1. Profiling (최적화 전, ee1d011 코드, 블런더 직후 247국면 VCT 5만 노드)
+VCF는 병목이 아님(247국면 합 5,035노드, 국면 중앙값 0.04 ms). VCT 구간 비중(포함 시간, 8스레드; 호출 수는 결정적):
+
+| 구간 | 호출 | 비중 |
+|---|---|---|
+| AND 노드 수 생성 | 32.8만 | **77.8%** |
+| └ 방어수마다 `refuted(d)` (착수 → 방어 5목 점 → 공격 쌍위협 재검사) | 3,814만 (AND 노드당 116) | 45.8% |
+| └ 합법성(흑 방어 시 금수 판정), 모든 점 | 4,529만 (노드당 138) | 18.3% |
+| OR 노드 위협수 생성(`threat_moves`) | 17.1만 | 15.6% |
+| 전체 보드 5목 점 스캔 | 109만 | 5.4% |
+| TT 조회·저장 | 402만 | 1.6% |
+
+노드당 할당 **145회**. 원인: (1) TT가 pn/dn만 저장해 df-pn이 노드를 재방문할 때마다 수 생성(AND 노드 전 빈 점 반박 검사)을 반복, (2) 모든 빈 점에 금수 판정 후 반박 검사, (3) 반박 검사가 매번 착수·해시 갱신·셀 625바이트 복사. 원본: `benchmarks/perf/results/baseline_ee1d011_after_blunder_{vcf,vct}_tprof.json`(시간은 스로틀링 아래 측정, 호출 수는 정확).
+
+### 2. 최적화 (1–4는 정확: 같은 탐색 트리, 같은 노드 수, 같은 결과)
+1. **생성 캐시**: 노드 키별 수 생성 결과 재사용. OR 노드의 깊이 컷은 원래 순서(즉승 검사 → 깊이 컷)대로 재적용, 깊이 컷 결과는 캐시하지 않음.
+2. **지연 합법성**: AND 노드에서 반박되지 않은 빈 점에만 금수 판정(같은 집합·같은 순서).
+3. **fast_refute** (ADR-01 C안의 최소 범위: 노드 단위 위협 정보 + local invalidation): AND 노드마다 공격 쌍위협 수 e와 그 5목 점 집합을 한 번 계산. 방어 돌 d는 공격 연속 길이를 바꾸지 않으므로 e의 5목 점 수 = 기존 집합에서 d를 뺀 크기; 방어 5목 점은 9칸 창 사전 필터를 통과할 때만 원래 검사; **공격 흑의 합법성은 canonical `black_verdict_cells`로 정확히 재판정**(재귀 거짓금수는 국소성이 보장되지 않으므로). 비기본 흑 옵션은 원래 경로.
+4. `five_points_near` 셀 복사 제거, 반박 버퍼 재사용 → 노드당 할당 145 → 5.2.
+5. (정확 아님, 별도 측정) **VCT 시간 이월**: ee1d011의 40/40/20 분할에서 빠른 VCF·꺼진 loss 검색이 남긴 시간이 버려져, 필터의 VCT는 후보 예산의 40%만 사용했다. opt-in으로 VCT가 남은 시간을 사용. 결과는 UNKNOWN → WIN으로만 바뀌고 WIN/LOSS가 뒤바뀌지 않음. MCTS 루트 전술은 ee1d011 분할 유지 — 처음에 기본값을 켬으로 두었다가 MCTS 시간을 빼앗아 `Search.TimeLimitStopsSearch`가 실패한 것을 발견, opt-in으로 수정.
+
+TT 검토: UNKNOWN은 증명으로 저장하지 않음(예산 중단 시 pn/dn ≥ 1로만 저장), 깊이 컷 DISPROVEN 비저장 — 예산 의존 결과가 증명으로 캐시되는 경로 없음(변경 없음). 수 정렬은 변경하지 않음(트리 보존이 차분 검증의 전제); 정책 prior 미사용.
+
+### 3. 정확성
+| 검증 | 결과 |
+|---|---|
+| 차분: 벤치 102(VCF/VCT/analyze), 블런더 247(VCF/VCT/analyze), 필터 워크로드 1,976(analyze, 노드 예산) ref vs live | 결과·노드 수 불일치 **0** |
+| 스위치 8조합(캐시·지연·fast_refute on/off) vs ref, 무작위 국면 RIF/Omokdojang, WIN/LOSS 모드 | 비트 동일 (`SolverAccel.DfpnMatchesReferenceAndSwitchesAreNeutral`) |
+| 비기본 흑 옵션 / 흑 밀집 보드(장목·4-4·3-3·재귀 거짓금수), 양 색 공격 | 비트 동일 |
+| 노드 예산 30/300/3000 × 이월 on/off의 모든 WIN/LOSS 주장 → 독립 검증기 | REFUTED 0 |
+| D4 8이미지 | WIN/LOSS 모순 0 |
+| 입력 불변, play/undo 400회 스트레스 후 셀·8개 해시·차례 복원 | 통과 |
+| 8스레드 병렬 호출 = 순차 결과 | 통과 |
+| 예산 소진 → UNKNOWN (LOSS 아님) | 통과 |
+| 시간 제한 측정에서 live가 ref의 WIN을 잃은 국면 | 0 (8조건 × 1,976) |
+| `dojozero_tactics fuzz --positions 2000 --seed 2026` (analyze_tactics 주장 → 독립 검증기) | 주장 1,837(WIN 1,522 / LOSS 315), 검증 1,828, 너무 큼 9, **REFUTED 0** |
+| 전체 테스트 | C++ 265개 중 264 통과·1 skip(기존 앱 증거 없음), Python 76 통과 |
+
+### 4. 속도 (같은 바이너리, 국면마다 ref → live 교대 `--impl pair`, 스로틀링 해제)
+측정 환경 주의: 1차 측정 중에는 사용자 GUI의 Rapfi 분석 엔진이 백그라운드에서 평균 ~1.7코어 사용(발견 후 종료), 재측정 중에는 OneDrive가 ~1.4코어 사용(`benchmarks/perf/results/background_load_rerun.csv`). 절대 nodes/s는 부하에 따라 30–50% 달라진다; 비율은 교대 측정이라 견고하다.
+
+| VCT, 블런더 247, 5만 노드 | 1차 ref → live | 재측정 ref → live | 배율(재측정) | 국면별 중앙값 |
+|---|---|---|---|---|
+| 1스레드 | 24.8k → 81.5k | 16.7k → 55.4k | **3.3×** | 4.1× |
+| 2스레드 (스레드당) | 23.0k → 84.1k | 15.4k → 54.4k | 3.5× | 4.4× |
+| 4스레드 (스레드당) | 18.7k → 80.2k | 9.5k → 39.3k | 4.2× | 5.0× |
+| 8스레드 (스레드당, 필터 설정) | 10.0k → 53.5k | 5.8k → 30.9k | **5.3×** | 6.3× |
+
+ref는 스레드가 늘수록 스레드당 속도가 크게 떨어짐(1→8: −65%), live는 −44%. analyze(필터 호출 형태, 1스레드): 블런더 3.4×, 벤치 2.7×. VCF: 변경 없음(블런더 109k → 125k nodes/s; 벤치 문제는 합 598노드라 무의미). nodes-to-proof(중앙값 1,635 / p95 5,783)는 트리가 같으므로 불변.
+
+**proof@시간** (필터 워크로드 1,976, VCF 100k / VCT 50k 노드, 8스레드, 재측정; 노드 예산만의 상한 1,836 WIN):
+
+| 시간 | ref | live | live + 이월 |
+|---|---|---|---|
+| 125 ms | 1,137–1,155 | 1,421 | **1,614** |
+| 250 ms | 1,219–1,224 | 1,569 | **1,744** |
+| 500 ms | 1,318–1,327 | 1,707 | 1,796 |
+| 1000 ms | 1,460–1,473 | 1,783 | 1,816 |
+
+개선판 125 ms(1,614)가 ee1d011 1000 ms(약 1,465)보다 많이 증명한다.
+
+### 5. 247 블런더 재생 (k=8, 8스레드, 500 ms/수, 노드 심판: VCF 200k / VCT 100k, 시계 없음)
+E3a 수치(187 / 149)는 1초 시간 제한 심판·스로틀링 조건이라 직접 비교할 수 없다 — 같은 실행에서 전 arm을 재측정했다. 3회 실행(Rapfi 부하 중 2회 + 제거 후 1회) 모두 같은 경향; 아래는 마지막 실행(OneDrive 부하 기록됨).
+
+| arm | 블런더 | 흑 / 백 | 필터 증명 | UNKNOWN | 후보 검사 / 반박 | 수 교체 | 남은 sims | 방어 ms 평균/p95 |
+|---|---|---|---|---|---|---|---|---|
+| 필터 없음 | 234 | 131/142 · 103/105 | — | — | — | — | 269 | — |
+| A: ee1d011 솔버 50% | 214 | 117 · 97 | 67.5% | 32.5% | 7.91 / 5.34 | 25.9% | 109 | 119 / 223 |
+| B 10% | 213 | 115 · 98 | 75.8% | 24.2% | 7.91 / 6.00 | 30.0% | 203 | 59 / 109 |
+| B 20% | 206 | 111 · 95 | 82.7% | 17.3% | 7.91 / 6.55 | 32.4% | 171 | 105 / 227 |
+| **B 30%** | **203** | 109 · 94 | 86.4% | 13.6% | 7.91 / 6.84 | 28.3% | **152** | 114 / 182 |
+| B 50% | 203 | 109 · 94 | 89.8% | 10.2% | 7.91 / 7.11 | 21.9% | 106 | 149 / 281 |
+| B 50% 이월 없음 | 208 | 112 · 96 | 82.0% | 18.0% | 7.91 / 6.49 | 31.2% | 103 | 92 / 154 |
+
+국면 단위: A → B30 블런더 제거 11 / 신규 0, 필터 없음 → B30 제거 32 / 신규 1 ("제거"는 심판이 더 이상 강제승을 증명하지 못함; 심판 UNKNOWN 포함). **남은 실패 원인이 바뀜**: A는 예산 부족 179 / 상위 8 전부 반박 35, B30은 80 / **123**, B50은 44 / 159 — 솔버가 빨라지자 "상위 k 후보 중 안전한 수가 없음"(또는 이미 진 국면)이 주 병목. 흑 블런더 비율 77%(109/142), 백 90%(94/105).
+방어 비율 30%를 A/B arm으로 **사전 확정**(재생 국면 기준, A/B opening과 별개): 50%와 블런더 동일, sims +43%.
+
+### 6. 외부 paired A/B (사전 등록, Tier B)
+A = 필터 끔, B = 개선 솔버 + 필터(k=8, 수당 시간 30%, 8스레드, 이월). 500 ms/수, 같은 체크포인트, `renju_balanced_v1` opening 24–63(E3a와 동일), Pela 2023·Yixin 2018 각 40쌍, 색 교대, arm 교대, 외부 엔진 단일 프로세스(스레드 수 지정 안 함 — E3a와 동일).
+
+| 상대 | A | B | 쌍대 차이 [95%] | ΔElo (로컬, 점추정) |
+|---|---|---|---|---|
+| Pela 2023 | 0.263 (흑 0.150 / 백 0.375) | 0.300 (흑 0.175 / 백 0.425) | +0.0375 [−0.050, +0.119] | +32 |
+| Yixin 2018 | 0.025 (0.025 / 0.025) | 0.037 (0.025 / 0.050) | +0.0125 [−0.043, +0.068] | +73 (점수가 0에 가까워 매우 불확실) |
+| **합산 80쌍** | 0.144 | 0.169 | **+0.025 [−0.025, +0.075] → INCONCLUSIVE** | +33 |
+
+쌍 차이: 0 ×64, +0.5 ×10, −0.5 ×6. 실패 0, DojoZero 금수패 0(금수패 2+2는 Pela). 수당 시간 A 409–422 ms / B 403–409 ms, sims/수 A 172·162 → B 117·118(−32%). B의 필터: 수당 솔버 호출 6.3, 증명(WIN) 2.2–3.5, 솔버 노드 1.3–1.7만, 솔버 CPU 323–385 ms(8스레드 합), 방어 벽시계 112–115 ms, 수 교체 3.7–6.3%. 실전에서 UNKNOWN 45–65%는 대부분 "강제승 없음"(안전한 후보)이라 실패율이 아니다. 대국 내 tactical blunder 비율: **UNKNOWN**(대국 분류 미실행).
+**무효 실행 1건(기록 유지)**: 첫 A/B(`runs/evaluation/ab_e3b_fastsolver_k8_s30.json`)는 사용자 GUI의 Rapfi 분석 엔진이 CPU를 점유해 Yixin 구간에서 DojoZero가 수당 1.3 sims·1.25 s로 굶었다(같은 국면 재현 시 정상) → 판정에 사용하지 않음. 그 실행의 Pela 구간: +0.025 [−0.063, +0.113].
+E3a(−0.019 [−0.075, +0.038])와 비교: 점추정 부호가 +로 바뀌었으나 두 실행 모두 0을 포함. 조건(스로틀링 해제로 외부 엔진도 전속력, 배경 부하)이 달라 "같은 조건"이 아니다 — 비교는 각 실행 내부 arm 간에만 유효.
+
+### 결론
+**INCONCLUSIVE** (명세 §13: "솔버 속도는 크게 개선됐지만 replay·Elo 개선이 약함").
+- 솔버 가속 자체는 정확성 회귀 없이 채택(결과 비트 동일, 기본 경로). 필터 기본값은 계속 **끔**.
+- 충족: 필터 설정(8스레드) 5.3×, proof@125–250 ms +40%, 필터의 sims 손실 감소, 정확성 회귀 0. 미충족: 1스레드 3.3×·100k nodes/s, 재생 블런더 감소 소폭(214 → 203), 외부 A/B CI가 0 포함.
+- **tactical solver 속도는 병목 중 하나였을 뿐 전체 병목은 아니다**: 솔버가 빨라지자 남은 블런더의 다수(123/203)는 상위 8 후보가 전부 강제패로 증명되는 국면 — 후보 범위(policy coverage) 또는 그 전 수에서 이미 진 국면 문제.
+- 다음 단계 권고: **Case C (policy candidate coverage)** — 블런더 국면에서 안전한 수가 존재하는지(전 합법수 솔버 검사), 그 수의 policy/visit 순위, top-k 밖 안전 방어 비율 측정 → 결과로 Case B(value/policy tactical reanalysis) 또는 Case A(proof-aware MCTS) 결정. 흑 측 약점(Case D)은 계속 기록.
+
+### 재현성
+baseline `ee1d011`; corpus sha256: bench_problems `7b5d31c1…`, after_blunder `57123c09…`, filter_workload `54303e54…`; checkpoint `runs/taraguchi_v1/models/gen_001.pt` (파일 sha256 `3067e05e…`, model_sha `9ccd7fab…`); `renju_balanced_v1` `1043ff68…`; Pela 2023 exe `b97df7a3…`, Yixin 2018 exe `f6d1a01b…`; Windows 11 Home 10.0.26200, Intel Core Ultra 7 258V (4P+4LPE, 8스레드), 32 GB, 전원 연결(재측정·A/B) / 배터리(1차 측정); MSVC 19.43.34808 Release, CMake 4.3.2; 결과 파일 `benchmarks/perf/results/`(README 참조), A/B `runs/evaluation/ab_e3b_fastsolver_k8_s30_rerun.json` + DB `experiment`. 솔버 설정: VCF 100k / VCT 50k 노드, depth 40, 필터 k=8·8스레드·후보당 `500 × share` ms.
 
 ---
 

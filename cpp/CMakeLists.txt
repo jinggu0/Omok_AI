@@ -1,4 +1,4 @@
-add_library(dojozero_core STATIC
+set(DOJOZERO_CORE_SOURCES
   board/coord.cpp
   board/transform.cpp
   board/zobrist.cpp
@@ -23,11 +23,27 @@ add_library(dojozero_core STATIC
   protocol/piskvork_adapter.cpp
   protocol/gomocup_process.cpp
   protocol/external_engine.cpp
+  tactics/tprof.cpp
+  tactics/reference/ref_threats.cpp
+  tactics/reference/ref_vcf.cpp
+  tactics/reference/ref_dfpn.cpp
+  tactics/reference/ref_engine.cpp
 )
+add_library(dojozero_core STATIC ${DOJOZERO_CORE_SOURCES})
 target_include_directories(dojozero_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(dojozero_core PUBLIC nlohmann_json::nlohmann_json)
 
 if(DOJOZERO_BUILD_TOOLS)
+  # Profiling build of the same sources (DZ_TPROF timers; never linked into production targets).
+  add_library(dojozero_core_tprof STATIC ${DOJOZERO_CORE_SOURCES})
+  target_include_directories(dojozero_core_tprof PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+  target_link_libraries(dojozero_core_tprof PUBLIC nlohmann_json::nlohmann_json)
+  target_compile_definitions(dojozero_core_tprof PUBLIC DZ_TPROF)
+  add_executable(dojozero_tprof tools/tactics_profile.cpp)
+  target_link_libraries(dojozero_tprof PRIVATE dojozero_core_tprof)
+  add_executable(dojozero_tbench tools/tactics_profile.cpp)
+  target_link_libraries(dojozero_tbench PRIVATE dojozero_core)
+
   add_executable(dojozero_engine cli/main.cpp)
   target_link_libraries(dojozero_engine PRIVATE dojozero_core)
 

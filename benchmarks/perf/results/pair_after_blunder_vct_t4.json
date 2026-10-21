@@ -1,0 +1,2763 @@
+{
+ "allocations": 81722638,
+ "allocations_per_node": 149.98199246443733,
+ "build": "production",
+ "carry_unused_time": true,
+ "corpus": "benchmarks/perf/after_blunder.json",
+ "corpus_sha256": "57123c0914e4b472bce86370167b18f6e783e5e7aae7d75ad6e739d2122b33cb",
+ "fast_refute": true,
+ "gen_cache": true,
+ "impl": "pair(ref then live)",
+ "lazy_legality": true,
+ "median_ms": 36.4833,
+ "median_ms_to_proof": 36.4833,
+ "median_nodes_to_proof": 1635.0,
+ "mode": "vct",
+ "ms_budget": 0.0,
+ "nodes_budget": 50000,
+ "nodes_per_s_aggregate": 30136.127958949604,
+ "nodes_per_s_per_thread": 39288.16875268668,
+ "p95_ms": 185.9952,
+ "p95_ms_to_proof": 185.9952,
+ "p95_nodes_to_proof": 5783.0,
+ "pair": {
+  "mismatch_result_or_nodes": 0,
+  "per_position_speedup_median": 5.044903828279626,
+  "per_position_speedup_p10": 2.5113444689689737,
+  "per_position_speedup_p90": 7.631074659619252,
+  "ref_nodes_per_s_per_thread": 9474.41625924681,
+  "ref_solver_ms_sum": 57510.98380000001,
+  "ref_total_nodes": 544883,
+  "speedup_nps": 4.1467640514889075,
+  "speedup_total_time": 4.1467640514889075
+ },
+ "per_position": [
+  {
+   "id": "0247c56dad424f7a-0-0@25",
+   "ms": 148.0095,
+   "nodes": 4866,
+   "ref": {
+    "ms": 421.8298,
+    "nodes": 4866,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-1-0@25",
+   "ms": 13.371,
+   "nodes": 308,
+   "ref": {
+    "ms": 33.731,
+    "nodes": 308,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-1-1@10",
+   "ms": 17.2651,
+   "nodes": 1158,
+   "ref": {
+    "ms": 131.1049,
+    "nodes": 1158,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-10-1@18",
+   "ms": 7.9624,
+   "nodes": 644,
+   "ref": {
+    "ms": 64.3256,
+    "nodes": 644,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-11-0@21",
+   "ms": 129.2938,
+   "nodes": 5093,
+   "ref": {
+    "ms": 409.5758,
+    "nodes": 5093,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-11-1@16",
+   "ms": 28.3477,
+   "nodes": 2257,
+   "ref": {
+    "ms": 216.7853,
+    "nodes": 2257,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-2-0@21",
+   "ms": 19.5578,
+   "nodes": 468,
+   "ref": {
+    "ms": 55.965,
+    "nodes": 468,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-2-1@42",
+   "ms": 55.6025,
+   "nodes": 4149,
+   "ref": {
+    "ms": 290.2162,
+    "nodes": 4149,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-3-0@27",
+   "ms": 14.911,
+   "nodes": 359,
+   "ref": {
+    "ms": 41.8719,
+    "nodes": 359,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-3-1@10",
+   "ms": 34.9489,
+   "nodes": 2207,
+   "ref": {
+    "ms": 207.8314,
+    "nodes": 2207,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-4-1@20",
+   "ms": 83.432,
+   "nodes": 5274,
+   "ref": {
+    "ms": 376.8565,
+    "nodes": 5274,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-5-0@23",
+   "ms": 1.9353,
+   "nodes": 44,
+   "ref": {
+    "ms": 4.6147,
+    "nodes": 44,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-5-1@24",
+   "ms": 0.5173,
+   "nodes": 16,
+   "ref": {
+    "ms": 0.4885,
+    "nodes": 16,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-6-0@25",
+   "ms": 7.9013,
+   "nodes": 218,
+   "ref": {
+    "ms": 17.189,
+    "nodes": 218,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-6-1@12",
+   "ms": 43.5846,
+   "nodes": 3413,
+   "ref": {
+    "ms": 358.7207,
+    "nodes": 3413,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-7-0@19",
+   "ms": 9.6171,
+   "nodes": 393,
+   "ref": {
+    "ms": 24.55,
+    "nodes": 393,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-7-1@36",
+   "ms": 10.2869,
+   "nodes": 603,
+   "ref": {
+    "ms": 60.8527,
+    "nodes": 603,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-8-1@22",
+   "ms": 30.2808,
+   "nodes": 2039,
+   "ref": {
+    "ms": 214.3817,
+    "nodes": 2039,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-9-0@15",
+   "ms": 164.6617,
+   "nodes": 5265,
+   "ref": {
+    "ms": 464.1905,
+    "nodes": 5265,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0247c56dad424f7a-9-1@14",
+   "ms": 41.2475,
+   "nodes": 3225,
+   "ref": {
+    "ms": 336.0962,
+    "nodes": 3225,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-0-0@13",
+   "ms": 185.9952,
+   "nodes": 5631,
+   "ref": {
+    "ms": 490.7382,
+    "nodes": 5631,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-0-1@16",
+   "ms": 9.6923,
+   "nodes": 611,
+   "ref": {
+    "ms": 71.186,
+    "nodes": 611,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-1-0@33",
+   "ms": 54.3864,
+   "nodes": 1349,
+   "ref": {
+    "ms": 149.2986,
+    "nodes": 1349,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-1-1@16",
+   "ms": 104.1997,
+   "nodes": 5456,
+   "ref": {
+    "ms": 631.9689,
+    "nodes": 5456,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-11-0@23",
+   "ms": 64.1441,
+   "nodes": 1067,
+   "ref": {
+    "ms": 192.6074,
+    "nodes": 1067,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-11-1@16",
+   "ms": 23.7396,
+   "nodes": 1242,
+   "ref": {
+    "ms": 170.0134,
+    "nodes": 1242,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-2-0@21",
+   "ms": 74.6533,
+   "nodes": 7058,
+   "ref": {
+    "ms": 247.0066,
+    "nodes": 7058,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-2-1@28",
+   "ms": 24.9453,
+   "nodes": 2315,
+   "ref": {
+    "ms": 156.2504,
+    "nodes": 2315,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-3-1@22",
+   "ms": 18.3461,
+   "nodes": 983,
+   "ref": {
+    "ms": 108.0491,
+    "nodes": 983,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-4-0@33",
+   "ms": 20.5978,
+   "nodes": 297,
+   "ref": {
+    "ms": 54.2154,
+    "nodes": 297,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-4-1@14",
+   "ms": 21.6537,
+   "nodes": 1208,
+   "ref": {
+    "ms": 129.5583,
+    "nodes": 1208,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-5-0@23",
+   "ms": 6.5641,
+   "nodes": 130,
+   "ref": {
+    "ms": 10.5361,
+    "nodes": 130,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-5-1@16",
+   "ms": 10.3397,
+   "nodes": 474,
+   "ref": {
+    "ms": 67.277,
+    "nodes": 474,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-6-0@17",
+   "ms": 1.2159,
+   "nodes": 19,
+   "ref": {
+    "ms": 4.7676,
+    "nodes": 19,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-7-0@19",
+   "ms": 41.5004,
+   "nodes": 821,
+   "ref": {
+    "ms": 104.2218,
+    "nodes": 821,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-7-1@32",
+   "ms": 72.3249,
+   "nodes": 4572,
+   "ref": {
+    "ms": 419.0176,
+    "nodes": 4572,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-8-0@13",
+   "ms": 100.4669,
+   "nodes": 1923,
+   "ref": {
+    "ms": 281.5045,
+    "nodes": 1923,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-8-1@34",
+   "ms": 59.6362,
+   "nodes": 3761,
+   "ref": {
+    "ms": 416.9643,
+    "nodes": 3761,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "0381aab01cf441ac-9-0@21",
+   "ms": 247.9162,
+   "nodes": 7271,
+   "ref": {
+    "ms": 634.3652,
+    "nodes": 7271,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-0-0@15",
+   "ms": 0.1012,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.1103,
+    "nodes": 2,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-0-1@16",
+   "ms": 9.5288,
+   "nodes": 611,
+   "ref": {
+    "ms": 70.7064,
+    "nodes": 611,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-1-0@27",
+   "ms": 1.299,
+   "nodes": 21,
+   "ref": {
+    "ms": 2.3612,
+    "nodes": 21,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-1-1@14",
+   "ms": 72.6906,
+   "nodes": 4144,
+   "ref": {
+    "ms": 512.0822,
+    "nodes": 4144,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-10-0@17",
+   "ms": 45.3137,
+   "nodes": 1089,
+   "ref": {
+    "ms": 125.7223,
+    "nodes": 1089,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-11-0@21",
+   "ms": 164.1719,
+   "nodes": 3928,
+   "ref": {
+    "ms": 497.7929,
+    "nodes": 3928,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-11-1@14",
+   "ms": 12.6868,
+   "nodes": 665,
+   "ref": {
+    "ms": 78.0328,
+    "nodes": 665,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-2-0@19",
+   "ms": 156.3377,
+   "nodes": 5036,
+   "ref": {
+    "ms": 460.8401,
+    "nodes": 5036,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-2-1@36",
+   "ms": 61.7053,
+   "nodes": 3366,
+   "ref": {
+    "ms": 380.1593,
+    "nodes": 3366,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-3-0@31",
+   "ms": 2.4395,
+   "nodes": 39,
+   "ref": {
+    "ms": 4.6483,
+    "nodes": 39,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-3-1@18",
+   "ms": 7.3834,
+   "nodes": 284,
+   "ref": {
+    "ms": 43.2808,
+    "nodes": 284,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-4-0@33",
+   "ms": 19.8349,
+   "nodes": 297,
+   "ref": {
+    "ms": 43.6182,
+    "nodes": 297,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-4-1@16",
+   "ms": 40.0567,
+   "nodes": 2586,
+   "ref": {
+    "ms": 268.401,
+    "nodes": 2586,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-5-1@22",
+   "ms": 80.4966,
+   "nodes": 4753,
+   "ref": {
+    "ms": 565.1142,
+    "nodes": 4753,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-6-0@35",
+   "ms": 241.4343,
+   "nodes": 3792,
+   "ref": {
+    "ms": 579.2506,
+    "nodes": 3792,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-6-1@22",
+   "ms": 28.32,
+   "nodes": 1153,
+   "ref": {
+    "ms": 199.3488,
+    "nodes": 1153,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-7-0@19",
+   "ms": 1.5355,
+   "nodes": 23,
+   "ref": {
+    "ms": 3.3188,
+    "nodes": 23,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-7-1@30",
+   "ms": 70.8559,
+   "nodes": 3659,
+   "ref": {
+    "ms": 437.5982,
+    "nodes": 3659,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-8-0@15",
+   "ms": 126.1335,
+   "nodes": 2978,
+   "ref": {
+    "ms": 397.1822,
+    "nodes": 2978,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-8-1@38",
+   "ms": 0.093,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.0993,
+    "nodes": 2,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-9-0@19",
+   "ms": 24.0764,
+   "nodes": 402,
+   "ref": {
+    "ms": 64.3552,
+    "nodes": 402,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "1077f072e5d34e43-9-1@36",
+   "ms": 8.6527,
+   "nodes": 254,
+   "ref": {
+    "ms": 37.7006,
+    "nodes": 254,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-0-1@32",
+   "ms": 70.8213,
+   "nodes": 4419,
+   "ref": {
+    "ms": 479.6654,
+    "nodes": 4419,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-10-1@46",
+   "ms": 4.8803,
+   "nodes": 176,
+   "ref": {
+    "ms": 28.6006,
+    "nodes": 176,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-11-1@42",
+   "ms": 3.5395,
+   "nodes": 298,
+   "ref": {
+    "ms": 17.2868,
+    "nodes": 298,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-2-1@32",
+   "ms": 68.8426,
+   "nodes": 5083,
+   "ref": {
+    "ms": 435.7923,
+    "nodes": 5083,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-4-0@27",
+   "ms": 138.8022,
+   "nodes": 3141,
+   "ref": {
+    "ms": 399.2944,
+    "nodes": 3141,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-5-0@27",
+   "ms": 94.4248,
+   "nodes": 2174,
+   "ref": {
+    "ms": 271.1021,
+    "nodes": 2174,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-5-1@48",
+   "ms": 1.7879,
+   "nodes": 72,
+   "ref": {
+    "ms": 11.0377,
+    "nodes": 72,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-6-0@23",
+   "ms": 11.658,
+   "nodes": 256,
+   "ref": {
+    "ms": 34.6072,
+    "nodes": 256,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-7-0@45",
+   "ms": 57.2545,
+   "nodes": 921,
+   "ref": {
+    "ms": 119.1647,
+    "nodes": 921,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-7-1@18",
+   "ms": 112.2991,
+   "nodes": 6597,
+   "ref": {
+    "ms": 669.7398,
+    "nodes": 6597,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-8-0@21",
+   "ms": 94.2703,
+   "nodes": 2717,
+   "ref": {
+    "ms": 279.5649,
+    "nodes": 2717,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "6c0339f180704afe-9-1@30",
+   "ms": 64.6397,
+   "nodes": 4301,
+   "ref": {
+    "ms": 520.6071,
+    "nodes": 4301,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-0-0@21",
+   "ms": 184.8181,
+   "nodes": 4710,
+   "ref": {
+    "ms": 554.6,
+    "nodes": 4710,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-0-1@22",
+   "ms": 1.8684,
+   "nodes": 54,
+   "ref": {
+    "ms": 11.6597,
+    "nodes": 54,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-1-0@23",
+   "ms": 186.0534,
+   "nodes": 3683,
+   "ref": {
+    "ms": 488.2627,
+    "nodes": 3683,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-1-1@16",
+   "ms": 41.316,
+   "nodes": 2115,
+   "ref": {
+    "ms": 305.7243,
+    "nodes": 2115,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-10-0@21",
+   "ms": 73.4675,
+   "nodes": 2626,
+   "ref": {
+    "ms": 233.4194,
+    "nodes": 2626,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-10-1@18",
+   "ms": 12.6578,
+   "nodes": 644,
+   "ref": {
+    "ms": 74.7412,
+    "nodes": 644,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-11-0@33",
+   "ms": 97.6845,
+   "nodes": 2479,
+   "ref": {
+    "ms": 285.1953,
+    "nodes": 2479,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-2-0@23",
+   "ms": 15.7634,
+   "nodes": 216,
+   "ref": {
+    "ms": 30.0982,
+    "nodes": 216,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-3-1@32",
+   "ms": 45.2411,
+   "nodes": 3234,
+   "ref": {
+    "ms": 306.3105,
+    "nodes": 3234,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-4-0@35",
+   "ms": 8.4892,
+   "nodes": 105,
+   "ref": {
+    "ms": 15.9725,
+    "nodes": 105,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-4-1@20",
+   "ms": 94.6975,
+   "nodes": 5274,
+   "ref": {
+    "ms": 445.3109,
+    "nodes": 5274,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-5-0@23",
+   "ms": 0.1285,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.1325,
+    "nodes": 2,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-5-1@16",
+   "ms": 11.6906,
+   "nodes": 474,
+   "ref": {
+    "ms": 73.2008,
+    "nodes": 474,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-6-0@27",
+   "ms": 0.3481,
+   "nodes": 6,
+   "ref": {
+    "ms": 0.399,
+    "nodes": 6,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-7-0@13",
+   "ms": 60.792,
+   "nodes": 2792,
+   "ref": {
+    "ms": 202.8759,
+    "nodes": 2792,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-7-1@34",
+   "ms": 36.4833,
+   "nodes": 1913,
+   "ref": {
+    "ms": 248.6135,
+    "nodes": 1913,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-8-0@9",
+   "ms": 72.7793,
+   "nodes": 1909,
+   "ref": {
+    "ms": 219.3704,
+    "nodes": 1909,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-8-1@30",
+   "ms": 44.2535,
+   "nodes": 2906,
+   "ref": {
+    "ms": 331.9352,
+    "nodes": 2906,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "746d62158a3845f3-9-1@34",
+   "ms": 68.7005,
+   "nodes": 6622,
+   "ref": {
+    "ms": 534.2435,
+    "nodes": 6622,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-0-1@24",
+   "ms": 112.0255,
+   "nodes": 5309,
+   "ref": {
+    "ms": 724.729,
+    "nodes": 5309,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-1-0@15",
+   "ms": 249.5132,
+   "nodes": 5363,
+   "ref": {
+    "ms": 665.7049,
+    "nodes": 5363,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-1-1@10",
+   "ms": 36.5188,
+   "nodes": 1971,
+   "ref": {
+    "ms": 259.4506,
+    "nodes": 1971,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-10-1@18",
+   "ms": 3.7179,
+   "nodes": 213,
+   "ref": {
+    "ms": 29.0834,
+    "nodes": 213,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-11-0@37",
+   "ms": 232.2466,
+   "nodes": 4249,
+   "ref": {
+    "ms": 618.5973,
+    "nodes": 4249,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-11-1@38",
+   "ms": 33.7516,
+   "nodes": 1417,
+   "ref": {
+    "ms": 209.2168,
+    "nodes": 1417,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-2-0@21",
+   "ms": 272.7762,
+   "nodes": 6499,
+   "ref": {
+    "ms": 699.1097,
+    "nodes": 6499,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-2-1@30",
+   "ms": 17.8129,
+   "nodes": 561,
+   "ref": {
+    "ms": 75.0478,
+    "nodes": 561,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-3-0@27",
+   "ms": 14.2367,
+   "nodes": 247,
+   "ref": {
+    "ms": 35.3419,
+    "nodes": 247,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-3-1@12",
+   "ms": 30.1218,
+   "nodes": 1665,
+   "ref": {
+    "ms": 192.636,
+    "nodes": 1665,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-4-1@20",
+   "ms": 104.3042,
+   "nodes": 5274,
+   "ref": {
+    "ms": 461.7194,
+    "nodes": 5274,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-5-1@18",
+   "ms": 65.3305,
+   "nodes": 3762,
+   "ref": {
+    "ms": 327.9647,
+    "nodes": 3762,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-6-1@26",
+   "ms": 25.9463,
+   "nodes": 1304,
+   "ref": {
+    "ms": 162.5699,
+    "nodes": 1304,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-7-1@38",
+   "ms": 39.1686,
+   "nodes": 3137,
+   "ref": {
+    "ms": 137.2874,
+    "nodes": 3137,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-8-0@15",
+   "ms": 105.0312,
+   "nodes": 1805,
+   "ref": {
+    "ms": 237.7925,
+    "nodes": 1805,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-8-1@24",
+   "ms": 22.3462,
+   "nodes": 906,
+   "ref": {
+    "ms": 130.8109,
+    "nodes": 906,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-9-0@15",
+   "ms": 194.3171,
+   "nodes": 5265,
+   "ref": {
+    "ms": 535.4531,
+    "nodes": 5265,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "7834f44dc7ad4417-9-1@14",
+   "ms": 57.1532,
+   "nodes": 3819,
+   "ref": {
+    "ms": 459.1484,
+    "nodes": 3819,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-0-0@21",
+   "ms": 181.3938,
+   "nodes": 4710,
+   "ref": {
+    "ms": 603.2276,
+    "nodes": 4710,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-1-0@31",
+   "ms": 38.7731,
+   "nodes": 682,
+   "ref": {
+    "ms": 103.3818,
+    "nodes": 682,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-1-1@10",
+   "ms": 21.2342,
+   "nodes": 876,
+   "ref": {
+    "ms": 153.6184,
+    "nodes": 876,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-10-1@18",
+   "ms": 3.724,
+   "nodes": 213,
+   "ref": {
+    "ms": 28.5727,
+    "nodes": 213,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-11-0@19",
+   "ms": 221.0346,
+   "nodes": 5084,
+   "ref": {
+    "ms": 616.4362,
+    "nodes": 5084,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-11-1@34",
+   "ms": 120.5856,
+   "nodes": 8883,
+   "ref": {
+    "ms": 398.1271,
+    "nodes": 8883,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-2-0@23",
+   "ms": 2.1104,
+   "nodes": 31,
+   "ref": {
+    "ms": 3.2027,
+    "nodes": 31,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-3-0@23",
+   "ms": 175.0987,
+   "nodes": 4705,
+   "ref": {
+    "ms": 507.0995,
+    "nodes": 4705,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-4-0@27",
+   "ms": 5.2533,
+   "nodes": 75,
+   "ref": {
+    "ms": 12.0297,
+    "nodes": 75,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-4-1@24",
+   "ms": 1.0873,
+   "nodes": 25,
+   "ref": {
+    "ms": 9.1712,
+    "nodes": 25,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-5-1@24",
+   "ms": 0.5216,
+   "nodes": 16,
+   "ref": {
+    "ms": 0.6895,
+    "nodes": 16,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-6-0@25",
+   "ms": 11.9908,
+   "nodes": 218,
+   "ref": {
+    "ms": 23.9517,
+    "nodes": 218,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-6-1@30",
+   "ms": 7.2784,
+   "nodes": 251,
+   "ref": {
+    "ms": 58.283,
+    "nodes": 251,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-7-0@17",
+   "ms": 160.2531,
+   "nodes": 5783,
+   "ref": {
+    "ms": 534.5737,
+    "nodes": 5783,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-7-1@34",
+   "ms": 90.3114,
+   "nodes": 4809,
+   "ref": {
+    "ms": 537.9148,
+    "nodes": 4809,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-8-0@15",
+   "ms": 99.0734,
+   "nodes": 1805,
+   "ref": {
+    "ms": 250.9092,
+    "nodes": 1805,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-8-1@32",
+   "ms": 105.7905,
+   "nodes": 9043,
+   "ref": {
+    "ms": 336.2373,
+    "nodes": 9043,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-9-0@15",
+   "ms": 196.288,
+   "nodes": 5265,
+   "ref": {
+    "ms": 549.6834,
+    "nodes": 5265,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8e16df63dc134304-9-1@14",
+   "ms": 51.4479,
+   "nodes": 3225,
+   "ref": {
+    "ms": 413.7338,
+    "nodes": 3225,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-1-1@40",
+   "ms": 1.6173,
+   "nodes": 55,
+   "ref": {
+    "ms": 10.1454,
+    "nodes": 55,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-10-0@45",
+   "ms": 108.945,
+   "nodes": 5682,
+   "ref": {
+    "ms": 444.8205,
+    "nodes": 5682,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-10-1@32",
+   "ms": 58.1101,
+   "nodes": 3904,
+   "ref": {
+    "ms": 447.7785,
+    "nodes": 3904,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-11-0@59",
+   "ms": 30.5628,
+   "nodes": 451,
+   "ref": {
+    "ms": 60.9859,
+    "nodes": 451,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-11-1@30",
+   "ms": 2.93,
+   "nodes": 124,
+   "ref": {
+    "ms": 18.3742,
+    "nodes": 124,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-2-0@31",
+   "ms": 48.0456,
+   "nodes": 965,
+   "ref": {
+    "ms": 113.7977,
+    "nodes": 965,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-2-1@46",
+   "ms": 10.0888,
+   "nodes": 318,
+   "ref": {
+    "ms": 59.6321,
+    "nodes": 318,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-3-1@32",
+   "ms": 108.5979,
+   "nodes": 5390,
+   "ref": {
+    "ms": 531.3889,
+    "nodes": 5390,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-4-1@28",
+   "ms": 14.7324,
+   "nodes": 746,
+   "ref": {
+    "ms": 114.041,
+    "nodes": 746,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-5-0@49",
+   "ms": 28.9565,
+   "nodes": 1811,
+   "ref": {
+    "ms": 146.0379,
+    "nodes": 1811,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-5-1@34",
+   "ms": 12.3692,
+   "nodes": 539,
+   "ref": {
+    "ms": 77.6368,
+    "nodes": 539,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-6-0@31",
+   "ms": 59.3621,
+   "nodes": 1432,
+   "ref": {
+    "ms": 170.813,
+    "nodes": 1432,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-6-1@30",
+   "ms": 36.0488,
+   "nodes": 1383,
+   "ref": {
+    "ms": 248.7691,
+    "nodes": 1383,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-7-0@27",
+   "ms": 47.5157,
+   "nodes": 963,
+   "ref": {
+    "ms": 124.578,
+    "nodes": 963,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-7-1@48",
+   "ms": 2.4264,
+   "nodes": 66,
+   "ref": {
+    "ms": 10.5391,
+    "nodes": 66,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-8-1@44",
+   "ms": 1.1867,
+   "nodes": 40,
+   "ref": {
+    "ms": 6.7113,
+    "nodes": 40,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-9-0@23",
+   "ms": 33.1736,
+   "nodes": 1508,
+   "ref": {
+    "ms": 138.1227,
+    "nodes": 1508,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "8f6b7e5b0ce54368-9-1@40",
+   "ms": 16.5391,
+   "nodes": 496,
+   "ref": {
+    "ms": 99.0943,
+    "nodes": 496,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-0-0@17",
+   "ms": 151.7554,
+   "nodes": 4473,
+   "ref": {
+    "ms": 536.5986,
+    "nodes": 4473,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-0-1@20",
+   "ms": 41.7848,
+   "nodes": 1871,
+   "ref": {
+    "ms": 276.2684,
+    "nodes": 1871,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-1-0@11",
+   "ms": 146.5354,
+   "nodes": 3459,
+   "ref": {
+    "ms": 458.7081,
+    "nodes": 3459,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-1-1@32",
+   "ms": 13.0672,
+   "nodes": 472,
+   "ref": {
+    "ms": 69.2769,
+    "nodes": 472,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-10-0@47",
+   "ms": 69.2452,
+   "nodes": 2209,
+   "ref": {
+    "ms": 281.078,
+    "nodes": 2209,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-10-1@26",
+   "ms": 46.9889,
+   "nodes": 2436,
+   "ref": {
+    "ms": 263.3568,
+    "nodes": 2436,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-11-0@41",
+   "ms": 7.8317,
+   "nodes": 756,
+   "ref": {
+    "ms": 42.8671,
+    "nodes": 756,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-11-1@10",
+   "ms": 25.9362,
+   "nodes": 1940,
+   "ref": {
+    "ms": 233.326,
+    "nodes": 1940,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-2-0@19",
+   "ms": 15.4949,
+   "nodes": 201,
+   "ref": {
+    "ms": 26.0191,
+    "nodes": 201,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-2-1@50",
+   "ms": 54.3899,
+   "nodes": 2767,
+   "ref": {
+    "ms": 298.5207,
+    "nodes": 2767,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-3-1@26",
+   "ms": 65.9841,
+   "nodes": 3523,
+   "ref": {
+    "ms": 496.9162,
+    "nodes": 3523,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-4-1@18",
+   "ms": 42.4312,
+   "nodes": 2113,
+   "ref": {
+    "ms": 254.8752,
+    "nodes": 2113,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-5-1@26",
+   "ms": 100.436,
+   "nodes": 3458,
+   "ref": {
+    "ms": 677.1286,
+    "nodes": 3458,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-6-0@21",
+   "ms": 12.7815,
+   "nodes": 198,
+   "ref": {
+    "ms": 31.0329,
+    "nodes": 198,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-7-0@23",
+   "ms": 18.3265,
+   "nodes": 527,
+   "ref": {
+    "ms": 64.5858,
+    "nodes": 527,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-7-1@36",
+   "ms": 3.7379,
+   "nodes": 102,
+   "ref": {
+    "ms": 21.4265,
+    "nodes": 102,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-8-0@21",
+   "ms": 184.7455,
+   "nodes": 4228,
+   "ref": {
+    "ms": 660.0154,
+    "nodes": 4228,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-8-1@40",
+   "ms": 24.0022,
+   "nodes": 1629,
+   "ref": {
+    "ms": 78.0913,
+    "nodes": 1629,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-9-0@11",
+   "ms": 119.5273,
+   "nodes": 3314,
+   "ref": {
+    "ms": 444.3359,
+    "nodes": 3314,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "b7ddf6aa3e014f8d-9-1@32",
+   "ms": 0.4227,
+   "nodes": 10,
+   "ref": {
+    "ms": 0.3996,
+    "nodes": 10,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-0-0@19",
+   "ms": 60.5864,
+   "nodes": 804,
+   "ref": {
+    "ms": 134.8748,
+    "nodes": 804,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-0-1@26",
+   "ms": 0.9143,
+   "nodes": 28,
+   "ref": {
+    "ms": 7.208,
+    "nodes": 28,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-1-0@13",
+   "ms": 195.6702,
+   "nodes": 4325,
+   "ref": {
+    "ms": 544.1499,
+    "nodes": 4325,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-1-1@8",
+   "ms": 1.898,
+   "nodes": 90,
+   "ref": {
+    "ms": 11.1488,
+    "nodes": 90,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-10-1@12",
+   "ms": 13.2631,
+   "nodes": 735,
+   "ref": {
+    "ms": 85.3334,
+    "nodes": 735,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-11-0@23",
+   "ms": 7.3814,
+   "nodes": 106,
+   "ref": {
+    "ms": 16.6621,
+    "nodes": 106,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-11-1@14",
+   "ms": 88.0681,
+   "nodes": 4416,
+   "ref": {
+    "ms": 542.4736,
+    "nodes": 4416,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-2-0@19",
+   "ms": 110.8683,
+   "nodes": 3274,
+   "ref": {
+    "ms": 277.1597,
+    "nodes": 3274,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-2-1@16",
+   "ms": 43.4797,
+   "nodes": 2778,
+   "ref": {
+    "ms": 311.2934,
+    "nodes": 2778,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-3-0@17",
+   "ms": 2.8858,
+   "nodes": 45,
+   "ref": {
+    "ms": 7.1005,
+    "nodes": 45,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-3-1@10",
+   "ms": 8.5302,
+   "nodes": 433,
+   "ref": {
+    "ms": 64.6166,
+    "nodes": 433,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-4-1@24",
+   "ms": 76.2362,
+   "nodes": 4002,
+   "ref": {
+    "ms": 354.479,
+    "nodes": 4002,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-5-0@39",
+   "ms": 61.4374,
+   "nodes": 833,
+   "ref": {
+    "ms": 129.9374,
+    "nodes": 833,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-5-1@14",
+   "ms": 13.389,
+   "nodes": 515,
+   "ref": {
+    "ms": 71.3074,
+    "nodes": 515,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-6-0@19",
+   "ms": 75.6955,
+   "nodes": 2525,
+   "ref": {
+    "ms": 286.9109,
+    "nodes": 2525,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-6-1@22",
+   "ms": 52.0602,
+   "nodes": 2599,
+   "ref": {
+    "ms": 400.0769,
+    "nodes": 2599,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-7-0@13",
+   "ms": 35.881,
+   "nodes": 998,
+   "ref": {
+    "ms": 105.7347,
+    "nodes": 998,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-7-1@38",
+   "ms": 0.094,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.7414,
+    "nodes": 2,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-8-1@10",
+   "ms": 117.1115,
+   "nodes": 7671,
+   "ref": {
+    "ms": 893.6866,
+    "nodes": 7671,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-9-0@11",
+   "ms": 114.7185,
+   "nodes": 3314,
+   "ref": {
+    "ms": 399.6672,
+    "nodes": 3314,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "baa2f004057a4ec7-9-1@10",
+   "ms": 1.7509,
+   "nodes": 72,
+   "ref": {
+    "ms": 11.8193,
+    "nodes": 72,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-0-1@42",
+   "ms": 24.9841,
+   "nodes": 741,
+   "ref": {
+    "ms": 151.9516,
+    "nodes": 741,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-1-0@33",
+   "ms": 221.154,
+   "nodes": 5489,
+   "ref": {
+    "ms": 593.4152,
+    "nodes": 5489,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-1-1@34",
+   "ms": 9.5414,
+   "nodes": 356,
+   "ref": {
+    "ms": 42.1368,
+    "nodes": 356,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-10-1@44",
+   "ms": 60.7278,
+   "nodes": 4168,
+   "ref": {
+    "ms": 368.6785,
+    "nodes": 4168,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-11-0@33",
+   "ms": 1.2058,
+   "nodes": 14,
+   "ref": {
+    "ms": 0.8925,
+    "nodes": 14,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-2-0@25",
+   "ms": 143.9151,
+   "nodes": 4532,
+   "ref": {
+    "ms": 478.8286,
+    "nodes": 4532,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-2-1@40",
+   "ms": 30.9482,
+   "nodes": 2519,
+   "ref": {
+    "ms": 215.685,
+    "nodes": 2519,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-4-1@24",
+   "ms": 9.171,
+   "nodes": 485,
+   "ref": {
+    "ms": 54.5165,
+    "nodes": 485,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-5-0@45",
+   "ms": 121.219,
+   "nodes": 8927,
+   "ref": {
+    "ms": 580.2521,
+    "nodes": 8927,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-5-1@24",
+   "ms": 91.0932,
+   "nodes": 4829,
+   "ref": {
+    "ms": 409.3376,
+    "nodes": 4829,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-6-1@30",
+   "ms": 6.9025,
+   "nodes": 238,
+   "ref": {
+    "ms": 31.9834,
+    "nodes": 238,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-7-0@27",
+   "ms": 45.5313,
+   "nodes": 963,
+   "ref": {
+    "ms": 110.2007,
+    "nodes": 963,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-7-1@24",
+   "ms": 1.8376,
+   "nodes": 107,
+   "ref": {
+    "ms": 14.5125,
+    "nodes": 107,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-8-1@32",
+   "ms": 37.8349,
+   "nodes": 1639,
+   "ref": {
+    "ms": 247.7212,
+    "nodes": 1639,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "d994f8c0ed0c4cd6-9-0@23",
+   "ms": 59.1095,
+   "nodes": 1635,
+   "ref": {
+    "ms": 189.5664,
+    "nodes": 1635,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-0-1@34",
+   "ms": 4.5805,
+   "nodes": 229,
+   "ref": {
+    "ms": 28.1594,
+    "nodes": 229,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-1-1@26",
+   "ms": 117.1159,
+   "nodes": 6276,
+   "ref": {
+    "ms": 796.6961,
+    "nodes": 6276,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-10-1@40",
+   "ms": 29.5811,
+   "nodes": 1941,
+   "ref": {
+    "ms": 237.1187,
+    "nodes": 1941,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-11-0@57",
+   "ms": 245.384,
+   "nodes": 5310,
+   "ref": {
+    "ms": 722.983,
+    "nodes": 5310,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-11-1@34",
+   "ms": 35.4941,
+   "nodes": 2354,
+   "ref": {
+    "ms": 298.9749,
+    "nodes": 2354,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-2-1@40",
+   "ms": 13.7535,
+   "nodes": 602,
+   "ref": {
+    "ms": 90.5293,
+    "nodes": 602,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-3-1@50",
+   "ms": 28.1538,
+   "nodes": 1493,
+   "ref": {
+    "ms": 162.5756,
+    "nodes": 1493,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-4-1@34",
+   "ms": 35.4874,
+   "nodes": 1868,
+   "ref": {
+    "ms": 225.508,
+    "nodes": 1868,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-5-0@37",
+   "ms": 30.9207,
+   "nodes": 526,
+   "ref": {
+    "ms": 82.4274,
+    "nodes": 526,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-5-1@34",
+   "ms": 31.8653,
+   "nodes": 3059,
+   "ref": {
+    "ms": 280.9396,
+    "nodes": 3059,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-7-0@27",
+   "ms": 43.093,
+   "nodes": 963,
+   "ref": {
+    "ms": 105.0797,
+    "nodes": 963,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-7-1@36",
+   "ms": 18.2902,
+   "nodes": 609,
+   "ref": {
+    "ms": 92.2723,
+    "nodes": 609,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-9-0@23",
+   "ms": 166.1054,
+   "nodes": 7065,
+   "ref": {
+    "ms": 464.1528,
+    "nodes": 7065,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "e32c37cb12384493-9-1@14",
+   "ms": 42.762,
+   "nodes": 3697,
+   "ref": {
+    "ms": 423.8102,
+    "nodes": 3697,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-0-1@28",
+   "ms": 24.1024,
+   "nodes": 1609,
+   "ref": {
+    "ms": 177.5492,
+    "nodes": 1609,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-10-1@42",
+   "ms": 43.5043,
+   "nodes": 1675,
+   "ref": {
+    "ms": 272.6367,
+    "nodes": 1675,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-11-1@54",
+   "ms": 5.5072,
+   "nodes": 279,
+   "ref": {
+    "ms": 29.8428,
+    "nodes": 279,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-2-0@39",
+   "ms": 92.655,
+   "nodes": 1926,
+   "ref": {
+    "ms": 234.5316,
+    "nodes": 1926,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-2-1@48",
+   "ms": 69.4201,
+   "nodes": 4202,
+   "ref": {
+    "ms": 478.0515,
+    "nodes": 4202,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-3-1@44",
+   "ms": 7.4922,
+   "nodes": 274,
+   "ref": {
+    "ms": 39.9809,
+    "nodes": 274,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-4-0@27",
+   "ms": 55.5163,
+   "nodes": 1768,
+   "ref": {
+    "ms": 179.0799,
+    "nodes": 1768,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-4-1@32",
+   "ms": 7.2133,
+   "nodes": 345,
+   "ref": {
+    "ms": 42.5865,
+    "nodes": 345,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-5-1@40",
+   "ms": 24.7378,
+   "nodes": 1217,
+   "ref": {
+    "ms": 182.8461,
+    "nodes": 1217,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-6-1@20",
+   "ms": 42.4496,
+   "nodes": 1917,
+   "ref": {
+    "ms": 266.1587,
+    "nodes": 1917,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-7-0@25",
+   "ms": 1.4235,
+   "nodes": 23,
+   "ref": {
+    "ms": 3.0884,
+    "nodes": 23,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-7-1@40",
+   "ms": 45.4738,
+   "nodes": 2158,
+   "ref": {
+    "ms": 283.3952,
+    "nodes": 2158,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-9-0@23",
+   "ms": 163.6376,
+   "nodes": 7065,
+   "ref": {
+    "ms": 455.9862,
+    "nodes": 7065,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "eea01435fabc4950-9-1@30",
+   "ms": 70.0127,
+   "nodes": 3713,
+   "ref": {
+    "ms": 477.2938,
+    "nodes": 3713,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-0-1@44",
+   "ms": 68.7032,
+   "nodes": 5694,
+   "ref": {
+    "ms": 196.7392,
+    "nodes": 5694,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-1-1@50",
+   "ms": 38.6801,
+   "nodes": 2604,
+   "ref": {
+    "ms": 226.5022,
+    "nodes": 2604,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-10-1@36",
+   "ms": 14.6753,
+   "nodes": 512,
+   "ref": {
+    "ms": 81.4441,
+    "nodes": 512,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-11-0@17",
+   "ms": 108.8211,
+   "nodes": 4241,
+   "ref": {
+    "ms": 368.4389,
+    "nodes": 4241,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-11-1@42",
+   "ms": 14.1944,
+   "nodes": 610,
+   "ref": {
+    "ms": 66.7916,
+    "nodes": 610,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-2-0@33",
+   "ms": 49.118,
+   "nodes": 816,
+   "ref": {
+    "ms": 137.5649,
+    "nodes": 816,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-2-1@46",
+   "ms": 30.8922,
+   "nodes": 932,
+   "ref": {
+    "ms": 149.947,
+    "nodes": 932,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-3-1@60",
+   "ms": 1.5278,
+   "nodes": 47,
+   "ref": {
+    "ms": 5.7751,
+    "nodes": 47,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-4-1@36",
+   "ms": 34.0585,
+   "nodes": 4693,
+   "ref": {
+    "ms": 317.3908,
+    "nodes": 4693,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-5-1@50",
+   "ms": 9.6246,
+   "nodes": 429,
+   "ref": {
+    "ms": 55.6699,
+    "nodes": 429,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-6-1@38",
+   "ms": 31.5073,
+   "nodes": 1707,
+   "ref": {
+    "ms": 207.6409,
+    "nodes": 1707,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-7-0@25",
+   "ms": 10.2497,
+   "nodes": 159,
+   "ref": {
+    "ms": 23.9648,
+    "nodes": 159,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-7-1@26",
+   "ms": 8.5742,
+   "nodes": 254,
+   "ref": {
+    "ms": 41.7675,
+    "nodes": 254,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-8-0@33",
+   "ms": 32.4668,
+   "nodes": 1413,
+   "ref": {
+    "ms": 125.6671,
+    "nodes": 1413,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-9-0@25",
+   "ms": 76.952,
+   "nodes": 2887,
+   "ref": {
+    "ms": 212.0953,
+    "nodes": 2887,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  },
+  {
+   "id": "f6f193b5b6ae4aed-9-1@30",
+   "ms": 59.1562,
+   "nodes": 4301,
+   "ref": {
+    "ms": 401.6933,
+    "nodes": 4301,
+    "result": "WIN"
+   },
+   "result": "WIN"
+  }
+ ],
+ "positions": 247,
+ "proved": 247,
+ "results": {
+  "WIN": 247
+ },
+ "solver_ms_sum": 13868.882599999999,
+ "threads": 4,
+ "total_nodes": 544883,
+ "vct_nodes_budget": 50000,
+ "wall_ms": 18080.7236
+}

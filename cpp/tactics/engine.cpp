@@ -2,6 +2,7 @@
 
 #include "tactics/verify.h"
 
+#include <algorithm>
 #include <chrono>
 #include <sstream>
 
@@ -62,6 +63,13 @@ TacticalDecision analyze_tactics(const GameState& g, const TacticalLimits& limit
     d.reason = TacticReason::NO_DEFENSE;
     return finish();
   }
+  // Time for a stage: the fixed share (ee1d011), or all time left minus a reserve (see engine.h).
+  auto stage_ms = [&](double share, double reserve_share) {
+    if (limits.max_ms <= 0) return 0.0;
+    if (!limits.carry_unused_time) return limits.max_ms * share;
+    const double used = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    return std::max(0.01, limits.max_ms - used - limits.max_ms * reserve_share);  // 0 would mean unlimited
+  };
   // 3. Proven tactical win: VCF, then threat-space df-pn.
   const VcfResult vcf = solve_vcf(*pos, {limits.vcf_nodes, limits.max_depth, limits.max_ms * 0.4});
   d.nodes += vcf.nodes;
@@ -73,7 +81,7 @@ TacticalDecision analyze_tactics(const GameState& g, const TacticalLimits& limit
     d.proof_moves = proof_from_pv(g, vcf.pv);
     return finish();
   }
-  const DfpnResult vct = solve_dfpn(*pos, DfpnMode::PROVE_WIN, {limits.vct_nodes, limits.max_depth, false, limits.max_ms * 0.4});
+  const DfpnResult vct = solve_dfpn(*pos, DfpnMode::PROVE_WIN, {limits.vct_nodes, limits.max_depth, false, stage_ms(0.4, limits.loss_nodes > 0 ? 0.2 : 0.0)});
   d.nodes += vct.nodes;
   if (vct.result == ProofResult::WIN) {
     d.result = ProofResult::WIN;
@@ -88,7 +96,7 @@ TacticalDecision analyze_tactics(const GameState& g, const TacticalLimits& limit
     d.move = threats.front();
   }
   // 4. Proven loss (the opponent attacks, every reply of ours is searched).
-  const DfpnResult loss = solve_dfpn(*pos, DfpnMode::PROVE_LOSS, {limits.loss_nodes, limits.max_depth, false, limits.max_ms * 0.2});
+  const DfpnResult loss = solve_dfpn(*pos, DfpnMode::PROVE_LOSS, {limits.loss_nodes, limits.max_depth, false, stage_ms(0.2, 0.0)});
   d.nodes += loss.nodes;
   if (loss.result == ProofResult::LOSS) {
     d.result = ProofResult::LOSS;

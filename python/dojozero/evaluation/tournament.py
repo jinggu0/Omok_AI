@@ -43,15 +43,36 @@ PROFILE = "RENJU_GOMOCUP"
 REPO = Path(__file__).resolve().parents[3]
 
 
+def disable_power_throttling() -> bool:
+    """Opt this process out of Windows power throttling (EcoQoS). A windowless background process may
+    otherwise run on slow cores: a solver benchmark ran ~8x slower that way (PROGRESS Phase 8 E3b).
+    Process-local; no system setting is changed. Engines started by the C++ launcher are opted out
+    there. Returns True when the call succeeded."""
+    if sys.platform != "win32":
+        return False
+    import ctypes
+
+    class _State(ctypes.Structure):
+        _fields_ = [("Version", ctypes.c_ulong), ("ControlMask", ctypes.c_ulong), ("StateMask", ctypes.c_ulong)]
+
+    st = _State(1, 0x1, 0)  # PROCESS_POWER_THROTTLING_CURRENT_VERSION, EXECUTION_SPEED, off
+    k32 = ctypes.windll.kernel32
+    k32.GetCurrentProcess.restype = ctypes.c_void_p
+    return bool(k32.SetProcessInformation(ctypes.c_void_p(k32.GetCurrentProcess()), 4,  # ProcessPowerThrottling
+                                          ctypes.byref(st), ctypes.sizeof(st)))
+
+
 class keep_awake:
     """Hold a per-process 'system required' request on Windows while a long, time-controlled
-    evaluation runs (an idle sleep once stretched a round robin by 3 hours, PROGRESS Phase 8).
+    evaluation runs (an idle sleep once stretched a round robin by 3 hours, PROGRESS Phase 8), and
+    opt the process out of power throttling (disable_power_throttling).
     Released on exit; no power setting is changed; a closed lid still sleeps."""
 
     def __enter__(self):
         if sys.platform == "win32":
             import ctypes
             ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001)  # CONTINUOUS | SYSTEM_REQUIRED
+            self.unthrottled = disable_power_throttling()
         return self
 
     def __exit__(self, *exc):
@@ -103,7 +124,11 @@ class InProcessPlayer:
         warm_up(self.player)
         from ..model.load import model_sha
         self.model_hash = model_sha(self.player.evaluator.model)
-        self.engine_id = f"dojo-{self.model_hash[:12]}" + (f"-def{s.defense_k}" if s.defense_k else "")
+        # Root defense filter: "-def{k}" = filter with the ee1d011 solver (E3a ids); the optimized solver
+        # (Phase 8 E3b) adds "-fast" and, with the fixed ee1d011 time split, "-nocarry".
+        self.engine_id = f"dojo-{self.model_hash[:12]}" + (
+            f"-def{s.defense_k}" + ("" if s.defense_impl == "ref" else "-fast" + ("" if s.defense_carry else "-nocarry"))
+            if s.defense_k else "")
 
     def start_game(self):
         return None
@@ -125,6 +150,16 @@ class InProcessPlayer:
             a = r["action"]
             stats = {"sims": r["simulations"], "nodes": r["nodes"],
                      "nn_evals": self.player.evaluator.evaluations - evals0}
+            d = r.get("defense")
+            if d is not None:  # per-move filter statistics (means over moves in the game record)
+                checks = [c for c in d.get("checks", []) if c.get("result") not in ("ILLEGAL", "TERMINAL")]
+                stats |= {"def_ms": d.get("ms", 0.0), "def_checked": d.get("checked", 0),
+                          "def_refuted": len(d.get("refuted", [])), "def_changed": float(d.get("changed", False)),
+                          "def_solver_calls": len(checks),
+                          "def_win": sum(c["result"] == "WIN" for c in checks),
+                          "def_unknown": sum(c["result"] == "UNKNOWN" for c in checks),
+                          "def_nodes": sum(c.get("nodes", 0) for c in checks),
+                          "def_solver_ms": sum(c.get("ms", 0.0) for c in checks)}
         ms = (time.perf_counter() - t0) * 1000
         if a == "pass":
             raise DojoZeroError("in-process player chose PASS in a no-pass profile")
@@ -139,7 +174,8 @@ class InProcessPlayer:
         s = self.player.settings
         return {"kind": "dojo", "spec": self.spec, "root": s.root, "simulations": s.simulations, "max_ms": s.max_ms,
                 "root_tactics_nodes": s.root_tactics_nodes, "defense_k": s.defense_k,
-                "defense_share": s.defense_share, "model_hash": self.model_hash}
+                "defense_share": s.defense_share, "defense_threads": s.defense_threads,
+                "defense_impl": s.defense_impl, "defense_carry": s.defense_carry, "model_hash": self.model_hash}
 
 
 class ProcessPlayer:

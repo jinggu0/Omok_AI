@@ -146,6 +146,15 @@ bool GomocupProcess::start(const Options& opt, std::string* error) {
     return false;
   }
   if (job) AssignProcessToJobObject(job, pi.hProcess);
+  {
+    // Engines run windowless in the background, where Windows power throttling (EcoQoS) may put
+    // them on slow cores; opt them out so every timed engine gets full speed (Phase 8 E3b).
+    PROCESS_POWER_THROTTLING_STATE pt{};
+    pt.Version = PROCESS_POWER_THROTTLING_CURRENT_VERSION;
+    pt.ControlMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED;
+    pt.StateMask = 0;
+    SetProcessInformation(pi.hProcess, ProcessPowerThrottling, &pt, sizeof(pt));
+  }
   ResumeThread(pi.hThread);
   CloseHandle(pi.hThread);
   process_ = pi.hProcess;

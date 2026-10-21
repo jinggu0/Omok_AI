@@ -114,7 +114,7 @@ def make_player(spec: str, device: str, cache: dict) -> Player:
     # Options are trailing ":key=value" segments; the checkpoint path may itself contain ':' (C:\...).
     segs = rest.split(":")
     opts = []
-    while segs and "=" in segs[-1] and segs[-1].split("=")[0] in ("sims", "root", "tactics", "defense", "defshare", "defthreads"):
+    while segs and "=" in segs[-1] and segs[-1].split("=")[0] in ("sims", "root", "tactics", "defense", "defshare", "defthreads", "defimpl", "defcarry"):
         opts.insert(0, segs.pop())
     ckpt = ":".join(segs)
     parts = [kind, ckpt] + opts
@@ -137,6 +137,10 @@ def make_player(spec: str, device: str, cache: dict) -> Player:
             s.defense_share = float(v)
         elif k == "defthreads":
             s.defense_threads = int(v)
+        elif k == "defimpl":
+            s.defense_impl = v  # live | ref (frozen ee1d011 solver)
+        elif k == "defcarry":
+            s.defense_carry = v not in ("0", "false")
     return Player(spec, kind, evaluator, fcfg, s)
 
 

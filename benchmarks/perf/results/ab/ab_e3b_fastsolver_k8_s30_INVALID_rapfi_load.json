@@ -1,0 +1,1121 @@
+{
+ "pooled": {
+  "pairs": 80,
+  "mean_diff": 0.0125,
+  "ci95": [
+   -0.03125,
+   0.05625
+  ],
+  "se": 0.021741796066620887
+ },
+ "per_opponent": {
+  "pela_2023": {
+   "baseline": 0.2,
+   "candidate": 0.225,
+   "paired": {
+    "pairs": 40,
+    "mean_diff": 0.025,
+    "ci95": [
+     -0.0625,
+     0.1125
+    ],
+    "se": 0.04366979828269511
+   },
+   "elo_baseline": -240.82399653118495,
+   "elo_candidate": -214.84767375797915
+  },
+  "yixin_2018": {
+   "baseline": 0.0,
+   "candidate": 0.0,
+   "paired": {
+    "pairs": 40,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "se": 0.0
+   },
+   "elo_baseline": -1599.9826273520769,
+   "elo_candidate": -1599.9826273520769
+  }
+ },
+ "candidate_failures": 0,
+ "decision": "INCONCLUSIVE",
+ "time_ms": 500.0,
+ "openings": {
+  "id": "renju_balanced_v1",
+  "hash": "1043ff68de3e04f1cc2db4f4b97aab8367177eb8283d37cfeb20c4837714470a",
+  "offset": 24
+ },
+ "baseline": {
+  "kind": "dojo",
+  "spec": "dojo:runs/taraguchi_v1/models/gen_001.pt",
+  "root": "PUCT",
+  "simulations": 100000,
+  "max_ms": 500.0,
+  "root_tactics_nodes": 5000,
+  "defense_k": 0,
+  "defense_share": 0.3,
+  "defense_threads": 4,
+  "defense_impl": "live",
+  "defense_carry": true,
+  "model_hash": "9ccd7fab25a2a9d96318b5fd86d8f4e0960d24f6a8a29d7f17f075092e48df6e"
+ },
+ "candidate": {
+  "kind": "dojo",
+  "spec": "dojo:runs/taraguchi_v1/models/gen_001.pt:defense=8:defshare=0.3:defthreads=8",
+  "root": "PUCT",
+  "simulations": 100000,
+  "max_ms": 500.0,
+  "root_tactics_nodes": 5000,
+  "defense_k": 8,
+  "defense_share": 0.3,
+  "defense_threads": 8,
+  "defense_impl": "live",
+  "defense_carry": true,
+  "model_hash": "9ccd7fab25a2a9d96318b5fd86d8f4e0960d24f6a8a29d7f17f075092e48df6e"
+ },
+ "rows": [
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0024",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0025",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0026",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0027",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0028",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0029",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0030",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": -0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0031",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0032",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0033",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0034",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": -0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0035",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0036",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0037",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0038",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0039",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": -0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0040",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0041",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0042",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0043",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0044",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": -0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0045",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0046",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0047",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0048",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0049",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0050",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0051",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0052",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0053",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0054",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": -0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0055",
+   "baseline": {
+    "score": 0.5,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0056",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.5,
+    "failures": []
+   },
+   "diff": 0.5
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0057",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0058",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0059",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0060",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0061",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0062",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "pela_2023",
+   "opening": "bal1-0063",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0024",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0025",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0026",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0027",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0028",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0029",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0030",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0031",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0032",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0033",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0034",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0035",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0036",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0037",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0038",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0039",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0040",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0041",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0042",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0043",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0044",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0045",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0046",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0047",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0048",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0049",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0050",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0051",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0052",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0053",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0054",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0055",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0056",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0057",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0058",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0059",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0060",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0061",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0062",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  },
+  {
+   "opponent": "yixin_2018",
+   "opening": "bal1-0063",
+   "baseline": {
+    "score": 0.0,
+    "failures": []
+   },
+   "candidate": {
+    "score": 0.0,
+    "failures": []
+   },
+   "diff": 0.0
+  }
+ ]
+}

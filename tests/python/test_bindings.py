@@ -123,3 +123,9 @@ def test_gather_is_inverse_of_table():
         x = np.arange(225)
         y = x[GATHER[k]]
         assert (y[t[k]] == x).all()
+
+
+def test_power_throttling_opt_out_is_harmless():
+    import sys
+    from dojozero.evaluation.tournament import disable_power_throttling
+    assert disable_power_throttling() is (sys.platform == "win32")

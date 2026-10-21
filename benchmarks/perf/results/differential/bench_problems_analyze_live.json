@@ -1,0 +1,648 @@
+{
+ "allocations": 1155881,
+ "allocations_per_node": 3.758046005039421,
+ "build": "production",
+ "corpus": "benchmarks/perf/bench_problems.json",
+ "corpus_sha256": "7b5d31c14dfb9b97bc60b27528e9989f96071d0a272ffa0831a4ded69a93589e",
+ "fast_refute": true,
+ "gen_cache": true,
+ "impl": "live",
+ "lazy_legality": true,
+ "median_ms": 0.498,
+ "median_ms_to_proof": 0.1979,
+ "median_nodes_to_proof": 11.0,
+ "mode": "analyze",
+ "ms_budget": 0.0,
+ "nodes_budget": 50000,
+ "nodes_per_s_aggregate": 22387.375614954988,
+ "nodes_per_s_per_thread": 22444.001805035536,
+ "p95_ms": 658.1202,
+ "p95_ms_to_proof": 370.9792,
+ "p95_nodes_to_proof": 8512.0,
+ "per_position": [
+  {
+   "id": "win1-black",
+   "ms": 0.0272,
+   "nodes": 0,
+   "result": "WIN"
+  },
+  {
+   "id": "win1-white-overline",
+   "ms": 0.0064,
+   "nodes": 0,
+   "result": "WIN"
+  },
+  {
+   "id": "black-overline-is-not-a-win",
+   "ms": 0.0788,
+   "nodes": 3,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "black-overline-no-vcf",
+   "ms": 0.0367,
+   "nodes": 3,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "forced-block",
+   "ms": 0.7018,
+   "nodes": 34,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "open-four-no-defense",
+   "ms": 0.0063,
+   "nodes": 0,
+   "result": "LOSS"
+  },
+  {
+   "id": "straight-four-vcf",
+   "ms": 0.0286,
+   "nodes": 1,
+   "result": "WIN"
+  },
+  {
+   "id": "four-three-vcf",
+   "ms": 0.0402,
+   "nodes": 2,
+   "result": "WIN"
+  },
+  {
+   "id": "white-vcf-forbidden-induction",
+   "ms": 0.0233,
+   "nodes": 1,
+   "result": "WIN"
+  },
+  {
+   "id": "black-no-defense-forbidden",
+   "ms": 0.0073,
+   "nodes": 0,
+   "result": "LOSS"
+  },
+  {
+   "id": "black-double-four-not-allowed",
+   "ms": 155.5899,
+   "nodes": 3529,
+   "result": "WIN"
+  },
+  {
+   "id": "white-double-four-wins",
+   "ms": 0.0303,
+   "nodes": 1,
+   "result": "WIN"
+  },
+  {
+   "id": "white-double-three-no-vcf",
+   "ms": 0.2784,
+   "nodes": 11,
+   "result": "WIN"
+  },
+  {
+   "id": "white-double-three-vct",
+   "ms": 0.2583,
+   "nodes": 11,
+   "result": "WIN"
+  },
+  {
+   "id": "two-open-threes-loss",
+   "ms": 1.2349,
+   "nodes": 173,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "two-open-threes-decide",
+   "ms": 1.1227,
+   "nodes": 173,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "black-four-three-decide",
+   "ms": 0.047,
+   "nodes": 2,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-0",
+   "ms": 0.4097,
+   "nodes": 28,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-1",
+   "ms": 0.1206,
+   "nodes": 4,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-2",
+   "ms": 0.2289,
+   "nodes": 12,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-3",
+   "ms": 0.0601,
+   "nodes": 3,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-4",
+   "ms": 0.0878,
+   "nodes": 4,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-5",
+   "ms": 0.0682,
+   "nodes": 2,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-6",
+   "ms": 0.0974,
+   "nodes": 4,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-7",
+   "ms": 0.068,
+   "nodes": 3,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-8",
+   "ms": 0.1561,
+   "nodes": 9,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-9",
+   "ms": 0.0975,
+   "nodes": 4,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-10",
+   "ms": 0.498,
+   "nodes": 45,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-11",
+   "ms": 0.073,
+   "nodes": 3,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-12",
+   "ms": 0.1979,
+   "nodes": 13,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-13",
+   "ms": 0.0514,
+   "nodes": 2,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-14",
+   "ms": 0.2995,
+   "nodes": 20,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-15",
+   "ms": 0.2503,
+   "nodes": 12,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-16",
+   "ms": 0.0729,
+   "nodes": 3,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-17",
+   "ms": 0.0579,
+   "nodes": 2,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-18",
+   "ms": 0.1104,
+   "nodes": 6,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-19",
+   "ms": 0.2202,
+   "nodes": 11,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-20",
+   "ms": 0.0545,
+   "nodes": 2,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-21",
+   "ms": 0.2754,
+   "nodes": 16,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-22",
+   "ms": 0.1872,
+   "nodes": 9,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-23",
+   "ms": 0.1327,
+   "nodes": 7,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-24",
+   "ms": 0.0937,
+   "nodes": 5,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-25",
+   "ms": 0.092,
+   "nodes": 5,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-26",
+   "ms": 0.0873,
+   "nodes": 3,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-27",
+   "ms": 0.1258,
+   "nodes": 7,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-28",
+   "ms": 0.1342,
+   "nodes": 3,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-29",
+   "ms": 0.2852,
+   "nodes": 27,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-30",
+   "ms": 0.0896,
+   "nodes": 5,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-31",
+   "ms": 0.054,
+   "nodes": 3,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-32",
+   "ms": 0.0504,
+   "nodes": 2,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-33",
+   "ms": 0.0462,
+   "nodes": 2,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-34",
+   "ms": 0.1694,
+   "nodes": 6,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-35",
+   "ms": 0.0613,
+   "nodes": 3,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-36",
+   "ms": 0.0991,
+   "nodes": 6,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-37",
+   "ms": 1.0392,
+   "nodes": 141,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-38",
+   "ms": 0.0757,
+   "nodes": 4,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vcf-1-39",
+   "ms": 0.0635,
+   "nodes": 2,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-0",
+   "ms": 22.0051,
+   "nodes": 505,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-1",
+   "ms": 7.7038,
+   "nodes": 449,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-2",
+   "ms": 159.8493,
+   "nodes": 4718,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-3",
+   "ms": 56.0616,
+   "nodes": 1232,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-4",
+   "ms": 265.2205,
+   "nodes": 8512,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-5",
+   "ms": 72.369,
+   "nodes": 4150,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-6",
+   "ms": 1.0765,
+   "nodes": 56,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-7",
+   "ms": 22.3926,
+   "nodes": 788,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-8",
+   "ms": 0.6909,
+   "nodes": 33,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-9",
+   "ms": 20.328,
+   "nodes": 1279,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-10",
+   "ms": 3.8082,
+   "nodes": 190,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-11",
+   "ms": 518.4114,
+   "nodes": 21682,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-12",
+   "ms": 46.1669,
+   "nodes": 1492,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-13",
+   "ms": 17.5734,
+   "nodes": 1974,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-14",
+   "ms": 514.0358,
+   "nodes": 12874,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-15",
+   "ms": 6.1159,
+   "nodes": 335,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-16",
+   "ms": 9.3738,
+   "nodes": 567,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-17",
+   "ms": 74.6439,
+   "nodes": 2073,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-18",
+   "ms": 2.0566,
+   "nodes": 96,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-19",
+   "ms": 97.6639,
+   "nodes": 8040,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-20",
+   "ms": 21.3921,
+   "nodes": 828,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-21",
+   "ms": 28.0375,
+   "nodes": 1836,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-22",
+   "ms": 658.1202,
+   "nodes": 18840,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-23",
+   "ms": 1047.2251,
+   "nodes": 9659,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-vct-2-24",
+   "ms": 370.9792,
+   "nodes": 2766,
+   "result": "WIN"
+  },
+  {
+   "id": "gen-loss-3-0",
+   "ms": 74.3415,
+   "nodes": 757,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-1",
+   "ms": 1525.5647,
+   "nodes": 50015,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-2",
+   "ms": 674.2322,
+   "nodes": 7825,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-3",
+   "ms": 259.9046,
+   "nodes": 4412,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-4",
+   "ms": 25.7488,
+   "nodes": 555,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-5",
+   "ms": 172.0206,
+   "nodes": 1139,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-6",
+   "ms": 128.5232,
+   "nodes": 759,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-7",
+   "ms": 825.2297,
+   "nodes": 50007,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-8",
+   "ms": 474.7528,
+   "nodes": 3257,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-9",
+   "ms": 359.2919,
+   "nodes": 1632,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-10",
+   "ms": 445.0324,
+   "nodes": 50005,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-11",
+   "ms": 295.9675,
+   "nodes": 2816,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-12",
+   "ms": 6.1164,
+   "nodes": 88,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-13",
+   "ms": 610.0979,
+   "nodes": 3400,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-14",
+   "ms": 169.6492,
+   "nodes": 2310,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-15",
+   "ms": 6.7019,
+   "nodes": 72,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-16",
+   "ms": 2638.3998,
+   "nodes": 14566,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-17",
+   "ms": 85.8002,
+   "nodes": 707,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-18",
+   "ms": 635.8688,
+   "nodes": 3231,
+   "result": "UNKNOWN"
+  },
+  {
+   "id": "gen-loss-3-19",
+   "ms": 81.6013,
+   "nodes": 656,
+   "result": "UNKNOWN"
+  }
+ ],
+ "positions": 102,
+ "proved": 75,
+ "results": {
+  "LOSS": 2,
+  "UNKNOWN": 25,
+  "WIN": 75
+ },
+ "solver_ms_sum": 13704.106900000002,
+ "threads": 1,
+ "total_nodes": 307575,
+ "vct_nodes_budget": 50000,
+ "wall_ms": 13738.7698
+}

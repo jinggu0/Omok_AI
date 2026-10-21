@@ -4,6 +4,8 @@
 #include <chrono>
 #include <unordered_map>
 
+#include "tactics/tprof.h"
+
 namespace dz::tactics {
 
 const char* vcf_status_name(VcfResult::Status s) {
@@ -38,6 +40,7 @@ class VcfSearch {
   enum class Outcome { FOUND, NONE, ABORT };
 
   Outcome or_node(int depth) {
+    DZ_TPROF_SCOPE(VCF_NODE);
     if (++nodes_ > limits_.max_nodes) return Outcome::ABORT;
     if (limits_.max_ms > 0 && (nodes_ & 255) == 0 &&
         std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start_).count() > limits_.max_ms) {
@@ -47,21 +50,34 @@ class VcfSearch {
     const Rules& rules = pos_.rules();
     std::vector<Point> buf;
 
-    five_points(b, attacker_, rules, buf);
+    {
+      DZ_TPROF_SCOPE(TERMINAL_CHECK);
+      five_points(b, attacker_, rules, buf);
+    }
     if (!buf.empty()) {
       pv_ = {buf.front()};
       return Outcome::FOUND;
     }
     const uint64_t key = pos_.key();
     const int remaining = limits_.max_depth - depth;
-    if (auto it = failed_.find(key); it != failed_.end() && it->second >= remaining) return Outcome::NONE;
+    bool failed_hit;
+    {
+      DZ_TPROF_SCOPE(TT_LOOKUP);
+      auto it = failed_.find(key);
+      failed_hit = it != failed_.end() && it->second >= remaining;
+      if (failed_hit) DZ_TPROF_COUNT(TT_HIT);
+    }
+    if (failed_hit) return Outcome::NONE;
     if (depth >= limits_.max_depth) {
       depth_limited_ = true;
       return Outcome::NONE;
     }
 
     std::vector<Point> opp;
-    five_points(b, defender_, rules, opp);
+    {
+      DZ_TPROF_SCOPE(OPP_FIVE_SCAN);
+      five_points(b, defender_, rules, opp);
+    }
     std::vector<Point> candidates;
     if (opp.size() < 2) {
       four_moves(b, attacker_, rules, candidates);
@@ -72,7 +88,9 @@ class VcfSearch {
       }
     }
 
+    DZ_TPROF_ADD(CANDIDATES, candidates.size());
     for (Point m : candidates) {
+      DZ_TPROF_COUNT(PLAY_UNDO);
       pos_.play(m);
       five_points_near(b, m, attacker_, rules, buf);
       Outcome r = Outcome::NONE;
@@ -86,6 +104,7 @@ class VcfSearch {
           pv_ = {m, kNoPoint, c};  // forbidden block point: black cannot defend
           r = Outcome::FOUND;
         } else {
+          DZ_TPROF_COUNT(PLAY_UNDO);
           pos_.play(c);
           r = or_node(depth + 1);
           pos_.undo(c);
@@ -95,6 +114,7 @@ class VcfSearch {
       pos_.undo(m);
       if (r != Outcome::NONE) return r;
     }
+    DZ_TPROF_SCOPE(TT_STORE);
     auto& slot = failed_[key];
     slot = std::max(slot, remaining);
     return Outcome::NONE;

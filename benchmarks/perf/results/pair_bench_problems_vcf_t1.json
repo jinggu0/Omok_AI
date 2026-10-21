@@ -1,0 +1,1169 @@
+{
+ "allocations": 6412,
+ "allocations_per_node": 10.722408026755852,
+ "build": "production",
+ "carry_unused_time": true,
+ "corpus": "benchmarks/perf/bench_problems.json",
+ "corpus_sha256": "7b5d31c14dfb9b97bc60b27528e9989f96071d0a272ffa0831a4ded69a93589e",
+ "fast_refute": true,
+ "gen_cache": true,
+ "impl": "pair(ref then live)",
+ "lazy_legality": true,
+ "median_ms": 0.0257,
+ "median_ms_to_proof": 0.0524,
+ "median_nodes_to_proof": 4.0,
+ "mode": "vcf",
+ "ms_budget": 0.0,
+ "nodes_budget": 100000,
+ "nodes_per_s_aggregate": 8315.557323113633,
+ "nodes_per_s_per_thread": 40174.942391282435,
+ "p95_ms": 0.1825,
+ "p95_ms_to_proof": 0.3189,
+ "p95_nodes_to_proof": 28.0,
+ "pair": {
+  "mismatch_result_or_nodes": 0,
+  "per_position_speedup_median": 0.0,
+  "per_position_speedup_p10": 0.0,
+  "per_position_speedup_p90": 0.0,
+  "ref_nodes_per_s_per_thread": 69261.86312095348,
+  "ref_solver_ms_sum": 8.633899999999997,
+  "ref_total_nodes": 598,
+  "speedup_nps": 0.5800442058730657,
+  "speedup_total_time": 0.5800442058730656
+ },
+ "per_position": [
+  {
+   "id": "win1-black",
+   "ms": 0.0036,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0186,
+    "nodes": 1,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "win1-white-overline",
+   "ms": 0.0027,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.003,
+    "nodes": 1,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "black-overline-is-not-a-win",
+   "ms": 0.0091,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0121,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "black-overline-no-vcf",
+   "ms": 0.0078,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0082,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "forced-block",
+   "ms": 0.0084,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0089,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "open-four-no-defense",
+   "ms": 0.004,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0042,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "straight-four-vcf",
+   "ms": 0.0112,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0146,
+    "nodes": 1,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "four-three-vcf",
+   "ms": 0.0198,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.0224,
+    "nodes": 2,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "white-vcf-forbidden-induction",
+   "ms": 0.0103,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.012,
+    "nodes": 1,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "black-no-defense-forbidden",
+   "ms": 0.0082,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0085,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "black-double-four-not-allowed",
+   "ms": 0.0258,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0273,
+    "nodes": 3,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "white-double-four-wins",
+   "ms": 0.01,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0109,
+    "nodes": 1,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "white-double-three-no-vcf",
+   "ms": 0.0084,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0086,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "white-double-three-vct",
+   "ms": 0.0078,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0081,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "two-open-threes-loss",
+   "ms": 0.0083,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0088,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "two-open-threes-decide",
+   "ms": 0.0076,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0078,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "black-four-three-decide",
+   "ms": 0.0187,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.0193,
+    "nodes": 2,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-0",
+   "ms": 0.227,
+   "nodes": 28,
+   "ref": {
+    "ms": 0.298,
+    "nodes": 28,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-1",
+   "ms": 0.0528,
+   "nodes": 4,
+   "ref": {
+    "ms": 0.0686,
+    "nodes": 4,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-2",
+   "ms": 9.3704,
+   "nodes": 12,
+   "ref": {
+    "ms": 0.1389,
+    "nodes": 12,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-3",
+   "ms": 0.0289,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0385,
+    "nodes": 3,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-4",
+   "ms": 0.0401,
+   "nodes": 4,
+   "ref": {
+    "ms": 0.0476,
+    "nodes": 4,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-5",
+   "ms": 0.0234,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.03,
+    "nodes": 2,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-6",
+   "ms": 0.0579,
+   "nodes": 4,
+   "ref": {
+    "ms": 0.077,
+    "nodes": 4,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-7",
+   "ms": 0.0409,
+   "nodes": 3,
+   "ref": {
+    "ms": 2.0974,
+    "nodes": 3,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-8",
+   "ms": 0.0985,
+   "nodes": 9,
+   "ref": {
+    "ms": 0.1118,
+    "nodes": 9,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-9",
+   "ms": 0.055,
+   "nodes": 4,
+   "ref": {
+    "ms": 0.0779,
+    "nodes": 4,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-10",
+   "ms": 0.3189,
+   "nodes": 45,
+   "ref": {
+    "ms": 0.4021,
+    "nodes": 45,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-11",
+   "ms": 0.0417,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0508,
+    "nodes": 3,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-12",
+   "ms": 0.1176,
+   "nodes": 13,
+   "ref": {
+    "ms": 0.1435,
+    "nodes": 13,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-13",
+   "ms": 0.0259,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.0312,
+    "nodes": 2,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-14",
+   "ms": 0.1825,
+   "nodes": 20,
+   "ref": {
+    "ms": 0.2025,
+    "nodes": 20,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-15",
+   "ms": 0.1434,
+   "nodes": 12,
+   "ref": {
+    "ms": 0.168,
+    "nodes": 12,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-16",
+   "ms": 0.0318,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.039,
+    "nodes": 3,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-17",
+   "ms": 0.0232,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.0268,
+    "nodes": 2,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-18",
+   "ms": 0.1042,
+   "nodes": 6,
+   "ref": {
+    "ms": 0.0835,
+    "nodes": 6,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-19",
+   "ms": 0.1407,
+   "nodes": 11,
+   "ref": {
+    "ms": 0.2932,
+    "nodes": 11,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-20",
+   "ms": 0.0282,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.0342,
+    "nodes": 2,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-21",
+   "ms": 0.1743,
+   "nodes": 16,
+   "ref": {
+    "ms": 0.1967,
+    "nodes": 16,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-22",
+   "ms": 0.0934,
+   "nodes": 9,
+   "ref": {
+    "ms": 0.1074,
+    "nodes": 9,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-23",
+   "ms": 0.07,
+   "nodes": 7,
+   "ref": {
+    "ms": 0.08,
+    "nodes": 7,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-24",
+   "ms": 0.0547,
+   "nodes": 5,
+   "ref": {
+    "ms": 0.07,
+    "nodes": 5,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-25",
+   "ms": 0.0524,
+   "nodes": 5,
+   "ref": {
+    "ms": 0.0611,
+    "nodes": 5,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-26",
+   "ms": 0.0547,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0654,
+    "nodes": 3,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-27",
+   "ms": 0.088,
+   "nodes": 7,
+   "ref": {
+    "ms": 0.1013,
+    "nodes": 7,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-28",
+   "ms": 0.0649,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0886,
+    "nodes": 3,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-29",
+   "ms": 0.2167,
+   "nodes": 27,
+   "ref": {
+    "ms": 0.4387,
+    "nodes": 27,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-30",
+   "ms": 0.052,
+   "nodes": 5,
+   "ref": {
+    "ms": 0.45,
+    "nodes": 5,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-31",
+   "ms": 0.0301,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0341,
+    "nodes": 3,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-32",
+   "ms": 0.0241,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.0302,
+    "nodes": 2,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-33",
+   "ms": 0.0223,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.0275,
+    "nodes": 2,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-34",
+   "ms": 0.0741,
+   "nodes": 6,
+   "ref": {
+    "ms": 0.0903,
+    "nodes": 6,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-35",
+   "ms": 0.0364,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.038,
+    "nodes": 3,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-36",
+   "ms": 0.0561,
+   "nodes": 6,
+   "ref": {
+    "ms": 0.0651,
+    "nodes": 6,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-37",
+   "ms": 1.26,
+   "nodes": 141,
+   "ref": {
+    "ms": 0.749,
+    "nodes": 141,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-38",
+   "ms": 0.0416,
+   "nodes": 4,
+   "ref": {
+    "ms": 0.0508,
+    "nodes": 4,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vcf-1-39",
+   "ms": 0.0299,
+   "nodes": 2,
+   "ref": {
+    "ms": 0.0374,
+    "nodes": 2,
+    "result": "FOUND"
+   },
+   "result": "FOUND"
+  },
+  {
+   "id": "gen-vct-2-0",
+   "ms": 0.0104,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0118,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-1",
+   "ms": 0.0092,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0106,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-2",
+   "ms": 0.0091,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0104,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-3",
+   "ms": 0.0941,
+   "nodes": 13,
+   "ref": {
+    "ms": 0.1014,
+    "nodes": 13,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-4",
+   "ms": 0.0097,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0109,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-5",
+   "ms": 0.0092,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0101,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-6",
+   "ms": 0.0092,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0097,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-7",
+   "ms": 0.0087,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0096,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-8",
+   "ms": 0.0086,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0098,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-9",
+   "ms": 0.0091,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0103,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-10",
+   "ms": 0.0086,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0093,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-11",
+   "ms": 0.0416,
+   "nodes": 5,
+   "ref": {
+    "ms": 0.047,
+    "nodes": 5,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-12",
+   "ms": 0.0452,
+   "nodes": 5,
+   "ref": {
+    "ms": 0.0513,
+    "nodes": 5,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-13",
+   "ms": 0.0257,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0279,
+    "nodes": 3,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-14",
+   "ms": 0.0093,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0107,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-15",
+   "ms": 0.0091,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0101,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-16",
+   "ms": 0.0086,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0099,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-17",
+   "ms": 0.0442,
+   "nodes": 5,
+   "ref": {
+    "ms": 0.0478,
+    "nodes": 5,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-18",
+   "ms": 0.0421,
+   "nodes": 5,
+   "ref": {
+    "ms": 0.0474,
+    "nodes": 5,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-19",
+   "ms": 0.0085,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0095,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-20",
+   "ms": 0.009,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0099,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-21",
+   "ms": 0.0081,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0095,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-22",
+   "ms": 0.136,
+   "nodes": 23,
+   "ref": {
+    "ms": 0.1508,
+    "nodes": 23,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-23",
+   "ms": 0.0087,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0093,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-vct-2-24",
+   "ms": 0.0264,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.029,
+    "nodes": 3,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-0",
+   "ms": 0.0089,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0098,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-1",
+   "ms": 0.095,
+   "nodes": 13,
+   "ref": {
+    "ms": 0.0979,
+    "nodes": 13,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-2",
+   "ms": 0.0135,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0164,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-3",
+   "ms": 0.0297,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0353,
+    "nodes": 3,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-4",
+   "ms": 0.0108,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0124,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-5",
+   "ms": 0.0111,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0124,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-6",
+   "ms": 0.0126,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0142,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-7",
+   "ms": 0.0432,
+   "nodes": 5,
+   "ref": {
+    "ms": 0.0546,
+    "nodes": 5,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-8",
+   "ms": 0.0093,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0104,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-9",
+   "ms": 0.0095,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0109,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-10",
+   "ms": 0.0271,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0302,
+    "nodes": 3,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-11",
+   "ms": 0.0105,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.013,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-12",
+   "ms": 0.009,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0103,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-13",
+   "ms": 0.0224,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.0267,
+    "nodes": 3,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-14",
+   "ms": 0.0105,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0127,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-15",
+   "ms": 0.0085,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0092,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-16",
+   "ms": 0.0257,
+   "nodes": 3,
+   "ref": {
+    "ms": 0.03,
+    "nodes": 3,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-17",
+   "ms": 0.0099,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0115,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-18",
+   "ms": 0.0785,
+   "nodes": 7,
+   "ref": {
+    "ms": 0.0848,
+    "nodes": 7,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  },
+  {
+   "id": "gen-loss-3-19",
+   "ms": 0.0104,
+   "nodes": 1,
+   "ref": {
+    "ms": 0.0118,
+    "nodes": 1,
+    "result": "NONE"
+   },
+   "result": "NONE"
+  }
+ ],
+ "positions": 102,
+ "proved": 47,
+ "results": {
+  "FOUND": 47,
+  "NONE": 55
+ },
+ "solver_ms_sum": 14.884900000000004,
+ "threads": 1,
+ "total_nodes": 598,
+ "vct_nodes_budget": 50000,
+ "wall_ms": 71.9134
+}

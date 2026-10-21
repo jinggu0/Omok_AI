@@ -103,7 +103,7 @@ forbidden-rule accuracy 지표(NN aux head의 금수 예측 정확도)는 별개
 ## 8. 성능 지표
 
 ### 8.1 측정 환경 (기준 머신, ASSUMPTIONS E-01..E-08)
-Intel Core Ultra 7 258V (4P+4LPE), 32 GB, Intel Arc 140V iGPU, Windows 11, MSVC 14.43 Release(/O2), 전원 연결·고성능 모드, 다른 부하 없음. 결과에는 커밋·빌드 플래그·전원 모드 기록.
+Intel Core Ultra 7 258V (4P+4LPE), 32 GB, Intel Arc 140V iGPU, Windows 11, MSVC 14.43 Release(/O2), 전원 연결·고성능 모드, 다른 부하 없음. 결과에는 커밋·빌드 플래그·전원 모드 기록. **주의(ASSUMPTIONS E-11)**: 창 없는 백그라운드 프로세스는 Windows 전원 스로틀링(EcoQoS)으로 최대 ~8배 느려질 수 있다 — 벤치마크·평가 프로세스는 스로틀링을 프로세스 단위로 끈다(Phase 8 E3b부터).
 
 ### 8.2 지표와 잠정 목표 (Phase 2–5 실측 후 갱신)
 | 지표 | 잠정 목표 | Phase 2 실측 (Board A, 2026-10-18) | 비고 |
@@ -113,6 +113,8 @@ Intel Core Ultra 7 258V (4P+4LPE), 32 GB, Intel Arc 140V iGPU, Windows 11, MSVC 
 | legal_actions 생성 /s | ≥ 200k | 25k (NORMAL_RENJU, 흑 차례 포함) | **미달**. 빈 점마다 금수 판정 → 증분 금수 캐시 필요 (Phase 5 전 ADR-01 재검토) |
 | VCF nodes/s | ≥ 1M | 70–78k (Phase 3, `dojozero_tactics perf`) | **미달 (~13배)**. 노드마다 전체 보드 스캔으로 위협 재계산. 증분 위협 추적(ADR-01 C안 line code) 필요 |
 | df-pn (VCT) nodes/s | — | 13.5–14k | AND 노드가 방어자 전체 합법수를 실제 보드에서 반박 검사(건전성 비용) |
+| **Phase 8 E3b 솔버 가속** (2026-10-21, 같은 바이너리에서 ee1d011 참조 구현과 국면마다 교대 측정 `--impl pair`, 전원 스로틀링 해제) | VCT ≥ 100k nodes/s 또는 ≥ 5× | VCT(블런더 직후 247국면, 5만 노드) 배율: 1스레드 **3.3×**, 2: 3.5×, 4: 4.2×, 8스레드(필터 설정) **5.3×**; 국면별 중앙값 4.1–6.3×. 절대값은 배경 부하에 따라 1스레드 live 55k–82k nodes/s(ref 17k–25k). VCF(변경 없음) 109k → 125k. 노드 예산 하 결과·노드 수 **ref와 비트 동일** | 1스레드 목표 **미달**(3.3×, < 100k), 8스레드 5×는 충족. 남은 비용: AND 노드 반박 루프(빈 점마다), OR 노드 위협수 생성, 전체 보드 5목 점 스캔 — 보드 전역 증분 line 상태(ADR-01 C 본체)가 다음 후보 |
+| **proof@시간** (필터 워크로드 1,976국면, analyze VCF 100k/VCT 50k, 8스레드; 상한 = 노드 예산만 1,836 WIN) | — | ref → live + VCT 시간 이월: 125 ms 1,137–1,155 → **1,614** / 250: ~1,220 → 1,744 / 500: ~1,320 → 1,796 / 1000: ~1,465 → 1,816. live가 ref의 WIN을 잃은 국면 0 | 125 ms의 개선판이 1000 ms의 ee1d011보다 많이 증명. 이월이 125 ms에서 +193 (PROGRESS Phase 8 E3b) |
 | analyze_tactics 지연 | — | 노드 예산만: p50 0ms, p90 ~20ms, p99 4.5s, max 6.1s / `max_ms=500`: p99 308ms, max 311ms | MCTS 통합 시 시간 상한 필수 |
 | MCTS nodes/s (uniform evaluator) | ≥ 500k | PUCT 34–39k / Gumbel 11–17k sims/s (Phase 5, `dojozero_bench_search`) | **미달**. 확장 시 legal_actions(금수 판정) 지배 |
 | batched NN eval/s | 실측 후 설정 | B6C64, PyTorch: CPU fp32 ≤ ~316/s(b512), XPU bf16 ≤ ~5.6k/s(b512), b1은 10–31/s (측정 편차 큼) | `runs/bench_device_b6c64.json`. 배치 1이 매우 느려 MCTS는 배치 추론 필수 |

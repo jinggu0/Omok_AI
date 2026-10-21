@@ -85,7 +85,7 @@ Status: **Draft v0.2** · 2026-10-19 (v0.2: §3.12 Protocol · External evaluati
 - 좌표: `using Point = uint8_t; constexpr Point kNoPoint = 255;` `(row, col)` 순서 고정 (RULES §1.2).
 - 결정적 모드: `DeterministicMode` 플래그 — 모든 RNG는 명시적 seed의 `std::mt19937_64`/PCG, 스레드 1개, 해시 테이블 순회 순서 무관한 알고리즘.
 
-### 3.2 Board — 표현 후보와 결정 절차 (ADR-01, 벤치마크 대기)
+### 3.2 Board — 표현 후보와 결정 절차 (ADR-01: A 채택, C는 솔버 내부 최소 범위만 — Phase 8 E3b)
 | 후보 | 내용 | 장점 | 단점 |
 |---|---|---|---|
 | A. compact array | `uint8_t cell[225]` + 경계 검사 | 단순, 정확성 검증 쉬움 | 패턴 판정 시 반복 스캔 |
@@ -408,7 +408,7 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 ## 10. 결정 대기 (ADR 목록)
 | ID | 결정 | 결정 시점 | 기준 |
 |---|---|---|---|
-| ADR-01 | Board 표현 A/B/C | Phase 2 말 → **부분 결정**: A(padded array + 8중 증분 Zobrist) 채택. 금수 판정 2.1M/s로 목표 충족, apply+undo(3.4M/s)·legal_actions(25k/s)는 미달. C(line code + 생성 테이블 + 증분 금수 캐시)는 Phase 2에서 **구현하지 않음** — MCTS nodes/s를 실측하는 Phase 5 전에 병목 여부로 재결정 | apply/undo/s, forbidden/s, 정확성 동일 |
+| ADR-01 | Board 표현 A/B/C | Phase 2 말 → **부분 결정**: A(padded array + 8중 증분 Zobrist) 채택. 금수 판정 2.1M/s로 목표 충족, apply+undo(3.4M/s)·legal_actions(25k/s)는 미달. C(line code + 생성 테이블 + 증분 금수 캐시)는 Phase 2에서 **구현하지 않음** — MCTS nodes/s를 실측하는 Phase 5 전에 병목 여부로 재결정. **Phase 8 E3b 재검토**: 솔버 프로파일 결과 병목은 보드 표현이 아니라 df-pn AND 노드의 방어수 전수 반박 검사(시간 78%, 노드당 할당 145회)와 재방문 노드의 수 생성 반복이었다. 그래서 C안의 *최소 범위*만 솔버 안에 적용: (1) 노드별 생성 결과 캐시, (2) AND 노드 단위 쌍위협 정보(local invalidation: 방어수 d가 바꿀 수 있는 것은 d가 차지한 5목 점뿐) 기반 정확한 반박 판정, (3) 반박되지 않은 수에만 합법성(금수) 판정. 보드 전역 line code·증분 금수 캐시는 **여전히 미구현** — 남은 비용이 OR 노드 위협수 생성·전체 보드 5목 점 스캔으로 분산돼 있어 다음 단계 후보. 규칙 판정은 계속 canonical `black_verdict`만 사용 | apply/undo/s, forbidden/s, 정확성 동일 / 솔버: ee1d011 참조 구현과 노드 예산 하 결과·노드 수 비트 동일 |
 | ADR-02 | 추론 런타임 (ORT CPU / OpenVINO / DirectML / PyBridge / libtorch) | Phase 4–5 → **Phase 5에서 결정**. Phase 4 기준점(PyTorch, B6C64): CPU fp32 최대 ~316 eval/s(b512), XPU bf16 최대 ~5.6k eval/s(b512), 배치 1은 모든 장치에서 수십 eval/s. ONNX Runtime/OpenVINO는 아직 미설치·미측정 | batched eval/s, 지연, 설치 용이성 |
 | ADR-03 | PUCT vs Gumbel (self-play/대국 각각) | Phase 5–6 → **미결**: 둘 다 구현·정확성 검증, 매치는 PUCT만 수행. Phase 6에서 동일 compute 비교 | 동일 compute Elo |
 | ADR-04 | 학습 장치 | **결정(Phase 4)**: Intel Arc 140V XPU + bf16 autocast + `AdamW(foreach=False)`. 측정(B6C64, b256): CPU fp32 0.18 step/s, XPU fp32 0.74–1.7, XPU bf16 3.4 step/s(측정 편차 큼). XPU foreach AdamW는 간헐적으로 잘못된 업데이트를 내므로 사용 금지 | step/s, 안정성 |
