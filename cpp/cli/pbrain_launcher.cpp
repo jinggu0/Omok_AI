@@ -12,6 +12,9 @@
 //   python=.venv/Scripts/python.exe  relative paths are relative to repo
 //   model=runs/taraguchi_v1/models/gen_001.pt
 //   device=xpu
+//   rule_dialect=gomocup             "yixin" for Yixin Board (its INFO rule 2 = Renju)
+//   opening_guard=1                  GUI usability guard for the first moves (0 = off)
+//   max_move_ms=0                    cap on the per-move search time (0 = the GUI's limit only)
 //   args=                            extra arguments for dojozero.protocol.pbrain
 //   stderr=pbrain-DojoZero.log       child stderr: a log file (appended; relative to the exe
 //                                    folder) or "inherit". A GUI that never reads stderr would
@@ -170,6 +173,11 @@ int wmain() {
 
   std::wstring cmd = quote_arg(python.wstring()) + L" -m dojozero.protocol.pbrain --think " +
                      quote_arg(L"engine:" + model.wstring()) + L" --device " + quote_arg(widen(device));
+  // GUI-only host options (python/dojozero/protocol/pbrain.py); evaluation paths never set them.
+  const std::string dialect = get(cfg, "rule_dialect", "gomocup");
+  if (dialect != "gomocup") cmd += L" --rule-dialect " + quote_arg(widen(dialect));
+  if (get(cfg, "opening_guard", "1") != "0") cmd += L" --opening-guard";
+  if (const std::string cap = get(cfg, "max_move_ms", "0"); cap != "0") cmd += L" --max-move-ms " + quote_arg(widen(cap));
   if (!extra.empty()) cmd += L" " + widen(extra);
 
   // PYTHONPATH=<repo>/python[;previous] for the child (inherited environment).
