@@ -119,6 +119,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--fault", choices=("crash", "timeout", "malformed", "error", "illegal", "start-crash", "slow-first"))
     ap.add_argument("--fault-after", type=int, default=0)
     args = ap.parse_args(argv)
+    if args.think.startswith("engine:"):
+        # Under pbrain-DojoZero.exe the venv python.exe is a redirector: the launcher's EcoQoS opt-out
+        # does not reach this interpreter, so opt out here as well.
+        from ..evaluation.tournament import disable_power_throttling
+        disable_power_throttling()
     return serve(make_think(args.think, args.device, args.seed), args.fault, args.fault_after)
 
 

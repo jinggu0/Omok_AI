@@ -113,6 +113,45 @@ best policy 순위 중앙값 2(p90 11, 최대 99), visit 중앙값 2. 반박되�
 
 ---
 
+## Phase 8 — GUI 엔진 런처 `pbrain-DojoZero.exe` (2026-10-21)
+
+목표: Gomocup GUI(Piskvork, Rapfi-YixinBoard)에서 DojoZero와 둘 수 있게 한다. ADR-08(C++ 추론 vs 런처)은
+결정하지 않고, 기존 Python 호스트를 감싸는 **임시 런처**만 추가했다. 사용법은 [GUI.md](GUI.md).
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| 런처: `<repo>/.venv/Scripts/python.exe -m dojozero.protocol.pbrain --think engine:<model> --device xpu`, PYTHONPATH=`<repo>/python`, stdin/stdout 핸들 상속(복사·재인코딩 없음), 종료 코드 전달, EcoQoS opt-out, kill-on-close Job(런처가 죽으면 Python도 종료), stderr는 exe 옆 로그 파일(기본) | `cpp/cli/pbrain_launcher.cpp`, `cpp/CMakeLists.txt`(target `pbrain_dojozero`, 정적 CRT) |
+| 저장소 위치: exe 옆 `pbrain-DojoZero.ini`(repo/python/model/device/args/stderr) 또는 빌드 시 기본값 | 같은 파일 |
+| Python 호스트가 자기 인터프리터도 EcoQoS opt-out(engine 모드) | `python/dojozero/protocol/pbrain.py` |
+| 한국어 사용법(Piskvork / Yixin Board, 시간 설정, 한계) | `docs/GUI.md`, README, ARCHITECTURE §3.12 |
+
+### Verified
+| 검증 | 결과 |
+|---|---|
+| 빌드 `cmake --build build/msvc --config Release --target pbrain_dojozero` | 성공, /W4 경고 0 |
+| 파이프 직접 구동(START/INFO/BEGIN/TURN/ABOUT/END) | 정상 응답, 종료 코드 0 |
+| 좌표 확인: BOARD로 자기 사목(가로 y=3, 세로 x=2) 제시 | 둘 다 오목 완성점(`3,3`, `2,13`) 응답 |
+| TournamentRunner(프로젝트 Gomocup 클라이언트) vs **Pela 2023**, `renju_balanced_v1` 4쌍, 1000 ms/수, RESTART 재사용 | 3회 실행 24판: 첫 빌드 8판 실패 0 · 최종 빌드 8판 **A:TIMEOUT 1건**(CPU 100% 시점, 첫 쌍 132초) · 최종 빌드 재실행 8판 실패 0. 나머지 전부 NORMAL_WIN, DojoZero 평균 628–697 ms/수 |
+| TournamentRunner vs heuristic(in-process), 2쌍, **매 판 새 프로세스**(START/END/종료 경로), 첫 빌드·최종 빌드 각 1회 | 8판 실패 0, 8판 모두 DojoZero 승 |
+| Yixin Board 복사본(scratch, 원본 폴더 미변경) + 기록용 엔진으로 실제 실행 | 명령 도달 확인(아래 발견 1·2), Yixin 종료 시 엔진도 종료(잔존 프로세스 0) |
+| 기동·첫 수 지연(콜드 스타트 6회) | START→OK: 6.9–10.5초(가벼운 부하), 47–70초(CPU 100%: 다른 세션의 `coverage_replay`가 ~5.5코어 점유, `import torch`만 26초). 첫 수: 2초 제한 1.68초, 1초 제한 0.83–0.85초. 부하 중 1초 제한에서 한 번 1.86초 |
+
+### 사고·발견
+0. **TIMEOUT 1건(원인 미확정)**: 최종 빌드 Pela 매치 첫 판에서 DojoZero 쪽 수가 1000 ms + slack 1000 ms를 넘었다. 다른 세션 작업이 CPU 100%를 쓰던 시점이고(같은 시점 1초 제한에서 1.86초 사례), 부하가 줄어든 재실행 8판은 실패 0. 런처는 프로세스 기동 후 관여하지 않으므로 부하 원인으로 **추정**하지만 확인하지 않았다 → GUI 권장 수당 시간 2초 이상.
+1. **런처 버그(수정됨)**: Yixin Board는 GLib gspawn으로 엔진을 띄우며 파이프를 CRT 디스크립터 표(lpReserved2)로 넘기고 프로세스 표준 핸들은 숨은 콘솔로 남긴다. 처음 구현(`GetStdHandle`)은 Python에 콘솔 핸들을 넘겨 명령을 하나도 받지 못했고, GUI를 닫아도 EOF가 없어 고아 프로세스가 남았다. `_get_osfhandle(0/1/2)`로 바꾼 뒤 정상. TournamentRunner는 `STARTF_USESTDHANDLES`라 이 차이를 드러내지 못한다.
+2. **Yixin Board는 아직 사용 불가**: 렌주 설정이 `INFO rule 2`(Yixin 방언; Gomocup 표준에서 2 = 연속 게임)를 보내고, `EngineSession`은 렌주 = 비트 4만 받으므로 모든 착수 요청에 `ERROR DojoZero supports only Renju (INFO rule 4)`. 같은 명령열에서 `rule 4`로 바꾸면 착수한다. 코덱이 Yixin의 `rule 2`를 렌주로 받을지는 결정 필요(이번 작업 범위 밖, 코덱 미변경). Yixin은 자기 폴더의 `engine.exe`만 실행하고, `yx...` 확장 명령에는 `UNKNOWN`으로 답한다(무해).
+3. **빈 판·초반 수가 비정상(모델 결함)**: 빈 판 흑 첫 수 `14,1`, 사람 중앙(`7,7`) 뒤 백 `2,0`, `7,7`·`8,8` 뒤 `2,14`. in-process 탐색(CPU, 64/400 sims)에서도 빈 판에 `B2`/`O14` → 런처가 아니라 taraguchi_v1이 Taraguchi-10 오프닝으로만 학습되어 빈 판 자유 오프닝을 본 적이 없기 때문으로 **추정**. 평가 매치는 5–6돌 오프닝 국면에서 시작해 이 결함이 수치에 드러나지 않았다. GUI 대국 품질에 직접 영향.
+4. venv의 `python.exe`는 실제 인터프리터를 자식으로 띄우는 리다이렉터다(프로세스 트리로 확인). 그래서 `GomocupProcess`/런처의 자식 EcoQoS opt-out은 실제 인터프리터에 닿지 않는다 → Python 호스트가 스스로 opt-out하도록 추가(효과 자체는 미측정).
+
+### Open
+- Piskvork 실제 창 확인(이 PC에 Piskvork 없음, **UNKNOWN**), Piskvork의 START 대기 시간 설정 확인.
+- 코덱의 Yixin `INFO rule 2` 처리 결정 → 결정되면 Yixin Board에서 실제 대국 확인.
+- 빈 판·초반 자유 오프닝 대응(모델 학습 범위 또는 별도 처리).
+- 기동 지연 10–70초: GUI 시작 대기 제한이 짧으면 실패. ADR-08 결정 시 고려.
+
+---
+
 ## Phase 8 (E3b) — Tactical solver profiling and acceleration, replay, paired A/B rerun (2026-10-21)
 
 질문: "모델은 그대로 두고 전술 솔버를 충분히 빠르게 만들면 실제 tactical blunder와 외부 성능이 개선되는가?"

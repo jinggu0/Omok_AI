@@ -309,6 +309,7 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 - `cpp/protocol/` 3개 모듈 구현. Windows: `CreateProcessW` + 파이프 + Job object(엔진이 띄운 하위 프로세스까지 종료), stdout/stderr 리더 스레드, 줄 길이 상한 8192. POSIX 경로(fork/exec)는 작성했지만 **이 머신에서 실행 검증 안 됨**.
 - 규칙 profile `RENJU_GOMOCUP`(RIF, 패스 없음, RULES §7.3) — 외부 평가 전용.
 - `pbrain-DojoZero.exe` 대신 **임시 Python 호스트** `python -m dojozero.protocol.pbrain`(C++ `EngineSession` + Python 착수 함수). 테스트용 장애 주입(`--fault crash|timeout|malformed|error|illegal|start-crash`) 겸용. 단독 exe는 ADR-08 결정 후(E3).
+- (2026-10-21) GUI용 **임시 `pbrain-DojoZero.exe`** = `cpp/cli/pbrain_launcher.cpp`: 위 Python 호스트를 띄우고 stdin/stdout 핸들을 그대로 상속시키는 런처(프로토콜 파싱 없음, 코덱은 여전히 `EngineSession` 하나). 저장소 위치는 exe 옆 `pbrain-DojoZero.ini` 또는 빌드 시 기본값. ADR-08(C++ 추론 vs 런처)은 여전히 미결정. 사용법 [GUI.md](GUI.md).
 - TournamentRunner는 대국을 **한 번에 하나씩** 진행(concurrent_games = 1 기록), 외부 엔진은 대국마다 새 프로세스, DojoZero는 PUCT 루트·노이즈 없음·`max_ms` 시간 제한(fixed_time) 또는 고정 sims(fixed_visits).
 - DB `runs/evaluation/results.sqlite`(EVALUATION §17 스키마 v1), Report v0(`dojozero.evaluation.report`), corpus 모듈(`dojozero.evaluation.corpus`), 엔진 레지스트리(`dojozero.evaluation.external`, sha256 고정 필수).
 - 미구현: adaptive opponent 선택(`ladder.py`, E2), 최대우도 ladder rating, loss_analysis(E3), 규칙 적합성 사전 검사 자동화(§EVALUATION 12.2), 병렬 대국.

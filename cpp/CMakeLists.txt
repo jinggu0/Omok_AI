@@ -33,6 +33,15 @@ add_library(dojozero_core STATIC ${DOJOZERO_CORE_SOURCES})
 target_include_directories(dojozero_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(dojozero_core PUBLIC nlohmann_json::nlohmann_json)
 
+if(WIN32)
+  # Gomocup/Piskvork engine exe for GUIs: a launcher around the Python host (ADR-08 interim). No core
+  # dependency and a static CRT, so the exe can be copied next to a GUI.
+  add_executable(pbrain_dojozero cli/pbrain_launcher.cpp)
+  set_target_properties(pbrain_dojozero PROPERTIES OUTPUT_NAME pbrain-DojoZero
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+  target_compile_definitions(pbrain_dojozero PRIVATE DOJOZERO_REPO_DIR="${PROJECT_SOURCE_DIR}")
+endif()
+
 if(DOJOZERO_BUILD_TOOLS)
   # Profiling build of the same sources (DZ_TPROF timers; never linked into production targets).
   add_library(dojozero_core_tprof STATIC ${DOJOZERO_CORE_SOURCES})

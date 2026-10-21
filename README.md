@@ -36,6 +36,13 @@ cmake --build build/msvc --config Release
 ./build/msvc/cpp/Release/dojozero_engine.exe benchmark --suite benchmarks
 ```
 
+## Play in a GUI (Piskvork / Yixin Board)
+```bash
+cmake --build build/msvc --config Release --target pbrain_dojozero
+```
+Load `build/msvc/cpp/Release/pbrain-DojoZero.exe` as a Gomocup engine (15×15, Renju). Start-up takes
+10–70 s; see [docs/GUI.md](docs/GUI.md) for settings and known limits.
+
 ## Python (training)
 ```bash
 python -m venv .venv
