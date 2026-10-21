@@ -209,6 +209,9 @@ class SearchBatch {
     d["pv"] = pv;
     d["simulations"] = r.simulations;
     d["nodes"] = r.nodes;
+    d["proof_jobs"] = r.proof_jobs;
+    d["proof_found"] = r.proof_found;
+    d["proof_nodes"] = r.proof_nodes;
     d["elapsed_ms"] = r.elapsed_ms;
     return d;
   }
@@ -381,7 +384,14 @@ PYBIND11_MODULE(_core, m) {
       .def_readwrite("virtual_loss", &search::SearchConfig::virtual_loss)
       .def_readwrite("seed", &search::SearchConfig::seed)
       .def_readwrite("max_ms", &search::SearchConfig::max_ms)
-      .def_readwrite("root_tactics_time_share", &search::SearchConfig::root_tactics_time_share);
+      .def_readwrite("root_tactics_time_share", &search::SearchConfig::root_tactics_time_share)
+      .def_readwrite("proof_threads", &search::SearchConfig::proof_threads)
+      .def_readwrite("proof_vcf_nodes", &search::SearchConfig::proof_vcf_nodes)
+      .def_readwrite("proof_vct_nodes", &search::SearchConfig::proof_vct_nodes)
+      .def_readwrite("proof_max_vct_nodes", &search::SearchConfig::proof_max_vct_nodes)
+      .def_readwrite("proof_min_visits", &search::SearchConfig::proof_min_visits)
+      .def_readwrite("proof_max_depth", &search::SearchConfig::proof_max_depth)
+      .def_readwrite("proof_scan_every", &search::SearchConfig::proof_scan_every);
   py::class_<SearchBatch>(m, "SearchBatch")
       .def(py::init<const features::FeatureConfig&>())
       .def("add", &SearchBatch::add)

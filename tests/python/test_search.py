@@ -69,3 +69,19 @@ def test_heuristic_and_random_bots_are_legal():
     for g in random_states(10, seed=7):
         assert _core.heuristic_action(g, 1) in g.legal_actions()
         assert _core.random_action(g, 1) in g.legal_actions()
+
+
+def test_proof_aware_search_reports_proofs_and_avoids_proven_losses():
+    # Black H8 I8 J8 open three, White to move (Phase 8 E3d proof-aware MCTS): moves that ignore the
+    # three let Black win by force; the tree marks them proven losses and never plays one.
+    g = _core.GameState("RENJU_GOMOCUP")
+    for m in ["H8", "A1", "I8", "A3", "J8"]:
+        assert g.apply(m)
+    s = SearchSettings(simulations=400, root="PUCT", root_tactics_nodes=0, proof_threads=4, proof_min_visits=1)
+    r = search_many([g], UniformNumpyEvaluator(), s, FeatureSpec().core())[0]
+    assert r["proof_jobs"] >= 1 and r["proof_found"] >= 1
+    chosen = next(c for c in r["children"] if c["action"] == r["action"])
+    assert chosen["proven"] != -1
+    after = g.copy()
+    assert after.apply(r["action"])
+    assert _core.analyze_tactics(after, 100000, 50000, 0, 0.0)["result"] != "WIN"

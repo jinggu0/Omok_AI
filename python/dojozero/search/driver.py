@@ -42,6 +42,14 @@ class SearchSettings:
     defense_threads: int = 4
     defense_impl: str = "live"    # "ref" = frozen ee1d011 solver (same-binary A/B, Phase 8 E3b)
     defense_carry: bool = True    # VCT may use time a fast VCF left unused (TacticalLimits)
+    # Proof-aware MCTS (PROGRESS Phase 8 E3d): solver threads prove the most-visited tree nodes while
+    # the search runs (SearchConfig.proof_*). 0 = off.
+    proof_threads: int = 0
+    proof_vcf_nodes: int = 20000
+    proof_vct_nodes: int = 4000
+    proof_max_vct_nodes: int = 256000
+    proof_min_visits: int = 4
+    proof_max_depth: int = 3
 
 
 def make_config(s: SearchSettings) -> "_core.SearchConfig":
@@ -58,6 +66,12 @@ def make_config(s: SearchSettings) -> "_core.SearchConfig":
     c.max_inflight = s.max_inflight
     c.seed = s.seed
     c.max_ms = s.max_ms * (1.0 - s.defense_share) if (s.defense_k > 0 and s.max_ms > 0) else s.max_ms
+    c.proof_threads = s.proof_threads
+    c.proof_vcf_nodes = s.proof_vcf_nodes
+    c.proof_vct_nodes = s.proof_vct_nodes
+    c.proof_max_vct_nodes = s.proof_max_vct_nodes
+    c.proof_min_visits = s.proof_min_visits
+    c.proof_max_depth = s.proof_max_depth
     return c
 
 

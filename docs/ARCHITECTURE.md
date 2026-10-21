@@ -257,6 +257,7 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 - 배치: `Tree::select(features)`/`complete(ticket, eval)`, virtual loss(트리당 in-flight 상한). Python `SearchBatch`가 여러 트리의 리프를 모아 한 번에 평가(제어 역전: C++ 스레드에서 Python 호출 없음), 트리 생성(루트 전술)은 `add_many`로 병렬. 네트워크 배치는 고정 버킷 크기로 패딩(XPU에서 shape마다 커널 준비 비용).
 - 트리 재사용, 루트 Dirichlet 노이즈, 시간 기반 탐색 한도는 **아직 없음**(Phase 6 self-play에서 추가).
 
+- **Proof-aware MCTS (Phase 8 E3d, 기본 끔)**: `SearchConfig.proof_threads > 0`이면 프로세스 전역 솔버 풀(`search/proof_pool`)이 방문 많은 미해결 노드(깊이 ≤ `proof_max_depth`)의 "둘 차례인 쪽 강제승"을 비동기로 증명하고, 트리는 자기 스레드에서 결과를 받아 기존 solved-node 경로로 표시·전파한다. 작업자는 트리 노드를 건드리지 않는다(위치 복사 + mailbox). 증명 캐시는 정확한 WIN/LOSS만 결과로 쓰고 UNKNOWN은 시도 예산만 기록한다. 측정상 MCTS와 CPU를 나눠 sims를 35–45% 줄인다(PROGRESS E3d).
 ### 3.11 Self-play runtime (Phase 6)
 
 **Phase 6 구현**: self-play는 C++ 바이너리가 아니라 Python(`dojozero.selfplay`)이 `SearchBatch`로 여러 게임을 묶어 구동한다(네트워크가 Python/PyTorch에 있으므로). 기록은 gzip JSONL(§5.1의 `.dzg`는 미구현). 모델 레지스트리는 `runs/<run>/registry.json`(best 버전·체크포인트·sha256), 단일 머신 순차 루프(`dojozero.rl.loop`)가 self-play/학습/평가를 파일로만 주고받는다. 같은 실행 디렉터리에 두 루프가 붙지 못하도록 `LOCK`(PID) 파일을 쓴다.

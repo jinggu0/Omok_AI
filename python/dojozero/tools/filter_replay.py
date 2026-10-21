@@ -8,7 +8,8 @@ choice is then judged by a solver. Arms (name=spec, or a preset):
   A      filter with the frozen ee1d011 solver (defimpl=ref)
   B      filter with the optimized solver (defimpl=live, unused VCF time carried to VCT)
   B0     optimized solver with the ee1d011 40/40/20 time split (defcarry=0)
-  custom: name=k/share/threads/impl/carry   e.g.  B30=8/0.3/8/live/1
+  P6     proof-aware MCTS (6 solver threads, depth 3), no post-search filter
+  custom: name=k/share/threads/impl/carry[/proof_threads/proof_depth]   e.g.  B30=8/0.3/8/live/1
 
 Judges (the opponent, to move after the choice, has a proven forced win = "still a blunder"):
   judge_ms   ee1d011 solver, VCF 200k / VCT 100k nodes, 1000 ms wall clock: the judge used for the
@@ -34,11 +35,32 @@ from ..evaluation.tournament import keep_awake
 from ..search.driver import search_many
 
 REPO = Path(__file__).resolve().parents[3]
-PRESETS = {"none": (0, 0.5, 8, "live", True), "A": (8, 0.5, 8, "ref", True), "B": (8, 0.5, 8, "live", True),
-           "B0": (8, 0.5, 8, "live", False)}
+# k, share, threads, impl, carry, proof_threads, proof_max_depth
+PRESETS = {"none": (0, 0.5, 8, "live", True, 0, 3), "A": (8, 0.5, 8, "ref", True, 0, 3),
+           "B": (8, 0.5, 8, "live", True, 0, 3), "B0": (8, 0.5, 8, "live", False, 0, 3),
+           "P6": (0, 0.5, 8, "live", True, 6, 3)}  # P6: proof-aware MCTS, 6 solver threads, no post filter
 
 
-def load_positions(db: str) -> list[tuple[str, object]]:
+def parse_arm(spec: str) -> tuple:
+    p = spec.split("/")
+    p += ["0", "3"][len(p) - 5:] if len(p) < 7 else []
+    return int(p[0]), float(p[1]), int(p[2]), p[3], p[4] not in ("0", "false"), int(p[5]), int(p[6])
+
+
+def load_positions(db: str, mode: str = "blunder", coverage: str | None = None) -> list[tuple[str, object]]:
+    """blunder: the position before each classified tactical blunder (E2c). decision: the position
+    before the earliest DojoZero move of the run of proven-lost moves ending at the blunder (E3c
+    backtrack; the blunder itself when no earlier move was proven lost) = where the game was lost."""
+    first = {}
+    if mode == "decision":
+        cov = json.loads(Path(coverage).read_text(encoding="utf-8"))
+        for r in cov["rows"]:
+            ply = r["ply"]
+            for b in r.get("backtrack", []):  # newest first
+                if b["code"] != "REFUTED":
+                    break
+                ply = b["ply"]
+            first[r["id"].split("@")[0]] = ply
     con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
     out = []
     for rj, mv, gid in con.execute("""select a.result_json, g.moves, g.game_id from analysis a join game g
@@ -47,6 +69,10 @@ def load_positions(db: str) -> list[tuple[str, object]]:
         if r["category"] != "tactical_blunder":
             continue
         ply = r["primary"]["ply"]
+        if mode == "decision":
+            if gid not in first:
+                continue
+            ply = first[gid]
         g = _core.GameState("RENJU_GOMOCUP")
         assert all(g.apply(m) for m in json.loads(mv)[:ply])
         out.append((f"{gid}@{ply}", g))
@@ -73,10 +99,13 @@ def _main(argv: list[str] | None) -> int:
     ap.add_argument("--ms", type=float, default=500.0)
     ap.add_argument("--arms", default="none,A,B")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--positions", choices=["blunder", "decision"], default="blunder")
+    ap.add_argument("--coverage", default=str(REPO / "benchmarks" / "perf" / "results" / "coverage_247.json"))
+    ap.add_argument("--judge-ms", type=int, default=1, help="0 = skip the time-limited E3a judge")
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
 
-    positions = load_positions(args.db)
+    positions = load_positions(args.db, args.positions, args.coverage)
     if args.limit:
         positions = positions[: args.limit]
     pl = make_player(f"engine:{args.ckpt}", args.device, {})
@@ -91,17 +120,18 @@ def _main(argv: list[str] | None) -> int:
             if h.is_terminal:
                 j = {"ms": "TERMINAL", "nodes": "TERMINAL"}
             else:
-                j = {"ms": _core.analyze_tactics(h, 200000, 100000, 0, 1000.0, "ref", False)["result"],
+                j = {"ms": _core.analyze_tactics(h, 200000, 100000, 0, 1000.0, "ref", False)["result"] if args.judge_ms else "SKIPPED",
                      "nodes": _core.analyze_tactics(h, 200000, 100000, 0, 0.0, "live", False)["result"]}
             judged[(pid, a)] = j
         return judged[(pid, a)]
 
-    report = {"ckpt": args.ckpt, "move_ms": args.ms, "positions": len(positions), "arms": {}}
+    report = {"ckpt": args.ckpt, "move_ms": args.ms, "positions": len(positions), "position_mode": args.positions,
+              "arms": {}}
     for arm in args.arms.split(","):
         name, _, spec = arm.partition("=")
-        k, share, threads, impl, carry = (PRESETS[name] if not spec else
-                                          (lambda p: (int(p[0]), float(p[1]), int(p[2]), p[3], p[4] not in ("0", "false")))(spec.split("/")))
+        k, share, threads, impl, carry, pthreads, pdepth = PRESETS[name] if not spec else parse_arm(spec)
         s.defense_k, s.defense_share, s.defense_threads, s.defense_impl, s.defense_carry = k, share, threads, impl, carry
+        s.proof_threads, s.proof_max_depth = pthreads, pdepth
         rows = []
         t0 = time.perf_counter()
         for pid, g in positions:
@@ -111,9 +141,18 @@ def _main(argv: list[str] | None) -> int:
             rows.append({"id": pid, "color": g.side_to_move, "action": r["action"], "sims": r["simulations"],
                          "judge_ms": j["ms"], "judge_nodes": j["nodes"], "checked": d.get("checked", 0),
                          "refuted": len(d.get("refuted", [])), "changed": d.get("changed", False),
-                         "defense_ms": d.get("ms", 0.0), "budget_ms": d.get("budget_ms"), "checks": d.get("checks", [])})
+                         "defense_ms": d.get("ms", 0.0), "budget_ms": d.get("budget_ms"), "checks": d.get("checks", []),
+                         "proof_jobs": r.get("proof_jobs", 0), "proof_found": r.get("proof_found", 0),
+                         "proof_nodes": r.get("proof_nodes", 0), "proven": r.get("proven", 2),
+                         "children_proven_loss": sum(c["proven"] == -1 for c in r["children"])})
         wall = time.perf_counter() - t0
-        summ = {"k": k, "share": share, "threads": threads, "impl": impl, "carry": carry, "wall_s": wall}
+        summ = {"k": k, "share": share, "threads": threads, "impl": impl, "carry": carry,
+                "proof_threads": pthreads, "proof_max_depth": pdepth, "wall_s": wall,
+                "proof_jobs_mean": statistics.fmean([x["proof_jobs"] for x in rows]),
+                "proof_found_mean": statistics.fmean([x["proof_found"] for x in rows]),
+                "proof_nodes_mean": statistics.fmean([x["proof_nodes"] for x in rows]),
+                "root_children_proven_loss_mean": statistics.fmean([x["children_proven_loss"] for x in rows]),
+                "root_proven": dict(Counter(x["proven"] for x in rows))}
         for jk in ("judge_ms", "judge_nodes"):
             for col in ("ALL", "BLACK", "WHITE"):
                 sel = [x for x in rows if col == "ALL" or x["color"] == col]

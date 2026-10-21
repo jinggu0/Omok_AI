@@ -128,7 +128,7 @@ class InProcessPlayer:
         # (Phase 8 E3b) adds "-fast" and, with the fixed ee1d011 time split, "-nocarry".
         self.engine_id = f"dojo-{self.model_hash[:12]}" + (
             f"-def{s.defense_k}" + ("" if s.defense_impl == "ref" else "-fast" + ("" if s.defense_carry else "-nocarry"))
-            if s.defense_k else "")
+            if s.defense_k else "") + (f"-proof{s.proof_threads}" if s.proof_threads else "")
 
     def start_game(self):
         return None
@@ -149,7 +149,9 @@ class InProcessPlayer:
             r = search_many([g], self.player.evaluator, self.player.settings, self.player.feature_config)[0]
             a = r["action"]
             stats = {"sims": r["simulations"], "nodes": r["nodes"],
-                     "nn_evals": self.player.evaluator.evaluations - evals0}
+                     "nn_evals": self.player.evaluator.evaluations - evals0,
+                     "proof_jobs": r.get("proof_jobs", 0), "proof_found": r.get("proof_found", 0),
+                     "proof_nodes": r.get("proof_nodes", 0)}
             d = r.get("defense")
             if d is not None:  # per-move filter statistics (means over moves in the game record)
                 checks = [c for c in d.get("checks", []) if c.get("result") not in ("ILLEGAL", "TERMINAL")]
@@ -175,7 +177,8 @@ class InProcessPlayer:
         return {"kind": "dojo", "spec": self.spec, "root": s.root, "simulations": s.simulations, "max_ms": s.max_ms,
                 "root_tactics_nodes": s.root_tactics_nodes, "defense_k": s.defense_k,
                 "defense_share": s.defense_share, "defense_threads": s.defense_threads,
-                "defense_impl": s.defense_impl, "defense_carry": s.defense_carry, "model_hash": self.model_hash}
+                "defense_impl": s.defense_impl, "defense_carry": s.defense_carry,
+                "proof_threads": s.proof_threads, "proof_max_depth": s.proof_max_depth, "model_hash": self.model_hash}
 
 
 class ProcessPlayer:

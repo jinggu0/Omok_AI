@@ -44,6 +44,7 @@ Tree::Tree(const GameState& root, const SearchConfig& cfg, const features::Featu
     : root_state_(root), work_(root), cfg_(cfg), fcfg_(fcfg), rng_(cfg.seed), start_(std::chrono::steady_clock::now()) {
   nodes_.reserve(static_cast<size_t>(std::min(cfg.simulations, 100000)) + cfg.max_inflight + 16);
   new_node(-1);
+  if (cfg.proof_threads > 0) proof_box_ = std::make_shared<ProofMailbox>();
   if (root.is_terminal() || root.phase() != OpeningPhase::NORMAL_RENJU) return;
   const tactics::Rules r = rules_of(root);
   std::vector<Point> five;
@@ -63,6 +64,126 @@ Tree::Tree(const GameState& root, const SearchConfig& cfg, const features::Featu
     } else if (d.result == tactics::ProofResult::LOSS) {
       root_proven_by_tactics_ = -1;  // keep searching for the most resistant move
     }
+  }
+}
+
+Tree::~Tree() {
+  if (proof_box_) {
+    std::lock_guard<std::mutex> lk(proof_box_->mu);
+    proof_box_->closed = true;  // queued jobs are dropped, running ones discard their result
+  }
+}
+
+GameState Tree::state_of(int32_t id) const {
+  std::vector<Action> acts;
+  for (int32_t c = id; nodes_[c].parent >= 0; c = nodes_[c].parent) {
+    const Node& p = nodes_[nodes_[c].parent];
+    for (uint32_t i = 0; i < p.edge_count; ++i) {
+      if (edges_[p.edge_begin + i].child == c) {
+        acts.push_back(edges_[p.edge_begin + i].action);
+        break;
+      }
+    }
+  }
+  GameState g = root_state_;
+  for (auto it = acts.rbegin(); it != acts.rend(); ++it) {
+    [[maybe_unused]] const bool ok = g.apply(*it);
+    assert(ok && "tree edge must be legal");
+  }
+  return g;
+}
+
+// Apply finished proof attempts. A proof is exact (independent of budgets): WIN = the node's actor
+// has a forced win, LOSS = it cannot stop an immediate win. UNKNOWN changes nothing but the
+// attempt count (never treated as a loss).
+void Tree::drain_proofs() {
+  if (!proof_box_ || proof_outstanding_ == 0) return;
+  std::vector<ProofOutcome> got;
+  {
+    std::lock_guard<std::mutex> lk(proof_box_->mu);
+    got.swap(proof_box_->done);
+  }
+  for (const ProofOutcome& o : got) {
+    --proof_outstanding_;
+    ++proof_jobs_;
+    proof_nodes_ += o.nodes;
+    Node& n = nodes_[o.node];
+    n.proof_busy = false;
+    if (!o.skipped && n.proof_level < 255) ++n.proof_level;
+    if (o.result == tactics::ProofResult::UNKNOWN) continue;
+    const bool win = o.result == tactics::ProofResult::WIN;
+    if (o.node == 0) {  // root: a win needs its move; the search then stops and plays it
+      if (win && o.move != kNoPoint && root_proven_by_tactics_ != 1) {
+        root_proven_by_tactics_ = 1;
+        root_tactics_move_ = Action::place(o.move);
+        ++proof_found_;
+      } else if (!win && root_proven_by_tactics_ == kUnknown) {
+        root_proven_by_tactics_ = -1;  // keep searching for the most resistant move
+        ++proof_found_;
+      }
+      continue;
+    }
+    if (n.proven != kUnknown) continue;
+    const float s = sign_of(n.actor);
+    n.proven = static_cast<int8_t>(win ? s : -s);
+    ++proof_found_;
+    for (int32_t p = n.parent; p >= 0; p = nodes_[p].parent) {
+      update_proven(p);
+      if (nodes_[p].proven == kUnknown) break;
+    }
+  }
+}
+
+// Queue attempts for the most-visited unsolved nodes within proof_max_depth, at most
+// proof_threads outstanding per tree.
+void Tree::schedule_proofs() {
+  if (!proof_box_) return;
+  if (proof_last_scan_ >= 0 && completed_ - proof_last_scan_ < cfg_.proof_scan_every) return;
+  proof_last_scan_ = completed_;
+  int slots = cfg_.proof_threads - proof_outstanding_;
+  if (slots <= 0) return;
+  if (cfg_.max_ms > 0 && elapsed_ms() >= cfg_.max_ms) return;
+  struct Cand {
+    int visits;
+    int32_t id;
+  };
+  std::vector<Cand> cands;
+  std::vector<std::pair<int32_t, int>> stack{{0, 0}};
+  while (!stack.empty()) {
+    const auto [id, depth] = stack.back();
+    stack.pop_back();
+    const Node& n = nodes_[id];
+    if (n.state != NodeState::EXPANDED || n.visits < cfg_.proof_min_visits) continue;
+    const uint64_t budget = cfg_.proof_vct_nodes << (2 * std::min<int>(n.proof_level, 20));
+    if (n.proven == kUnknown && !n.proof_busy && budget <= cfg_.proof_max_vct_nodes &&
+        !(id == 0 && root_proven_by_tactics_ != kUnknown)) {
+      cands.push_back({n.visits, id});
+    }
+    if (n.proven != kUnknown || depth >= cfg_.proof_max_depth) continue;
+    for (uint32_t i = 0; i < n.edge_count; ++i) {
+      const int32_t c = edges_[n.edge_begin + i].child;
+      if (c >= 0) stack.push_back({c, depth + 1});
+    }
+  }
+  std::stable_sort(cands.begin(), cands.end(), [](const Cand& x, const Cand& y) { return x.visits > y.visits; });
+  ProofPool& pool = ProofPool::instance(cfg_.proof_threads);
+  for (const Cand& c : cands) {
+    if (slots <= 0) break;
+    Node& n = nodes_[c.id];
+    GameState g = state_of(c.id);
+    if (g.phase() != OpeningPhase::NORMAL_RENJU || g.is_terminal()) {
+      n.proof_level = 255;  // never provable by the solver
+      continue;
+    }
+    ProofJob job{proof_box_, c.id, std::move(g), cfg_.proof_vcf_nodes,
+                 cfg_.proof_vct_nodes << (2 * std::min<int>(n.proof_level, 20)), {}};
+    if (cfg_.max_ms > 0) {
+      job.deadline = start_ + std::chrono::microseconds(static_cast<int64_t>(cfg_.max_ms * 1000.0));
+    }
+    n.proof_busy = true;
+    ++proof_outstanding_;
+    --slots;
+    pool.submit(std::move(job));
   }
 }
 
@@ -329,7 +450,9 @@ void Tree::update_proven(int32_t id) {
 }
 
 int Tree::descend(const std::function<void(const GameState&, Pending&)>& on_leaf) {
+  drain_proofs();
   if (done()) return -2;
+  schedule_proofs();
   if (static_cast<int>(pending_.size()) >= cfg_.max_inflight) return -2;
   std::vector<int32_t> path{0};
   int applied = 0;
@@ -540,6 +663,9 @@ SearchResult Tree::result() const {
   r.stalled = stalled_;
   r.simulations = completed_;
   r.nodes = static_cast<int>(nodes_.size());
+  r.proof_jobs = proof_jobs_;
+  r.proof_found = proof_found_;
+  r.proof_nodes = proof_nodes_;
   r.elapsed_ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start_).count();
   r.actor = root_state_.actor();
   const float a = sign_of(r.actor);

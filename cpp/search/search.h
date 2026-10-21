@@ -15,6 +15,7 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <optional>
 #include <random>
 #include <string>
@@ -22,6 +23,7 @@
 
 #include "features/features.h"
 #include "game/game_state.h"
+#include "search/proof_pool.h"
 
 namespace dz::search {
 
@@ -48,6 +50,17 @@ struct SearchConfig {
   // Gumbel Sequential Halving plans its phases from `simulations` and would stop mid-schedule.
   double max_ms = 0;
   double root_tactics_time_share = 0.25;  // root tactics wall-clock cap = share * max_ms
+  // Proof-aware MCTS (PROGRESS Phase 8 E3d): solver threads try to prove the most-visited nodes
+  // (side to move has a VCF/VCT win, or cannot stop an immediate win) while the search runs; a
+  // proof marks the node solved and the usual solved-node backup propagates it. 0 threads = off.
+  // A node is retried with a 4x larger VCT budget each time an attempt ends UNKNOWN.
+  int proof_threads = 0;
+  uint64_t proof_vcf_nodes = 20000;
+  uint64_t proof_vct_nodes = 4000;       // first attempt
+  uint64_t proof_max_vct_nodes = 256000;
+  int proof_min_visits = 4;
+  int proof_max_depth = 3;               // plies below the root (0 = root only)
+  int proof_scan_every = 8;              // completed simulations between job scans
 };
 
 // Raw network outputs; the tree picks the head that matches each node's action types.
@@ -101,6 +114,9 @@ struct SearchResult {
   std::vector<Action> pv;
   int simulations = 0;
   int nodes = 0;
+  int proof_jobs = 0;       // proof attempts finished (incl. cache hits)
+  int proof_found = 0;      // nodes solved by a proof attempt
+  uint64_t proof_nodes = 0; // solver nodes spent by finished attempts
   bool stalled = false;              // synchronous run stopped with nothing selectable (must never happen)
   double elapsed_ms = 0;
 };
@@ -108,6 +124,9 @@ struct SearchResult {
 class Tree {
  public:
   Tree(const GameState& root, const SearchConfig& cfg, const features::FeatureConfig& fcfg = {});
+  ~Tree();
+  Tree(const Tree&) = delete;
+  Tree& operator=(const Tree&) = delete;
 
   // Synchronous search to completion.
   SearchResult run(Evaluator& eval);
@@ -151,6 +170,8 @@ class Tree {
     PlayerId actor = PlayerId::P0;
     NodeState state = NodeState::NEW;
     int8_t proven = kUnknown;  // P0 perspective
+    uint8_t proof_level = 0;   // finished proof attempts (budget grows 4x per attempt)
+    bool proof_busy = false;   // an attempt is queued or running
   };
   struct Pending {
     std::vector<int32_t> path;        // node ids root..leaf
@@ -171,6 +192,9 @@ class Tree {
   int32_t new_node(int32_t parent);
   std::vector<Action> leaf_actions(const GameState& g, int8_t& proven_p0) const;
   int final_root_edge() const;
+  void drain_proofs();
+  void schedule_proofs();
+  GameState state_of(int32_t node) const;
 
   GameState root_state_;
   GameState work_;
@@ -187,6 +211,13 @@ class Tree {
   int root_proven_by_tactics_ = kUnknown;  // root actor perspective
   bool stalled_ = false;
   std::optional<Action> root_tactics_move_;
+
+  // Proof-aware MCTS state (only touched on the tree's own thread; workers use the mailbox).
+  std::shared_ptr<ProofMailbox> proof_box_;
+  int proof_outstanding_ = 0;
+  int proof_last_scan_ = -1;
+  int proof_jobs_ = 0, proof_found_ = 0;
+  uint64_t proof_nodes_ = 0;
 
   // Gumbel root state
   bool gumbel_ready_ = false;

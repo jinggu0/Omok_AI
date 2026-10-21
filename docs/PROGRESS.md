@@ -25,6 +25,64 @@ and what is still open. Newest phase first.
 
 ---
 
+## Phase 8 (E3d) — Case A: proof-aware MCTS (2026-10-21)
+
+질문: E3c 권고대로 솔버 증명을 탐색 트리 안(사후 필터가 아니라)에서 MCTS와 동시에 쓰면, 실제로 진 결정 국면에서 지는 수를 피하고 외부 성능이 오르는가?
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| 프로세스 전역 증명 풀(솔버 스레드, 트리별 mailbox — 작업자는 트리를 건드리지 않음, 트리 파괴 후 결과는 버림) + 증명 캐시(정확한 WIN/LOSS와 승리 수만 결과로 저장, UNKNOWN은 "시도한 예산"만 따로 기록 — 결과로 쓰지 않음) | `cpp/search/proof_pool.{h,cpp}` |
+| 트리 통합: 일정 시뮬레이션마다 깊이 ≤ `proof_max_depth`의 방문 많은 미해결 노드를 골라 "둘 차례인 쪽의 VCF/VCT 강제승" 증명 요청, UNKNOWN이면 다음 시도에서 VCT 예산 4배(4k → 256k), 결과는 기존 MCTS-solver 경로로 표시·전파(증명된 패배 자식은 선택·최종 선택에서 제외), 루트 승리 증명은 그 수를 둠 | `cpp/search/search.{h,cpp}` (`SearchConfig.proof_*`, `SearchResult.proof_*`) |
+| Python 설정(`SearchSettings.proof_*`, 스펙 옵션 `:proof=N:proofdepth=D`), 대국 기록에 수마다 증명 통계, 엔진 ID `-proofN` | `search/driver.py`, `evaluation/{match,tournament}.py`, `bindings/module.cpp` |
+| 재생 도구: `--positions decision`(E3c backtrack으로 복원한 "처음 진 결정 국면": 블런더에서 거슬러 올라간 연속 REFUTED 수 중 가장 이른 수 직전, 없으면 블런더 국면), 증명 arm, `--judge-ms 0` | `python/dojozero/tools/filter_replay.py` |
+| 테스트 | `tests/search/test_proof_mcts.cpp`(5), `tests/python/test_search.py`(1) |
+
+### 정확성
+| 검증 | 결과 |
+|---|---|
+| 증명 인지 탐색이 증명 표시한 루트 자식 → 독립 df-pn 재증명 + GameState 검증기 | 218개 중 216 검증, 2 예산 내 미결, **REFUTED·모순 0** |
+| 솔버만으로 찾은 루트 승리(루트 전술 끔) | 그 수를 두고, 둔 뒤 상대가 증명된 패배 |
+| 트리 16개 × 4스레드 동시, 증명 6스레드, 대기·실행 중 작업이 남은 채 트리 파괴 20회 | 트리 불변식 위반 0, 크래시 0 |
+| 증명 끔 = 기존 탐색(같은 시드) | 동일 |
+| 캐시가 UNKNOWN을 결과로 바꾸지 않음 | 통과 |
+| 기존 탐색 테스트 13개, Python 탐색·필터·토너먼트 | 통과 |
+
+### 측정 (사전 확정 설정: 솔버 6스레드, 깊이 3, VCT 4k→256k, 방문 ≥ 4; 측정 국면으로 튜닝하지 않음)
+환경: 전원 연결, Rapfi·GUI 종료, OneDrive가 측정 내내 ~1–1.2코어 사용(`benchmarks/perf/results/background_load_e3d.csv`). 심판 = 노드 예산만(VCF 200k / VCT 100k, 결정적), UNKNOWN은 진 수로 세지 않음(안전 증명도 아님).
+
+**처음 진 결정 국면 247**
+| arm | 진 수 | 흑 / 백 | 심판 UNKNOWN | sims/수 | 증명 시도·성공 / 노드 (수당) | 증명된 패배 루트 자식 |
+|---|---|---|---|---|---|---|
+| 필터 없음 | 221 | 122/142 · 99/105 | 26 | 214 | — | 0.48 |
+| **P6 (깊이 3)** | **170** | 78 · 92 | 77 | 122 | 21.7 · 4.8 / 4.4만 | 3.89 |
+| P6 깊이 1 | 167 | 74 · 93 | 80 | 123 | 9.9 · 3.5 / 2.0만 | 5.39 |
+| E3b 필터 B30 | 180 | 89 · 91 | 67 | 147 | (필터 증명 57%) | 0.34 |
+국면 단위: 필터 없음→P6 제거 56 / 신규 5, B30→P6 제거 16 / 신규 6, 깊이 1→3 제거 5 / 신규 8(차이 없음). "제거"의 상당 부분은 심판 UNKNOWN(26 → 77)이라 안전이 증명된 것은 아님.
+
+**블런더 국면 247**: 필터 없음 234(흑 129 · 백 105) / P6 202(108 · 94), sims 206 → 184 / B30 204(109 · 95), sims 139. 필터 없음→P6 제거 32 / 신규 0.
+
+**외부 paired A/B** (A = 증명 끔, B = P6; 500 ms/수, opening 24–63, Pela·Yixin 각 40쌍, 색 교대, arm 교대)
+| 상대 | A | B | 쌍대 차이 [95%] | ΔElo (로컬, 점추정) |
+|---|---|---|---|---|
+| Pela 2023 | 0.250 (흑 0.150 / 백 0.350) | 0.300 (0.200 / 0.400) | +0.050 [−0.071, +0.175] | +44 |
+| Yixin 2018 | 0.062 (0.100 / 0.025) | 0.037 (0.075 / 0.000) | −0.025 [−0.087, +0.037] | −93 |
+| **합산 80쌍** | 0.156 | 0.169 | **+0.0125 [−0.056, +0.081] → INCONCLUSIVE** | +16 |
+쌍 차이: 0 ×56, −0.5 ×12, +0.5 ×10, +1.0 ×2. 실패 0, DojoZero 금수패 0(Pela 금수패 A 3 / B 0). 수당 시간 A 400–407 ms / B 392–429 ms. **sims/수 A 171·184 → B 96·121 (−44% / −34%)**, B의 수당 증명 시도 19–22, 성공 1.2–2.0, 솔버 노드 2.5–3.0만. **상대 엔진의 수당 시간도 B에서 늘었다**(Pela 123 → 136 ms, Yixin 143 → 170 ms): 솔버 스레드가 외부 엔진과도 CPU를 나눔 — 외부 엔진은 단일 스레드, DojoZero는 GPU + CPU 6스레드 추가이므로 같은 계산량 비교가 아니다.
+
+### 결론
+**INCONCLUSIVE**.
+- 처음 진 결정 국면에서 증명 인지 탐색은 진 수를 221 → 170(B30 필터 180)으로 줄였고, 흑에서 크게(122 → 78) 줄었다. 그러나 감소분의 상당 부분은 심판 UNKNOWN 증가이고, 외부 A/B는 0을 포함한다(+0.0125).
+- **가설 일부 기각**: "솔버를 MCTS와 동시에 돌리면 MCTS 시간을 빼앗지 않는다"는 틀렸다. 이 노트북(4P + 4LPE)에서 솔버 6스레드는 MCTS sims를 35–45% 줄이고 상대 엔진도 느리게 한다.
+- 깊이 1과 3의 차이 없음 → 깊은 증명은 이 예산에서 거의 기여하지 않음.
+- 기본값은 **끔**(`proof_threads = 0`), 코드는 실험 옵션으로 둔다.
+- 다음 후보: (1) 스레드 수를 줄인 증명(2–3스레드, 깊이 1)으로 sims 손실과 증명 효과의 균형 측정, (2) Case B — 가치망·정책망이 위협을 보게 하는 전술 재분석 학습(이번 단계 금지 사항이던 retraining이 필요하므로 사용자 결정 필요), (3) 측정 시 상대 엔진과 CPU 경합을 없애는 프로세스 친화도(affinity) 고정.
+
+### 재현성
+코드 = 이 커밋(`phase-8-eval-infra`), checkpoint `gen_001.pt`(model_sha `9ccd7fab…`), `renju_balanced_v1` `1043ff68…`, Pela·Yixin exe 해시는 E3b와 동일, coverage `benchmarks/perf/results/coverage_247.json`(E3c). 결과: `benchmarks/perf/results/replay_e3d_{decision,blunder}.json`, `benchmarks/perf/results/ab/ab_e3d_proof6.json` + DB `experiment`.
+
+---
+
 ## Phase 8 (E3c) — Case C 진단: policy 후보 범위(candidate coverage) (2026-10-21)
 
 질문: "남은 블런더 국면에서 안전한 수가 policy/MCTS 상위 후보 밖에 있는가, 아니면 블런더 전에 이미 진 국면인가?"

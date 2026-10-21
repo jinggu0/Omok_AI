@@ -19,6 +19,7 @@ set(DOJOZERO_CORE_SOURCES
   tactics/benchmark.cpp
   features/features.cpp
   search/search.cpp
+  search/proof_pool.cpp
   search/bots.cpp
   protocol/piskvork_adapter.cpp
   protocol/gomocup_process.cpp

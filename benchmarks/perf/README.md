@@ -34,4 +34,7 @@ are the `pair_*` and `proofms_pair_*` files.
 | `results/coverage_247.json` | Case C (Phase 8 E3c): every legal move at the 247 pre-blunder positions (and 154 earliest provably-lost decisions) judged by the solver (VCF 200k / VCT 100k nodes, no clock), with policy and 500 ms visit ranks (`python -m dojozero.tools.coverage_replay --earlier`) |
 | `results/ab/ab_e3b_fastsolver_k8_s30_rerun.json` | external paired A/B (Pela 2023, Yixin 2018, 40 pairs each): the run used for the verdict |
 | `results/ab/ab_e3b_fastsolver_k8_s30_INVALID_rapfi_load.json` | first A/B, invalid: a background Rapfi analysis engine starved DojoZero in the Yixin half |
+| `results/replay_e3d_{decision,blunder}.json` | Case A (E3d): proof-aware MCTS arms vs none / B30 filter, on the first losing decision positions and on the blunder positions |
+| `results/ab/ab_e3d_proof6.json` | external paired A/B, proof-aware MCTS (6 solver threads) vs off |
+| `results/background_load_e3d.csv` | CPU used by other processes during the E3d runs |
 | `results/throttled/*` | early runs under power throttling (see caveat) |

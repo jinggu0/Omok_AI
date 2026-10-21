@@ -114,7 +114,7 @@ def make_player(spec: str, device: str, cache: dict) -> Player:
     # Options are trailing ":key=value" segments; the checkpoint path may itself contain ':' (C:\...).
     segs = rest.split(":")
     opts = []
-    while segs and "=" in segs[-1] and segs[-1].split("=")[0] in ("sims", "root", "tactics", "defense", "defshare", "defthreads", "defimpl", "defcarry"):
+    while segs and "=" in segs[-1] and segs[-1].split("=")[0] in ("sims", "root", "tactics", "defense", "defshare", "defthreads", "defimpl", "defcarry", "proof", "proofdepth"):
         opts.insert(0, segs.pop())
     ckpt = ":".join(segs)
     parts = [kind, ckpt] + opts
@@ -141,6 +141,10 @@ def make_player(spec: str, device: str, cache: dict) -> Player:
             s.defense_impl = v  # live | ref (frozen ee1d011 solver)
         elif k == "defcarry":
             s.defense_carry = v not in ("0", "false")
+        elif k == "proof":
+            s.proof_threads = int(v)  # proof-aware MCTS solver threads (0 = off)
+        elif k == "proofdepth":
+            s.proof_max_depth = int(v)
     return Player(spec, kind, evaluator, fcfg, s)
 
 
