@@ -38,4 +38,5 @@ are the `pair_*` and `proofms_pair_*` files.
 | `results/ab/ab_e3d_proof6.json` | external paired A/B, proof-aware MCTS (6 solver threads) vs off |
 | `results/background_load_e3d.csv` | CPU used by other processes during the E3d runs |
 | `results/replay_e3e_{decision,blunder}.json`, `results/ab/ab_e3e_proof3_d1.json`, `results/background_load_e3e.csv` | E3e: light proof-aware MCTS (2-3 threads, depth 1) replays and the A/B of the selected 3-thread setting |
+| `results/ab/ab_e3f_proof3_d1_holdout.json`, `results/background_load_e3f.csv` | E3f: holdout confirmation A/B (openings 64-103) of the light proof setting |
 | `results/throttled/*` | early runs under power throttling (see caveat) |
