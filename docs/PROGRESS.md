@@ -140,14 +140,39 @@ best policy 순위 중앙값 2(p90 11, 최대 99), visit 중앙값 2. 반박되�
 ### 사고·발견
 0. **TIMEOUT 1건(원인 미확정)**: 최종 빌드 Pela 매치 첫 판에서 DojoZero 쪽 수가 1000 ms + slack 1000 ms를 넘었다. 다른 세션 작업이 CPU 100%를 쓰던 시점이고(같은 시점 1초 제한에서 1.86초 사례), 부하가 줄어든 재실행 8판은 실패 0. 런처는 프로세스 기동 후 관여하지 않으므로 부하 원인으로 **추정**하지만 확인하지 않았다 → GUI 권장 수당 시간 2초 이상.
 1. **런처 버그(수정됨)**: Yixin Board는 GLib gspawn으로 엔진을 띄우며 파이프를 CRT 디스크립터 표(lpReserved2)로 넘기고 프로세스 표준 핸들은 숨은 콘솔로 남긴다. 처음 구현(`GetStdHandle`)은 Python에 콘솔 핸들을 넘겨 명령을 하나도 받지 못했고, GUI를 닫아도 EOF가 없어 고아 프로세스가 남았다. `_get_osfhandle(0/1/2)`로 바꾼 뒤 정상. TournamentRunner는 `STARTF_USESTDHANDLES`라 이 차이를 드러내지 못한다.
-2. **Yixin Board는 아직 사용 불가**: 렌주 설정이 `INFO rule 2`(Yixin 방언; Gomocup 표준에서 2 = 연속 게임)를 보내고, `EngineSession`은 렌주 = 비트 4만 받으므로 모든 착수 요청에 `ERROR DojoZero supports only Renju (INFO rule 4)`. 같은 명령열에서 `rule 4`로 바꾸면 착수한다. 코덱이 Yixin의 `rule 2`를 렌주로 받을지는 결정 필요(이번 작업 범위 밖, 코덱 미변경). Yixin은 자기 폴더의 `engine.exe`만 실행하고, `yx...` 확장 명령에는 `UNKNOWN`으로 답한다(무해).
+2. **Yixin Board 규칙 번호 불일치(→ 아래 후속에서 GUI 방언 옵션으로 해결)**: 렌주 설정이 `INFO rule 2`(Yixin 방언; Gomocup 표준에서 2 = 연속 게임)를 보내고, `EngineSession`은 렌주 = 비트 4만 받으므로 모든 착수 요청에 `ERROR DojoZero supports only Renju (INFO rule 4)`. 같은 명령열에서 `rule 4`로 바꾸면 착수한다. 코덱이 Yixin의 `rule 2`를 렌주로 받을지는 결정 필요(이번 작업 범위 밖, 코덱 미변경). Yixin은 자기 폴더의 `engine.exe`만 실행하고, `yx...` 확장 명령에는 `UNKNOWN`으로 답한다(무해).
 3. **빈 판·초반 수가 비정상(모델 결함)**: 빈 판 흑 첫 수 `14,1`, 사람 중앙(`7,7`) 뒤 백 `2,0`, `7,7`·`8,8` 뒤 `2,14`. in-process 탐색(CPU, 64/400 sims)에서도 빈 판에 `B2`/`O14` → 런처가 아니라 taraguchi_v1이 Taraguchi-10 오프닝으로만 학습되어 빈 판 자유 오프닝을 본 적이 없기 때문으로 **추정**. 평가 매치는 5–6돌 오프닝 국면에서 시작해 이 결함이 수치에 드러나지 않았다. GUI 대국 품질에 직접 영향.
 4. venv의 `python.exe`는 실제 인터프리터를 자식으로 띄우는 리다이렉터다(프로세스 트리로 확인). 그래서 `GomocupProcess`/런처의 자식 EcoQoS opt-out은 실제 인터프리터에 닿지 않는다 → Python 호스트가 스스로 opt-out하도록 추가(효과 자체는 미측정).
 
+### 후속: 사용자가 GUI로 직접 테스트할 수 있게 (2026-10-21)
+
+| 영역 | 내용 | 파일 |
+|---|---|---|
+| Yixin 방언 | `--rule-dialect yixin`(ini `rule_dialect=yixin`)일 때만 호스트가 `INFO rule 2` → `INFO rule 4`로 바꿔 세션에 전달. 기본(gomocup)은 rule 2 = 연속 게임으로 계속 거부. 규칙 판정은 그대로 `EngineSession` + 정식 `GameState`(새 규칙 로직 없음) | `python/dojozero/protocol/pbrain.py` |
+| 오프닝 가드 | `--opening-guard`(런처 기본 on, 평가·토너먼트 경로는 off): 빈 판 H8, 돌 6개 미만에서는 기존 돌로부터 Chebyshev 거리 2 이내로 제한하고 그 안에서 방문 수(없으면 prior) 최대인 수. 임계값 6 = 학습에서 NORMAL_RENJU 국면은 Taraguchi-10 6수 이후에만 나오고 그 전 돌은 모두 중앙 1/3/5/7 영역에 있음(RULES §8). **사용 편의 장치이며 기력 아님** | 같은 파일 |
+| 수당 상한 | `--max-move-ms`(ini `max_move_ms`): Yixin "unlimited"가 보내는 2,000,000 ms 대비 | 같은 파일, 런처 |
+| 테스트 | 두 방언(rule 2 거부/수용, rule 0·1 거부, Yixin 실제 명령열, 정식 규칙 판정 유지), 가드 6종 | `tests/python/test_pbrain_gui.py` |
+| 사용자용 설치 | `C:\dojozero_gui\YixinBoard-DojoZero`(Rapfi-YixinBoard 복사본, `engine.exe` = 런처, ini `rule_dialect=yixin`, 사람 흑·DojoZero 백·수당 5초), `C:\dojozero_gui\engine`(커밋 스냅샷 + 그 코드로 빌드한 `_core`·런처). 원본 Yixin 폴더는 변경 없음 | 저장소 밖 |
+| 문서 | 한국어 단계별 사용법 | `docs/GUI.md` |
+
+Verified:
+| 검증 | 결과 |
+|---|---|
+| `pytest tests/python/test_pbrain_gui.py tests/python/test_tournament.py` (스냅샷 `_core`) | 27/27 |
+| 런처 빌드(`build/msvc-gui`, 스냅샷 `C:\dojozero_gui\engineuild`) | 성공, 런처 경고 0 (`_core`는 기존 C4390 경고 2건) |
+| **실제 Yixin Board 창**에서 DojoZero 대 DojoZero(양쪽 컴퓨터, 수당 3초) | 23수 끝까지 진행, Yixin↔엔진 ERROR 0, 첫 수 중앙 `7,7`(가드), 기보를 정식 `GameState`로 재생 → BLACK_WIN(FIVE). Yixin 종료 시 엔진 종료(잔존 0) |
+
+발견:
+1. **작업 트리 의존 위험(실제 발생)**: 처음엔 엔진이 작업 트리(`C:	emp_git\Omok_AI`)를 그대로 썼는데, 다른 세션이 Case A로 `driver.py`를 고친 상태에서 `_core`가 재빌드되기 전이라 엔진이 시작 직후 `AttributeError: proof_threads`로 죽었다. → GUI 엔진은 커밋 스냅샷(`git archive`) + 별도 빌드한 `_core`로 분리. 저장소의 `_core`·`build/msvc`는 건드리지 않았다.
+2. Yixin은 `use database moves` = 0이면 START 후 착수 요청을 보내지 않았다(1에서는 정상, 원인 미확인). 수가 바뀔 때마다 `yxblockreset`·좌표 줄·`start 15`·`board ... done`을 보낸다. 앞의 것들에는 `UNKNOWN`으로 답하며 무해.
+3. Yixin settings의 시간 단위는 초(turn 3 → `INFO timeout_turn 3000`).
+
+미검증(UNKNOWN): 사람이 직접 클릭해서 두는 경로(엔진 응답 경로는 같은 `board ... done`이라 동작할 것으로 추정), Yixin swap 규칙(3/5/6), Piskvork 전체.
+
 ### Open
-- Piskvork 실제 창 확인(이 PC에 Piskvork 없음, **UNKNOWN**), Piskvork의 START 대기 시간 설정 확인.
-- 코덱의 Yixin `INFO rule 2` 처리 결정 → 결정되면 Yixin Board에서 실제 대국 확인.
-- 빈 판·초반 자유 오프닝 대응(모델 학습 범위 또는 별도 처리).
+- Piskvork 실제 확인(다운로드는 사용자 승인 필요).
+- 빈 판·초반 자유 오프닝의 근본 대응(모델 학습 범위). 현재는 GUI 가드로만 가림.
+- 스냅샷 갱신 절차: 새 모델·코드로 GUI 엔진을 바꾸려면 `git archive` 스냅샷을 새로 만들고 `_core`를 다시 빌드.
 - 기동 지연 10–70초: GUI 시작 대기 제한이 짧으면 실패. ADR-08 결정 시 고려.
 
 ---
