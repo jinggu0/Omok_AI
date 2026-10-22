@@ -1,0 +1,40 @@
+# Phase 8 E4 (Case B): small solver-supervised reanalysis fine-tune from the current best.
+run_name: e4_reanalysis_v1
+run_dir: runs
+seed: 11
+device: auto
+amp_bf16: true
+init_checkpoint: runs/taraguchi_v1/models/gen_001.pt   # model_sha 9ccd7fab...
+data:
+  reanalysis: data/reanalysis_v1/arrays.npz           # train split only; val for monitoring; test never read
+  replay_chunks:                                      # self-play of the starting run (keeps policy/value/opening heads)
+    - runs/taraguchi_v1/selfplay/gen_001.jsonl.gz
+    - runs/taraguchi_v1/selfplay/gen_002.jsonl.gz
+    - runs/taraguchi_v1/selfplay/gen_003.jsonl.gz
+  tactical: data/stage_a_v1
+  tactical_holdout_pct: 2.0
+  augment: true
+batch:
+  reanalysis: 128
+  replay: 64
+  tactical: 64
+source_weight:      # each source contributes its own loss
+  re: 1.0
+  rp: 1.0
+  sa: 0.5
+loss:
+  policy: 1.0
+  value: 1.0
+  aux: 0.5
+  opening: 1.0
+  danger: 1.0
+  refute: 1.0
+optim:              # AdamW as in the RL loop (taraguchi_v1: lr 5e-4, wd 1e-4); smaller lr for a fine-tune
+  lr: 0.0002
+  weight_decay: 0.0001
+  betas: [0.9, 0.999]
+  grad_clip: 5.0
+  warmup_steps: 50
+  total_steps: 1500
+log_every: 50
+eval_every: 250

@@ -4,6 +4,10 @@
   masked to -inf before the softmax, and a target with mass on an illegal action is a data error.
 * Value: W/D/L cross entropy, only where a proven value exists (UNKNOWN is never a loss target).
 * Aux: binary cross entropy per point and plane.
+* Danger / refute (Phase 8 E4, solver-supervised reanalysis): weighted binary cross entropy only
+  where a label exists (weight 0 = no label, e.g. UNKNOWN). Proven labels carry weight 1; heuristic
+  negatives (search exhausted without a proof, not a safety proof) carry a smaller weight. An
+  UNKNOWN move or position is never a target.
 Non-finite losses raise immediately (no silent NaN).
 """
 
@@ -29,6 +33,8 @@ class LossWeights:
     value: float = 1.0
     aux: float = 0.5
     opening: float = 1.0  # swap / branch / propose / select heads (Phase 7)
+    danger: float = 0.0   # tactical danger head (Phase 8 E4)
+    refute: float = 0.0   # per-move tactical refutation head (Phase 8 E4)
 
 
 # Head ids of a training position (which head its policy target belongs to).
@@ -72,6 +78,15 @@ def aux_loss(aux_logits: torch.Tensor, aux_target: torch.Tensor) -> torch.Tensor
     return F.binary_cross_entropy_with_logits(aux_logits, aux_target.float())
 
 
+def weighted_bce(logits: torch.Tensor, target: torch.Tensor, weight: torch.Tensor) -> torch.Tensor:
+    """Mean BCE over entries with weight > 0 (weights scale entries; weight 0 = unlabelled)."""
+    wsum = weight.float().sum()
+    if float(wsum) <= 0:
+        return logits.new_zeros(())
+    ce = F.binary_cross_entropy_with_logits(logits, target.float(), reduction="none")
+    return (ce * weight.float()).sum() / wsum
+
+
 def total_loss(out: dict, batch: dict, w: LossWeights) -> tuple[torch.Tensor, dict]:
     """batch["policy"] holds point/pass targets [N, 226] for the policy, propose and select heads
     (selected by batch["head"]); batch["tgt2"] holds swap/branch targets [N, 2]. Batches without
@@ -89,9 +104,14 @@ def total_loss(out: dict, batch: dict, w: LossWeights) -> tuple[torch.Tensor, di
               + masked_policy_loss(out["select"], legal_pts, batch["policy"][:, :225], head == HEAD_SELECT)
               + masked_policy_loss(out["swap"], ones2, batch["tgt2"], head == HEAD_SWAP)
               + masked_policy_loss(out["branch"], ones2, batch["tgt2"], head == HEAD_BRANCH))
-    loss = w.policy * lp + w.value * lv + w.aux * la + w.opening * lo
+    ld = lr = la.new_zeros(())
+    if "danger_t" in batch and "danger" in out:
+        ld = weighted_bce(out["danger"], batch["danger_t"], batch["danger_w"])
+    if "refute_t" in batch and "refute" in out:
+        lr = weighted_bce(out["refute"], batch["refute_t"], batch["refute_w"])
+    loss = w.policy * lp + w.value * lv + w.aux * la + w.opening * lo + w.danger * ld + w.refute * lr
     parts = {"loss": loss.detach(), "policy": lp.detach(), "value": lv.detach(), "aux": la.detach(),
-             "opening": lo.detach()}
+             "opening": lo.detach(), "danger": ld.detach(), "refute": lr.detach()}
     for k, v in parts.items():
         if not torch.isfinite(v):
             raise NonFiniteLoss(f"non-finite {k} loss")

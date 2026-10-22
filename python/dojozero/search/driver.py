@@ -101,7 +101,8 @@ class NetEvaluator:
             out = self.model(x)
         self.evaluations += n
         self.batches += 1
-        return {k: out[k][:n].float().cpu().numpy() for k in ("policy", "wdl", "swap", "branch", "propose", "select")}
+        return {k: out[k][:n].float().cpu().numpy() for k in ("policy", "wdl", "swap", "branch", "propose", "select",
+                                                              "danger", "refute") if k in out}
 
 
 class UniformNumpyEvaluator:

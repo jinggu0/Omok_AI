@@ -98,8 +98,11 @@ def five_stone_candidates(n: int, seed: int, exclude: set[int] = frozenset()) ->
 
 
 def build_balanced(candidates: int, seed: int, engines: tuple[str, str], time_ms: int, concurrency: int,
-                   target: int, set_id: str, log=print) -> dict:
-    cand = five_stone_candidates(candidates, seed)
+                   target: int, set_id: str, log=print, exclude_sets: tuple[str, ...] = ()) -> dict:
+    exclude: set[int] = set()
+    for sid in exclude_sets:  # never reuse a start position of an existing set (fresh holdout)
+        exclude |= corpus_mod.load(sid).canonical_hashes()
+    cand = five_stone_candidates(candidates, seed, exclude)
     ops = [{"opening_id": f"cand-{k:04d}", "moves": m} for k, m in enumerate(cand)]
     cset = corpus_mod.OpeningSet("candidates", PROFILE, ops, "", "candidates")
     jobs = [{"a": engines[0], "b": engines[1], "opening": o, "set": cset, "a_first": af, "pair_id": k}
@@ -192,6 +195,7 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--time-ms", type=int, default=200)
     b.add_argument("--concurrency", type=int, default=3)
     b.add_argument("--set-id", default="renju_balanced_v1")
+    b.add_argument("--exclude-sets", nargs="*", default=[], help="opening sets whose start positions are excluded")
     r = sub.add_parser("round-robin")
     r.add_argument("--openings", required=True)
     r.add_argument("--pairs", type=int, default=4)
@@ -205,7 +209,7 @@ def main(argv: list[str] | None = None) -> int:
     log = lambda m: print(m, flush=True)  # noqa: E731
     if args.cmd == "balance":
         d = build_balanced(args.candidates, args.seed, tuple(args.engines), args.time_ms, args.concurrency,
-                           args.target, args.set_id, log)
+                           args.target, args.set_id, log, tuple(args.exclude_sets))
         out = corpus_mod.CORPUS_DIR / f"{args.set_id}.json"
         out.write_text(json.dumps(d, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         s = corpus_mod.load(out)
