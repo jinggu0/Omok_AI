@@ -1,0 +1,178 @@
+{
+ "mode": "visits",
+ "dojo": "dojo:runs/taraguchi_v1/models/gen_001.pt",
+ "openings": "renju_balanced_v1",
+ "hash": "1043ff68de3e04f1cc2db4f4b97aab8367177eb8283d37cfeb20c4837714470a",
+ "rows": [
+  {
+   "kind": "visits",
+   "opponent": "pela_2023",
+   "value": 64,
+   "match_id": "7029e2ba784840b9",
+   "pairs": 12,
+   "score": 0.08333333333333333,
+   "score_ci95": [
+    -0.026785977535662864,
+    0.35388592179859524
+   ],
+   "elo": -416.55707406329003,
+   "elo_ci95": [
+    -1599.9826273520769,
+    -104.57836720554552
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 125.76639649567934,
+   "dojo_search": {
+    "nn_evals": 49.4285576804588,
+    "nodes": 51.850299293463955,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 51.80206076728425
+   },
+   "opp_ms_per_move": 137.8354151589242
+  },
+  {
+   "kind": "visits",
+   "opponent": "pela_2023",
+   "value": 256,
+   "match_id": "c423373056834c6c",
+   "pairs": 12,
+   "score": 0.2916666666666667,
+   "score_ci95": [
+    0.10253053910909307,
+    0.5716486641564913
+   ],
+   "elo": -154.14035254560682,
+   "elo_ci95": [
+    -376.8665753620387,
+    50.131626936703924
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 290.1592824801086,
+   "dojo_search": {
+    "nn_evals": 173.69918836727751,
+    "nodes": 185.50566926060807,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 185.34258513075733
+   },
+   "opp_ms_per_move": 126.43199838709678
+  },
+  {
+   "kind": "visits",
+   "opponent": "pela_2023",
+   "value": 1024,
+   "match_id": "164e3a22e5f548d9",
+   "pairs": 12,
+   "score": 0.2916666666666667,
+   "score_ci95": [
+    0.1025305391090931,
+    0.5716486641564913
+   ],
+   "elo": -154.14035254560682,
+   "elo_ci95": [
+    -376.86657536203865,
+    50.131626936703924
+   ],
+   "failures": {
+    "B:FORBIDDEN_MOVE": 1
+   },
+   "dojo_ms_per_move": 28279.6278029325,
+   "dojo_search": {
+    "nn_evals": 727.7955985069802,
+    "nodes": 767.8666238227521,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 767.7342164153446
+   },
+   "opp_ms_per_move": 126.72469652509653
+  },
+  {
+   "kind": "visits",
+   "opponent": "yixin_2018",
+   "value": 64,
+   "match_id": "482dc1241e1d4b9f",
+   "pairs": 12,
+   "score": 0.0,
+   "score_ci95": [
+    0.0,
+    0.2425007574992425
+   ],
+   "elo": -1599.9826273520769,
+   "elo_ci95": [
+    -1599.9826273520769,
+    -197.86764133386907
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 116.77540955176536,
+   "dojo_search": {
+    "nn_evals": 46.29879106030422,
+    "nodes": 49.230924439230364,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 49.230924439230364
+   },
+   "opp_ms_per_move": 123.772038028169
+  },
+  {
+   "kind": "visits",
+   "opponent": "yixin_2018",
+   "value": 256,
+   "match_id": "eb284dc8def74be4",
+   "pairs": 12,
+   "score": 0.0,
+   "score_ci95": [
+    0.0,
+    0.2425007574992425
+   ],
+   "elo": -1599.9826273520769,
+   "elo_ci95": [
+    -1599.9826273520769,
+    -197.86764133386907
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 355.8172074935643,
+   "dojo_search": {
+    "nn_evals": 191.68507255522545,
+    "nodes": 210.46953259373927,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 210.46953259373927
+   },
+   "opp_ms_per_move": 158.4633259052925
+  },
+  {
+   "kind": "visits",
+   "opponent": "yixin_2018",
+   "value": 1024,
+   "match_id": "37eeba1b9c01469f",
+   "pairs": 12,
+   "score": 0.08333333333333333,
+   "score_ci95": [
+    -0.02678597753566289,
+    0.35388592179859524
+   ],
+   "elo": -416.55707406329003,
+   "elo_ci95": [
+    -1599.9826273520769,
+    -104.57836720554552
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 1131.8765077142396,
+   "dojo_search": {
+    "nn_evals": 694.4205985714992,
+    "nodes": 742.3721525125202,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 742.3355453696631
+   },
+   "opp_ms_per_move": 166.11675777202072
+  }
+ ]
+}

@@ -320,7 +320,7 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 ## 4. Python
 
 - `dojozero_core` (pybind11): GameState, Action, encode_features, symmetry, solver, record reader/writer.
-- `model/`: `ResNetPV`, `HybridAttnPV` (conv stem + residual + 축(axial)/전역 attention 블록). 헤드: policy(226), WDL(3), aux(마스크들, BCE), opening heads(swap 2, branch 2, direct-fifth = policy head 공유 + phase plane, propose 225, select 225-masked).
+- `model/`: `ResNetPV`, `HybridAttnPV` (conv stem + residual + 축(axial)/전역 attention 블록). 헤드: policy(226), WDL(3), aux(마스크들, BCE), opening heads(swap 2, branch 2, direct-fifth = policy head 공유 + phase plane, propose 225, select 225-masked). Phase 8 E4: 선택적 전술 head `danger`(전역 1, 둘 차례의 증명된 패배) · `refute`(225, 이 수 뒤 상대의 증명된 강제승) — `ModelConfig.tactical_heads`, 탐색은 사용하지 않음(ADR-11).
 - `trainer/`: 학습 루프, 체크포인트, ONNX export + manifest, NaN 감지(손실·그래디언트 non-finite 시 즉시 중단 + 직전 배치 덤프; silent NaN 금지).
 - `replay/`: SQLite 인덱스(게임 id, 모델 버전, profile hash, opening key, 결과, 길이, canonical hash 집합) + chunk 파일. 샘플링(FIFO window, 감쇠, prioritized 옵션), 중복 제거, reanalysis 큐.
 - `league/`: opponent pool, PFSP 가중치, 모델 레지스트리.
@@ -420,3 +420,4 @@ class OpeningEngine {                     // opening 결정 전용 래퍼 (같�
 | ADR-10 | 루트 방어 필터(탐색 후 솔버로 후보 검사) | Phase 8 E3a → **미채택**(A/B INCONCLUSIVE, −0.019 [−0.075, +0.038]); 옵션으로 유지, 기본 끔. 솔버 가속 후 재측정 | 쌍대 A/B 점수, 전술 benchmark |
 | ADR-08 | `pbrain-DojoZero.exe` 추론 호스트: C++ 추론(ONNX Runtime/OpenVINO, ADR-02에 종속) vs Python(PyTorch XPU) 프로세스를 감싸는 런처 | E3 (PRD OQ-15) | 프로토콜 응답 지연, 설치 용이성, fixed-time Elo |
 | ADR-09 | Strength DB 저장소: SQLite(WAL) 단일 파일 vs JSONL + 인덱스 | E1 → **잠정 SQLite** (요구사항 FR-24 예시, 표준 라이브러리만으로 접근) | 동시 쓰기 안전성, 조회 편의 |
+| ADR-11 | 전술 보조 head(`danger`, `refute`)와 솔버 라벨 재분석 | **후보(Phase 8 E4)**: 공유 trunk 위 별도 모듈(옛 체크포인트 부분 로드), 증명된 라벨만 강한 target(UNKNOWN 가중치 0), 소규모 fine-tune으로 held-out value 보정 크게 개선·외부 +0.042 [−0.017, +0.100] 미확증 → 학습 방향으로 채택, 기본 모델 교체·RL loop 통합은 미결(사용자 결정) | held-out 보정, 재생 블런더, fixed-visits, 외부 paired A/B |

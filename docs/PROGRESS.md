@@ -25,6 +25,115 @@ and what is still open. Newest phase first.
 
 ---
 
+## Phase 8 (E4) — Case B: solver-supervised tactical reanalysis (2026-10-22)
+
+질문: "솔버가 만든 전술 라벨로 네트워크를 학습시키면 policy/value의 전술 맹점과 흑 약점이 줄고, 추가 MCTS 계산을 실제 강도로 바꿀 수 있는가?" 런타임 증명·필터는 모든 측정에서 끔(네트워크 효과만).
+기준선: commit `af38437`, checkpoint `runs/taraguchi_v1/models/gen_001.pt` (model_sha `9ccd7fab…`, 파일 sha256 `3067e05e…`). 후보: `runs/e4_reanalysis_v1/checkpoints/step_1500.pt` (model_sha `52d1cbae…`, 파일 sha256 `8e75a6be…`).
+
+### Delivered
+| 영역 | 파일 |
+|---|---|
+| 학습 전용 opening 120개(seed 101, 기존 세트 제외, 균형 필터 없음 — 평가 사용 금지) | `benchmarks/openings/renju_train_reanalysis_v1.json` (`c630df93…`) |
+| 국면 수집(opening 그룹 split, D4 정규 해시 중복 제거·split 간 제거), 솔버 라벨링, 학습 opening 생성 | `python/dojozero/tools/reanalysis_data.py` |
+| 학습 배열(재생 기반 인코딩: last_move 평면 보존), target 생성, 데이터셋(D4는 배치에서) | `python/dojozero/trainer/reanalysis.py` |
+| 소규모 fine-tune(재분석 + 셀프플레이 리플레이 + Stage A 혼합, 최종 step = 후보, val/test로 선택하지 않음) | `python/dojozero/trainer/reanalysis_train.py`, `configs/training/e4_reanalysis.yaml` |
+| 전술 head 2개(`danger`: 둘 차례가 증명된 패배인가, `refute`: 이 수 뒤 상대 강제승이 증명되는가) — 공유 trunk 위 별도 모듈, `ModelConfig.tactical_heads` 기본 False, 옛 체크포인트 부분 로드(`load_partial`: head 외 키 불일치는 오류) | `python/dojozero/model/{net,load}.py` |
+| 가중 마스크 BCE(가중치 0 = 라벨 없음/UNKNOWN), LossWeights.danger/refute(기본 0 = 기존 학습 불변) | `python/dojozero/trainer/losses.py` |
+| 진단 도구(정책 커버리지·value 보정·탐색 실패 분류, 모델 상위 수 추가 라벨) | `python/dojozero/tools/reanalysis_eval.py` |
+| 균형 holdout 생성기에 기존 세트 제외 옵션 | `python/dojozero/evaluation/engine_games.py` (`--exclude-sets`) |
+| 새 외부 holdout 60개(seed 201, 기존 4세트 제외, Rapfi 2025 vs AlphaGomoku 2026 200 ms 색 교대 필터 — balanced_v1과 같은 방법) | `benchmarks/openings/renju_holdout_e4_v1.json` (`2b66a098…`) |
+| 테스트 9개 | `tests/python/test_reanalysis.py` |
+
+### 1. Corpus와 split
+- 기존 perf corpus(E3b): bench_problems 102 / after_blunder 247 / filter_workload 1,976 — filter_workload는 **policy top-8**로 만든 proxy(실제 필터는 search visit top-k): 같은 workload가 아님(README 기록).
+- 재분석 국면: Strength DB의 RENJU_GOMOCUP 대국 전체 위치, **외부 A/B opening(balanced 24–103) 대국 1,920판 제외**. 그룹 = (opening 세트, opening id) — 같은 opening의 대국은 초반 국면을 공유하므로 대국보다 엄격.
+  - test = balanced_v1 opening 0–11(247 블런더 대국 전부, 엔진 라운드로빈 포함) — 학습에 한 번도 쓰지 않음
+  - val = 나머지 그룹 중 CRC32 % 7 == 0, train = 나머지
+  - 학습 데이터 확충: 학습 전용 opening 120 × 색 교대 × {Pela 2023, Yixin 2018, KataGomo 2021r} = 720판(기준 모델, 500 ms, 실패 0; DojoZero 점수 0.271 / 0.100 / 0.163)
+- 수집 49,206국면(중복 13,662 제거, split 간 중복 4 제거), 그룹 train 143 / val 33 / test 12. 라벨 대상 29,281: train 20,832(흑 10,398 / 백 10,434), val 4,256, test 4,193(DojoZero 차례만: 흑 2,407 / 백 1,786). 해시: positions `f4882795…`, labels `c2d9f31d…`, arrays `676fdc48…` (`benchmarks/reanalysis/manifest_reanalysis_v1.json`).
+
+### 2. 솔버 라벨 (VCF 50k / VCT 30k / loss 30k 노드, 시계 없음 = 결정적)
+| 수 단위 | 의미 | 개수 |
+|---|---|---|
+| PROVEN_UNSAFE | 이 수 뒤 상대 강제승 증명(정확) | 171,634 |
+| PROVEN_WINNING | 오목 또는 상대가 즉승을 못 막음(정확) | 7,200 |
+| UNREFUTED_EXHAUSTED | 위협 공간 탐색이 예산 안에서 끝났지만 증명 없음 — **안전 증명 아님**, 약한 음성(가중치 0.3) | 80,588 |
+| UNKNOWN_BUDGET | 예산 소진 — 학습 target 없음 | 44,298 |
+후보 수: train = 기준 policy top-8 + 실제 둔 수, val/test = top-16 + 둔 수; 평가 때 모델의 top-8과 탐색이 고른 수 중 라벨 없는 것은 같은 예산으로 추가 라벨(기준 169, 후보 1,063). 국면: 증명된 승 7,105 / 패 7,403 / UNKNOWN 14,773. 라벨링 2.7시간(7스레드).
+
+### 3. 기준 네트워크 진단 (test 4,193, 탐색 256 sims PUCT, 증명·필터 끔)
+| 지표 | 전체 | 흑 | 백 |
+|---|---|---|---|
+| policy 1순위가 PROVEN_UNSAFE | 48.7% | 47.3% | 50.6% |
+| non-refuted 수의 top-1 / top-4 / top-8 커버리지 | 78.7 / 94.3 / 98.1% | 81.4 / 95.9 / 98.5% | 73.5 / 91.1 / 97.4% |
+| 증명된 패배 국면 value 평균 | **+0.112** | +0.145 | +0.070 |
+| 증명된 패배인데 value ≥ 0 | **58.4%** | 64.0% | 51.4% |
+| 증명 국면 Brier / ECE(5) | 0.330 / 0.462 | 0.344 / 0.482 | 0.312 / 0.438 |
+| 탐색 선택이 PROVEN_UNSAFE | 46.6% | 45.5% | 48.2% |
+탐색이 PROVEN_UNSAFE를 고른 1,956건 분류(사전 등록 규칙, 도구 docstring): 국면 자체가 증명된 패배 1,698(87%), 라벨된 top-16 전부 반박(국면 UNKNOWN) 84, 대안이 UNKNOWN뿐 138, **피할 수 있었던 36건 = VALUE 21 (58%) / SEARCH 11 (31%) / POLICY 4 (11%)**. → policy 후보 범위는 병목이 아니고(top-8 98%), 가장 큰 측정 가능한 결함은 **value 낙관**(흑에서 더 큼). 대부분의 위반 선택은 이미 진 국면 — 결정적 실수는 그 전에, 이 라벨 예산(VCT 3만)으로는 증명되지 않는 더 긴 수읽기에서 일어났다(E3c: 실제 진 수 증명에 중앙값 3.2만 노드).
+
+### 4. 학습 (target, loss, config)
+- target: value ±1 = 증명된 승/패 국면만; danger 1 = 증명된 패배, 0 = 증명된 승(가중치 1), 0 = UNKNOWN이지만 UNREFUTED 후보가 있음(가중치 0.3); refute 1 = PROVEN_UNSAFE, 0 = PROVEN_WINNING(1) / UNREFUTED(0.3), UNKNOWN 0 가중치; policy = 증명된 승리 국면은 승리 수, 그 외 PROVEN_UNSAFE가 있으면 기준 policy에서 그 수만 0으로 만들고 재정규화(라벨 없는 수의 질량은 그대로), 증명된 패배는 policy target 없음.
+- 클래스 불균형: 라벨된 수 중 PROVEN_UNSAFE 57% / 음성 30%, danger 양성 7,403 / 라벨 24,324 — 극단적 희소가 아니어서 focal/class weight 없이 가중 BCE(경험적 음성만 0.3).
+- loss = policy + value + 0.5·aux + opening + danger + refute (재분석 배치), 리플레이·Stage A 배치는 기존 손실(danger/refute 0), source 가중치 1 / 1 / 0.5.
+- config: seed 11, AdamW(lr 2e-4, wd 1e-4, betas 0.9/0.999, foreach=False on XPU), warmup 50, cosine, 1,500 step, 배치 재분석 128 + 리플레이 64 + Stage A 64, grad clip 5, bf16 autocast, D4 증강(split 이후 배치 단위). 데이터: 재분석 train만, 리플레이 taraguchi_v1 gen_001–003(`7a49717a…`, `0ebf61e3…`, `2fd4dffd…`), Stage A `data/stage_a_v1`(manifest `abe3e9cf…`, 벤치마크 국면 제외 split). 5분(XPU).
+- val 손실 step 0 → 1500: value 0.604 → 0.259, danger 0.753 → 0.331, refute 1.031 → 0.352, policy 2.239 → 1.996 (1,250에서 최소, 1,500 약간 상승; train value 0.162 — 격차 있으나 붕괴 없음). 리플레이 손실은 원래 학습 수준 유지(policy 1.99, value 0.56).
+
+### 5. held-out 결과 (test, 기준 → 후보)
+| 지표 | 전체 | 흑 | 백 |
+|---|---|---|---|
+| 증명된 패배 value 평균 | +0.112 → **−0.662** | +0.145 → −0.647 | +0.070 → −0.681 |
+| 증명된 패배인데 value ≥ 0 | 58.4% → **9.2%** | 64.0% → 9.6% | 51.4% → 8.6% |
+| 증명된 승리 value 평균 | 0.804 → 0.708 | 0.805 → 0.776 | 0.803 → 0.635 |
+| Brier / ECE(5) | 0.330 / 0.462 → **0.069 / 0.124** | 0.344 / 0.482 → 0.069 / 0.138 | 0.312 / 0.438 → 0.070 / 0.107 |
+| policy 1순위 PROVEN_UNSAFE | 48.7% → 48.7% | 47.3 → 47.4% | 50.6 → 50.5% |
+| non-refuted top-8 커버리지 | 98.1 → 97.7% | 98.5 → 98.0% | 97.4 → 97.0% |
+| best non-refuted 평균 순위 | 1.62 → 1.72 | 1.49 → 1.61 | 1.88 → 1.95 |
+| 증명된 승리 수 top-1 | 53.5 → 52.1% | 54.7 → 52.7% | 52.2 → 51.5% |
+| 탐색 선택 PROVEN_UNSAFE | 46.6 → 45.9% | 45.5 → 44.7% | 48.2 → 47.6% |
+| 피할 수 있었던 실패 VALUE/SEARCH/POLICY | 21/11/4 → 12/4/5 | 15/9/3 → 10/3/4 | 6/2/1 → 2/1/1 |
+| danger head AUROC(정확 라벨) / precision / recall @0.5 | — → 0.953 / 0.979 / 0.765 | 0.979 | 0.929 |
+refute head(라벨된 56,907수): AUROC 0.837, precision 0.806, recall 0.998 @0.5. **value와 전술 head는 크게 개선, policy 순위·탐색 선택은 거의 그대로**(라벨된 test 국면 대부분이 이미 진 국면이라 선택 개선이 드러날 여지도 작음).
+
+### 6. 재생 (500 ms, PUCT, 증명·필터 끔; 노드 심판 VCF 200k / VCT 100k; UNKNOWN은 진 수로 세지 않음)
+| 국면 | 기준 | 후보 | 국면 단위 |
+|---|---|---|---|
+| 247 블런더 | 236 (흑 133 / 백 103), 심판 UNKNOWN 11 | **219** (120 / 99), UNKNOWN 28 | 제거 18 / 신규 1 |
+| 처음 진 결정 247 | 222 (흑 123 / 백 99), UNKNOWN 25 | **180** (95 / 85), UNKNOWN 67 | 제거 51 / 신규 9 |
+"제거"의 일부는 심판 UNKNOWN 증가(안전 증명 아님). 비교: 런타임 증명 3스레드(E3e) 처음 진 결정 221 → 170 — 네트워크만으로 비슷한 크기(런타임 비용 없음).
+
+### 7. fixed-visits (opening 0–11, 12쌍 = 24판/조건, 상대 500 ms; 이 opening의 대국은 test split)
+| 상대 | 모델 | 64 | 256 | 1024 sims |
+|---|---|---|---|---|
+| Pela 2023 | 기준 | 0.083 | 0.292 | 0.292 (흑 0.083 / 백 0.500) |
+| Pela 2023 | **후보** | 0.250 | 0.417 | **0.583** [0.320, 0.807] (흑 0.417 / 백 0.750) |
+| Yixin 2018 | 기준 | 0.000 | 0.000 | 0.083 |
+| Yixin 2018 | 후보 | 0.000 | 0.000 | 0.125 |
+기준은 E2c와 같이 256 ≈ 1024 정체, 후보는 Pela 상대 64 < 256 < 1024(표본 작음, 구간 넓음). Yixin 상대는 거의 0 그대로. 기록: 기준 실행 중 노트북 절전 공백 3.8시간(12:31–16:21) — sims 고정 실험이라 결과 영향 없음, 실패 0.
+
+### 8. 외부 paired A/B (사전 등록; 새 holdout `renju_holdout_e4_v1` 60쌍/상대, 500 ms, 증명·필터 끔, 색 교대, arm 교대)
+| 상대 | 기준 | 후보 | 쌍대 차이 [95%] | ΔElo (로컬, 점추정) |
+|---|---|---|---|---|
+| Pela 2023 | 0.242 (흑 0.133 / 백 0.350) | 0.300 (0.167 / 0.433) | +0.058 [−0.051, +0.168] | +51 |
+| Yixin 2018 | 0.042 (0.050 / 0.033) | 0.067 (0.083 / 0.050) | +0.025 [−0.018, +0.068] | +86 (점수 0 근처, 매우 불확실) |
+| **합산 120쌍** | 0.142 | 0.183 | **+0.042 [−0.017, +0.100] → INCONCLUSIVE** | +53 |
+쌍 차이: 0 ×80, +0.5 ×23, −0.5 ×13, +1 ×2, −1 ×2. 실패 0, DojoZero 금수패 0(Pela 금수패 기준 쪽 2). 수당 시간 394–409 ms(같은 런타임 설정), sims/수 206·185 → 186·173, 신경망 평가 190·167 → 171·152. 측정 중 다른 프로세스 평균 ~2.5코어(`benchmarks/reanalysis/background_load_e4_ab.csv`), 절전 공백 없음.
+
+### 판정
+**ACCEPT for training direction, external strength still INCONCLUSIVE** (명세 §17).
+- 개선(일관): held-out value 보정(증명된 패배 value +0.11 → −0.66, ECE 0.46 → 0.12), 전술 head 학습(danger AUROC 0.95), 재생 블런더 감소(처음 진 결정 222 → 180, 흑 123 → 95), fixed-visits 정체 해소(Pela 256 → 1024: 0.292 → 0.292 대 0.417 → 0.583), 외부 점추정 +0.042(두 상대 모두 +), 실패·금수패 0.
+- 미확증·부정 신호: 외부 CI가 0 포함, policy 순위·탐색 선택 지표는 거의 불변(약간 악화: best non-refuted 순위 1.62 → 1.72, 증명된 승리 value 0.80 → 0.71), fixed-visits·재생 표본 작음, 재생 감소 일부는 심판 UNKNOWN.
+- 기본 모델은 바꾸지 않는다(registry best 유지). 후보는 실험 체크포인트.
+
+### 다음 단계 (명세 §18 분기)
+- **Case B (value failure가 주원인, 보정 개선, Elo 점추정 +)** 해당 → 전술 value 보조(증명된 value target + danger/refute head)를 정식 학습 파이프라인(RL loop의 데이터 혼합)에 통합하는 설계, 그 뒤 self-play 재개 — **대규모 self-play 재개는 사용자 결정 필요**.
+- 함께: (1) 같은 방식으로 라벨 예산을 늘린 더 큰 재분석(긴 수읽기 실수는 VCT 3만으로 증명되지 않음), (2) 확인용 두 번째 holdout 또는 더 많은 쌍으로 외부 검정력 확보, (3) Case D(흑): 흑 개선이 컸으나 여전히 약함 — 금수 미래 위험 라벨은 아직 추가하지 않음.
+
+### 재현성
+기준 commit `af38437`; 후보 학습 commit = 이 커밋; 하드웨어 Intel Core Ultra 7 258V(4P+4LPE), Arc 140V(XPU), 32 GB, Windows 11 10.0.26200, 전원 연결; torch 2.14.1+xpu; MSVC 19.43; 솔버 VCF 50k / VCT 30k / loss 30k(라벨), 심판 VCF 200k / VCT 100k; split = opening 그룹 고정 규칙(seed 없음, `split_for`); 학습 seed 11; 외부 엔진 해시 E3b와 동일(Pela `b97df7a3…`, Yixin `f6d1a01b…`), 학습 대국 KataGomo 2021r(`external_engines/katagomo_2021r.json`); holdout `2b66a098…`, 학습 opening `c630df93…`. 결과 `benchmarks/reanalysis/`.
+
+---
+
 ## Phase 8 (E3f) — Holdout confirmation of light proof-aware MCTS (2026-10-22)
 
 E3e의 ACCEPT(+0.0875, opening 24–63 — 같은 세트로 한 세 번째 A/B)를 **한 번도 쓰지 않은 opening 64–103**(DB 확인: 어떤 대국에서도 쓰인 적 없음)으로 확인. 조건·판정 규칙은 E3e와 동일하게 사전 확정: A = 증명 끔, B = 증명 3스레드·깊이 1, 500 ms/수, Pela 2023·Yixin 2018 각 40쌍, 색 교대, arm 교대; 확인은 보류 세트 단독으로 판정. 환경: 전원 연결, GUI·pbrain 없음, 다른 프로세스 평균 ~2코어(OneDrive 등, `benchmarks/perf/results/background_load_e3f.csv`).

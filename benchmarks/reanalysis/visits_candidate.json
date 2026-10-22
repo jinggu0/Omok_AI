@@ -1,0 +1,178 @@
+{
+ "mode": "visits",
+ "dojo": "dojo:runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+ "openings": "renju_balanced_v1",
+ "hash": "1043ff68de3e04f1cc2db4f4b97aab8367177eb8283d37cfeb20c4837714470a",
+ "rows": [
+  {
+   "kind": "visits",
+   "opponent": "pela_2023",
+   "value": 64,
+   "match_id": "47ed9d5b2ef44e1b",
+   "pairs": 12,
+   "score": 0.25,
+   "score_ci95": [
+    0.08894003962896138,
+    0.53231033912066
+   ],
+   "elo": -190.84850188786498,
+   "elo_ci95": [
+    -404.17985675510187,
+    22.482852979372026
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 149.31133918348064,
+   "dojo_search": {
+    "nn_evals": 48.492844903954996,
+    "nodes": 52.00452559066108,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 51.91994956726927
+   },
+   "opp_ms_per_move": 116.02506140350874
+  },
+  {
+   "kind": "visits",
+   "opponent": "pela_2023",
+   "value": 256,
+   "match_id": "225735d8634042fd",
+   "pairs": 12,
+   "score": 0.4166666666666667,
+   "score_ci95": [
+    0.19325746190524656,
+    0.6804926643446272
+   ],
+   "elo": -58.45121427129521,
+   "elo_ci95": [
+    -248.23947422743672,
+    131.33704568484632
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 381.8767075936746,
+   "dojo_search": {
+    "nn_evals": 168.8624793720737,
+    "nodes": 183.1497778587965,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 182.95961339363203
+   },
+   "opp_ms_per_move": 130.84594231738038
+  },
+  {
+   "kind": "visits",
+   "opponent": "pela_2023",
+   "value": 1024,
+   "match_id": "8bfe528bd2db45b1",
+   "pairs": 12,
+   "score": 0.5833333333333334,
+   "score_ci95": [
+    0.3195073356553728,
+    0.8067425380947535
+   ],
+   "elo": 58.451214271295235,
+   "elo_ci95": [
+    -131.3370456848463,
+    248.2394742274368
+   ],
+   "failures": {
+    "B:FORBIDDEN_MOVE": 1
+   },
+   "dojo_ms_per_move": 1320.9734927920329,
+   "dojo_search": {
+    "nn_evals": 622.0466855785662,
+    "nodes": 662.9986541600935,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 662.7194284013857
+   },
+   "opp_ms_per_move": 151.21216586433263
+  },
+  {
+   "kind": "visits",
+   "opponent": "yixin_2018",
+   "value": 64,
+   "match_id": "d911fe54089e4227",
+   "pairs": 12,
+   "score": 0.0,
+   "score_ci95": [
+    0.0,
+    0.2425007574992425
+   ],
+   "elo": -1599.9826273520769,
+   "elo_ci95": [
+    -1599.9826273520769,
+    -197.86764133386907
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 145.5438309415015,
+   "dojo_search": {
+    "nn_evals": 47.2307393994894,
+    "nodes": 51.16096250563162,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 51.16096250563162
+   },
+   "opp_ms_per_move": 143.27973862815884
+  },
+  {
+   "kind": "visits",
+   "opponent": "yixin_2018",
+   "value": 256,
+   "match_id": "3dd638561f474848",
+   "pairs": 12,
+   "score": 0.0,
+   "score_ci95": [
+    0.0,
+    0.2425007574992425
+   ],
+   "elo": -1599.9826273520769,
+   "elo_ci95": [
+    -1599.9826273520769,
+    -197.86764133386907
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 472.72740964337055,
+   "dojo_search": {
+    "nn_evals": 191.73947506043578,
+    "nodes": 219.78461606655299,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 219.78461606655299
+   },
+   "opp_ms_per_move": 159.61018150684936
+  },
+  {
+   "kind": "visits",
+   "opponent": "yixin_2018",
+   "value": 1024,
+   "match_id": "2ed0352166604ef5",
+   "pairs": 12,
+   "score": 0.125,
+   "score_ci95": [
+    -0.0029470771274379415,
+    0.40246714079092466
+   ],
+   "elo": -338.0392160057027,
+   "elo_ci95": [
+    -1599.9826273520769,
+    -68.65254574062727
+   ],
+   "failures": {},
+   "dojo_ms_per_move": 1462.8108466672006,
+   "dojo_search": {
+    "nn_evals": 683.8288579476078,
+    "nodes": 770.0141947173197,
+    "proof_found": 0.0,
+    "proof_jobs": 0.0,
+    "proof_nodes": 0.0,
+    "sims": 769.9630042411292
+   },
+   "opp_ms_per_move": 165.8359713864307
+  }
+ ]
+}

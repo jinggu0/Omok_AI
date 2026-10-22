@@ -116,6 +116,7 @@ Status: **Draft v0.1** · 2026-10-18
 | E-09 | 저장소 | 빈 git 저장소 (`main`, 커밋 없음) | 기존 코드 제약 없음 |
 | E-10 | 평가 하드웨어 | 외부 엔진 평가도 같은 노트북(E-01..E-08)에서 수행한다고 가정. 학습·self-play와 동시 실행 시 CPU/GPU 경합으로 시간 통제 대국 결과가 달라짐 | Tier B/C 외부 대국은 다른 무거운 작업과 동시에 실행하지 않음, match에 hardware_id·동시 작업 기록 (PRD OQ-12). **유휴 절전**: 세션이 백그라운드 대기 중이면 앱의 keep-awake가 풀려 노트북이 절전에 들어감(라운드로빈 v1 무효화) → 평가 진입점이 프로세스 단위 절전 방지 요청을 유지(덮개 닫힘은 막지 못함) |
 | E-11 | Windows 전원 스로틀링(EcoQoS) | 창 없는 백그라운드 프로세스(에이전트 셸에서 띄운 벤치마크·평가)는 Windows가 저속 코어/저클럭에 둘 수 있음. 실측(2026-10-20, 배터리): 같은 ee1d011 솔버가 3.2k vs 24.8k nodes/s(1스레드), 몇 분 단위로 최대 5배 변동 | Phase 8 E3b부터 벤치마크 도구(`dojozero_tbench/tprof`), 평가 진입점(`keep_awake` → `disable_power_throttling`), C++ 엔진 실행기(외부 엔진 자식 프로세스)가 **프로세스 단위로** 스로틀링을 끔(시스템 설정은 바꾸지 않음). 그 이전의 시간 통제 평가(E1–E3a)가 스로틀링 아래 실행됐는지는 **UNKNOWN** — 같은 실행 안의 arm 비교는 영향을 같이 받았지만 절대 수치(sims/수, nodes/s)는 과소일 수 있음 |
+| E-12 | 솔버 라벨의 의미 | VCF/VCT는 위협 공간만 탐색하므로 "증명 없음"은 안전 증명이 아니다. 재분석 라벨: PROVEN_UNSAFE/PROVEN_WINNING만 정확, UNREFUTED_EXHAUSTED(예산 안에서 탐색 종료)는 경험적 음성(가중치 0.3), UNKNOWN_BUDGET은 라벨 없음. 라벨 예산(VCT 3만)으로는 긴 수읽기 패배(E3c 중앙값 3.2만 노드)가 증명되지 않아 "이미 진 국면"의 원인 수는 대부분 UNREFUTED/UNKNOWN으로 남는다 | Phase 8 E4 데이터·평가 해석 |
 
 ### 3.1 자원 가정에서 나오는 핵심 리스크 (PRD Risks R-01)
 AlphaZero 계열의 "최상급" 기력은 통상 수백~수천 GPU-일 규모 self-play를 필요로 한다. 노트북 내장 GPU 한 대로는
@@ -144,3 +145,4 @@ AlphaZero 계열의 "최상급" 기력은 통상 수백~수천 GPU-일 규모 se
 | 2026-10-18 | A-R3, A-R4, A-T3 | Phase 2 열거 결과로 갱신 (docs/PROGRESS.md) |
 | 2026-10-19 | A-P1..A-P3, E-10, D-05 | 외부 Strength Evaluation System(PRD v0.2) 가정 추가 |
 | 2026-10-20 | E-11 | Windows 전원 스로틀링(EcoQoS) 발견, 프로세스 단위 해제 (Phase 8 E3b) |
+| 2026-10-22 | E-12 | 솔버 라벨 의미(UNKNOWN ≠ 안전/패배) 명시 (Phase 8 E4) |

@@ -252,6 +252,14 @@ lo ≤ score ≤ hi                   → primary calibration opponent
 - balance는 순환 판정을 피하려고 복수 엔진(가능하면 외부 엔진 포함)과 고-budget 분석의 합의로 기록하고 불확실성을 함께 저장(출처는 OQ-14).
 - **누출 검사**: corpus 시작 국면의 canonical hash가 학습 데이터·self-play 시작점에 있으면 실패(PRD §15). self-play opening 생성기는 corpus 해시 집합을 제외 목록으로 받는다.
 
+### 15.3 실제 corpus 목록과 용도 (Phase 8 E4 갱신)
+| set | 개수 | 방법 | 용도 |
+|---|---|---|---|
+| `renju_balanced_v1` (`1043ff68…`) | 120 | seed 5, 5돌 백 차례, Rapfi 2025 vs AlphaGomoku 2026 200 ms 색 교대 필터 | 0–11 진단(E2c, 이제 재분석 test), 12–23·104–119 사다리 프로브, **24–103 외부 A/B(E3a–E3f) — 학습 사용 금지** |
+| `renju_train_reanalysis_v1` (`c630df93…`) | 120 | seed 101, 기존 세트 제외, 균형 필터 없음 | **학습 데이터 생성 전용**, 평가 사용 금지 |
+| `renju_holdout_e4_v1` (`2b66a098…`) | 60 | seed 201, 기존 4세트 제외, balanced_v1과 같은 필터 | 최종 외부 검증 전용(E4 A/B에서 1회 사용), 학습 사용 금지 |
+새 holdout은 seed ≥ 201, 생성 시 `--exclude-sets`로 모든 기존 세트를 제외한다.
+
 ## 16. Rating 이름 규칙 (혼용 금지)
 | 이름 | 뜻 | 출처 |
 |---|---|---|
