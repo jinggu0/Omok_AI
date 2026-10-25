@@ -51,7 +51,7 @@ from ..trainer.data import TacticalDataset
 from ..trainer.losses import LossWeights, total_loss
 from ..trainer.train import REPO, environment, git, pick_device
 
-KEYS = ("x", "legal", "policy", "has_policy", "value", "has_value", "aux", "head", "tgt2",
+KEYS = ("x", "legal", "policy", "has_policy", "value", "has_value", "value_w", "aux", "head", "tgt2",
         "danger_t", "danger_w", "refute_t", "refute_w")
 
 
@@ -60,11 +60,50 @@ def _complete(b: dict, device) -> dict:
     n = b["x"].shape[0]
     b.setdefault("head", torch.zeros(n, dtype=torch.int64, device=device))  # HEAD_POLICY
     b.setdefault("tgt2", torch.zeros(n, 2, dtype=torch.float32, device=device))
+    b.setdefault("value_w", torch.ones(n, dtype=torch.float32, device=device))
     b.setdefault("danger_t", torch.zeros(n, dtype=torch.float32, device=device))
     b.setdefault("danger_w", torch.zeros(n, dtype=torch.float32, device=device))
     b.setdefault("refute_t", torch.zeros(n, 225, dtype=torch.float32, device=device))
     b.setdefault("refute_w", torch.zeros(n, 225, dtype=torch.float32, device=device))
     return b
+
+
+def train_generation(learner, opt, replay, o: dict, seed: int, step: int, weights, amp: bool, device,
+                     tactical=None, reana=None) -> tuple[int, dict]:
+    """One generation of learner updates on replay (+ Stage A tactical mix, + E4 reanalysis buffer).
+    tactical = (dataset, pool, mix share); reana = (data, pool, rows per batch). Returns (step, metrics)."""
+    learner.train()
+    bs = o["batch_size"]
+    n_tac = int(round(bs * tactical[2])) if tactical is not None else 0
+    n_re = reana[2] if reana is not None else 0
+    agg: dict[str, list[float]] = {}
+    for _ in range(o["steps_per_generation"]):
+        parts_b = [_complete(replay.sample(bs - n_tac - n_re, seed, step, device), device)]
+        if n_tac:
+            rng = np.random.default_rng([seed, step, 11])
+            ds, pool = tactical[0], tactical[1]
+            parts_b.append(_complete(ds.batch(pool[rng.integers(0, len(pool), n_tac)], rng.integers(0, 8, n_tac), device), device))
+        if n_re:
+            rng = np.random.default_rng([seed, step, 13])
+            ds, pool = reana[0], reana[1]
+            parts_b.append(_complete(ds.batch(pool[rng.integers(0, len(pool), n_re)], rng.integers(0, 8, n_re), device), device))
+        b = parts_b[0] if len(parts_b) == 1 else {key: torch.cat([pb[key] for pb in parts_b]) for key in KEYS}
+        ctx = torch.autocast(device_type="xpu", dtype=torch.bfloat16) if amp else torch.autocast("cpu", enabled=False)
+        with ctx:
+            out = learner(b["x"])
+        out = {kk: v.float() for kk, v in out.items()}
+        loss, parts = total_loss(out, b, weights)
+        opt.zero_grad(set_to_none=True)
+        loss.backward()
+        gn = torch.nn.utils.clip_grad_norm_(learner.parameters(), o["grad_clip"],
+                                            foreach=False if device.type == "xpu" else None)
+        if not torch.isfinite(gn):
+            raise RuntimeError(f"non-finite gradient at step {step}")
+        opt.step()
+        step += 1
+        for kk, v in parts.items():
+            agg.setdefault(kk, []).append(float(v))
+    return step, {kk: float(np.mean(v)) for kk, v in agg.items()}
 
 
 def rel(p: Path) -> str:
@@ -292,6 +331,9 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
                 replay.attach_labels(rec["generation"], lp, bool(tac.get("override_value", True)))
     reana = None
     n_re = 0
+    vw = o.get("value_weighting") or {}
+    replay.value_weighting = {"balance": bool(vw.get("balance", False)), "proof": float(vw.get("proof", 1.0)),
+                              "clip": tuple(vw.get("clip", (0.5, 2.0)))}
     if tac_on and tac.get("reanalysis"):
         from ..trainer.reanalysis import ReanalysisData
         reana = ReanalysisData(REPO / tac["reanalysis"])
@@ -357,37 +399,11 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
         log(f"  opening: {ostats}; db {opening_db.summary()}; proposal regret {regret}")
         # 2. train the learner
         t0 = time.time()
-        learner.train()
-        bs = o["batch_size"]
-        n_tac = int(round(bs * mix)) if tactical is not None else 0
-        agg: dict[str, list[float]] = {}
-        for k in range(o["steps_per_generation"]):
-            parts_b = [_complete(replay.sample(bs - n_tac - n_re, cfg["seed"], step, device), device)]
-            if n_tac:
-                rng = np.random.default_rng([cfg["seed"], step, 11])
-                parts_b.append(_complete(tactical.batch(tactical_pool[rng.integers(0, len(tactical_pool), n_tac)],
-                                                        rng.integers(0, 8, n_tac), device), device))
-            if n_re:
-                rng = np.random.default_rng([cfg["seed"], step, 13])
-                parts_b.append(_complete(reana.batch(reana_pool[rng.integers(0, len(reana_pool), n_re)],
-                                                     rng.integers(0, 8, n_re), device), device))
-            b = parts_b[0] if len(parts_b) == 1 else {key: torch.cat([pb[key] for pb in parts_b]) for key in KEYS}
-            ctx = torch.autocast(device_type="xpu", dtype=torch.bfloat16) if amp else torch.autocast("cpu", enabled=False)
-            with ctx:
-                out = learner(b["x"])
-            out = {kk: v.float() for kk, v in out.items()}
-            loss, parts = total_loss(out, b, weights)
-            opt.zero_grad(set_to_none=True)
-            loss.backward()
-            gn = torch.nn.utils.clip_grad_norm_(learner.parameters(), o["grad_clip"],
-                                                foreach=False if device.type == "xpu" else None)
-            if not torch.isfinite(gn):
-                raise RuntimeError(f"non-finite gradient at step {step}")
-            opt.step()
-            step += 1
-            for kk, v in parts.items():
-                agg.setdefault(kk, []).append(float(v))
-        train_metrics = {kk: float(np.mean(v)) for kk, v in agg.items()}
+        if replay.value_weighting["balance"] or replay.value_weighting["proof"] != 1.0:
+            log(f"  value weights: {replay.value_cells()}")
+        step, train_metrics = train_generation(learner, opt, replay, o, cfg["seed"], step, weights, amp, device,
+                                               tactical=(tactical, tactical_pool, mix) if tactical is not None else None,
+                                               reana=(reana, reana_pool, n_re) if n_re else None)
         cand_rel = Path(cfg["run_dir"]) / cfg["run_name"] / "models" / f"gen_{gen:03d}.pt"
         save_model(REPO / cand_rel, learner, opt, spec, mcfg, cfg, step, env_small, train_metrics)
         cand_sha = model_sha(learner)

@@ -123,7 +123,8 @@ def test_two_generation_loop_with_labels_and_gate(tiny_tactical, small_solver, m
            "replay": {"window": 2, "capacity": 10000},
            "train": {"steps_per_generation": 3, "batch_size": 16, "lr": 0.001, "weight_decay": 0.0001,
                      "betas": [0.9, 0.999], "grad_clip": 5.0, "tactical_mix": 0.25, "tactical_data": str(data),
-                     "loss": {"policy": 1.0, "value": 1.0, "aux": 0.5, "danger": 1.0, "refute": 1.0}},
+                     "loss": {"policy": 1.0, "value": 1.0, "aux": 0.5, "danger": 1.0, "refute": 1.0},
+                     **({"value_weighting": {"balance": True}} if mode == "balanced" else {})},
            "eval": {"sims": 4, "pairs_per_round": 2, "min_pairs": 2, "max_pairs": 2, "elo0": 0, "elo1": 30,
                     "alpha": 0.05, "beta": 0.05, "anchor_pairs": 1},
            "tactical_aux": {"enabled": True, "label_fraction": 1.0, "top_k": 4, "threads": 2, "override_value": True},
@@ -173,3 +174,39 @@ def test_balanced_gate_set_is_stratified(tmp_path):
         for r in (1, -1):
             assert ((g["side"] == c) & (g["pos_result"] == r)).sum() == m["per_cell"]
     assert m == tactical.build_balanced_gate_set(arr, tmp_path / "g2.npz", split="val", seed=1) | {"sha256": m["sha256"]}
+
+
+def test_value_cell_weights_and_weighted_loss(tmp_path, small_solver):
+    import torch
+    from dojozero.trainer.losses import value_loss
+    spec = FeatureSpec()
+    s = SelfPlaySettings(games=4, sims_full=6, sims_fast=3, p_full=0.5, gumbel_m=4, root_tactics_nodes=50,
+                         max_inflight=2, profile="OMOKDOJANG_DAN")
+    chunk = tmp_path / "gen_001.jsonl.gz"
+    write_chunk(chunk, play_games(UniformNumpyEvaluator(), spec.core(), s, seed=3))
+    rb = ReplayBuffer(spec, window=2)
+    rb.ingest(chunk, 1)
+    assert (rb._concat()["value_w"] == 1).all()  # default: unweighted (E5 behaviour)
+    rb.value_weighting = {"balance": True, "proof": 1.0, "clip": (0.0, 100.0)}
+    d = rb._concat()
+    cells = [(d["black"] == c) & (d["value"] == r) for c in (True, False) for r in (1, -1)]
+    totals = [d["value_w"][m].sum() for m in cells if m.any()]
+    assert len(totals) >= 2 and np.allclose(totals, totals[0], rtol=1e-4)  # equal total weight per cell
+    assert np.isclose(d["value_w"][d["value"] != 0].mean(), 1.0, atol=1e-4) or len(totals) < 4
+    rb.value_weighting = {"balance": True, "proof": 1.0, "clip": (0.9, 1.1)}
+    w = rb._concat()["value_w"]
+    assert w.min() >= 0.9 - 1e-6 and w.max() <= 1.1 + 1e-6
+    path = tactical.label_chunk(chunk, 1, fraction=1.0, seed=3, top_k=4, threads=2)
+    rb.attach_labels(1, path, override_value=True)
+    rb.value_weighting = {"balance": False, "proof": 3.0, "clip": (0.5, 2.0)}
+    d = rb._concat()
+    assert d["proven"].sum() == (np.load(path)["proof"] != 0).sum()
+    assert (d["value_w"][d["proven"]] == 3).all() and (d["value_w"][~d["proven"]] == 1).all()
+    assert "value_w" in rb.sample(8, seed=0, step=0, device="cpu") and rb.value_cells()["proven"] == d["proven"].sum()
+    # weighted value loss: weights rescale rows; uniform weights give the unweighted loss
+    logits = torch.randn(6, 3)
+    v = torch.tensor([1, -1, 1, -1, 1, 0])
+    has = torch.ones(6, dtype=torch.bool)
+    assert torch.isclose(value_loss(logits, v, has), value_loss(logits, v, has, torch.full((6,), 2.0)))
+    w2 = torch.tensor([1.0, 0, 0, 0, 0, 0])
+    assert torch.isclose(value_loss(logits, v, has, w2), value_loss(logits[:1], v[:1], has[:1]))

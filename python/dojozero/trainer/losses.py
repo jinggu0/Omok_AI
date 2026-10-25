@@ -63,14 +63,17 @@ def masked_policy_loss(logits: torch.Tensor, legal: torch.Tensor, target: torch.
     return per_row.sum() / has.sum().clamp_min(1)
 
 
-def value_loss(wdl_logits: torch.Tensor, value: torch.Tensor, has_value: torch.Tensor) -> torch.Tensor:
-    """value: [N] in {+1 win, 0 draw, -1 loss} for the actor; classes W=0, D=1, L=2."""
+def value_loss(wdl_logits: torch.Tensor, value: torch.Tensor, has_value: torch.Tensor,
+               weight: torch.Tensor | None = None) -> torch.Tensor:
+    """value: [N] in {+1 win, 0 draw, -1 loss} for the actor; classes W=0, D=1, L=2.
+    weight: optional per-row weights (weighted mean over rows with a value)."""
     has = has_value.bool()
     if not bool(has.any()):
         return wdl_logits.new_zeros(())
     cls = (1 - value.long()).clamp(0, 2)  # +1 -> 0, 0 -> 1, -1 -> 2
     ce = F.cross_entropy(wdl_logits, cls, reduction="none")
-    return (ce * has.float()).sum() / has.sum().clamp_min(1)
+    w = has.float() if weight is None else has.float() * weight.float()
+    return (ce * w).sum() / w.sum().clamp_min(1e-8)
 
 
 def aux_loss(aux_logits: torch.Tensor, aux_target: torch.Tensor) -> torch.Tensor:
@@ -94,7 +97,7 @@ def total_loss(out: dict, batch: dict, w: LossWeights) -> tuple[torch.Tensor, di
     head = batch.get("head")
     has_policy = batch["has_policy"] if head is None else batch["has_policy"] & (head == HEAD_POLICY)
     lp = masked_policy_loss(out["policy"], batch["legal"], batch["policy"], has_policy)
-    lv = value_loss(out["wdl"], batch["value"], batch["has_value"])
+    lv = value_loss(out["wdl"], batch["value"], batch["has_value"], batch.get("value_w"))
     la = aux_loss(out["aux"], batch["aux"])
     lo = la.new_zeros(())
     if head is not None:

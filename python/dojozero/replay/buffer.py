@@ -61,6 +61,7 @@ class _Block:
     refute_t: np.ndarray = field(default_factory=lambda: np.zeros((0, 225), np.float16))
     refute_w: np.ndarray = field(default_factory=lambda: np.zeros((0, 225), np.float16))
     value_overridden: int = 0
+    proven: np.ndarray = field(default_factory=lambda: np.zeros(0, bool))  # value target is a solver proof
 
 
 class ReplayBuffer:
@@ -71,6 +72,10 @@ class ReplayBuffer:
         self.capacity = capacity
         self.blocks: list[_Block] = []
         self.stats = {"games": 0, "positions": 0, "opening_targets": 0}
+        # Value-loss weights (PROGRESS Phase 8 E5c): `balance` gives the four (colour to move) x (win / loss)
+        # cells of the replay the same total weight (mean 1 over decisive positions, then clipped);
+        # `proof` multiplies the weight of positions whose value target is a solver proof.
+        self.value_weighting = {"balance": False, "proof": 1.0, "clip": (0.5, 2.0)}
 
     def __len__(self) -> int:
         return sum(len(b.value) for b in self.blocks)
@@ -158,6 +163,8 @@ class ReplayBuffer:
             changed = int((blk.value[idx[proven]] != z["proof"][proven]).sum())
             blk.value[idx[proven]] = z["proof"][proven]
             blk.value_overridden = changed
+            blk.proven = np.zeros(n, bool)
+            blk.proven[idx[proven]] = True
         self._cache_key = None
         return {"attached": int(len(idx)), "proven": int((z["proof"] != 0).sum()), "value_changed": changed}
 
@@ -168,17 +175,50 @@ class ReplayBuffer:
             self.blocks.pop(0)
 
     def _concat(self):
-        if not hasattr(self, "_cache_key") or self._cache_key != tuple(id(b) for b in self.blocks):
+        if not hasattr(self, "_cache_key") or self._cache_key != (tuple(id(b) for b in self.blocks), repr(self.value_weighting)):
             for b in self.blocks:  # unlabelled blocks: zero targets with zero weight
                 if len(b.danger_t) != len(b.value):
                     n = len(b.value)
                     b.danger_t, b.danger_w = np.zeros(n, np.float32), np.zeros(n, np.float32)
                     b.refute_t, b.refute_w = np.zeros((n, NUM_POINTS), np.float16), np.zeros((n, NUM_POINTS), np.float16)
+                if len(b.proven) != len(b.value):
+                    b.proven = np.zeros(len(b.value), bool)
             self._cat = {k: np.concatenate([getattr(b, k) for b in self.blocks])
                          for k in ("feats", "legal", "aux", "policy", "value", "head", "tgt2",
-                                   "danger_t", "danger_w", "refute_t", "refute_w")}
-            self._cache_key = tuple(id(b) for b in self.blocks)
+                                   "danger_t", "danger_w", "refute_t", "refute_w", "proven")}
+            plane = list(self.cfg.plane_names).index("actor_is_black")
+            self._cat["black"] = self._cat["feats"][:, plane].max(axis=1) > 0
+            self._cat["value_w"] = self._value_weights(self._cat)
+            self._cache_key = (tuple(id(b) for b in self.blocks), repr(self.value_weighting))
         return self._cat
+
+    def _value_weights(self, d: dict) -> np.ndarray:
+        vw = self.value_weighting
+        w = np.ones(len(d["value"]), np.float32)
+        if vw.get("balance"):
+            n_dec = int((d["value"] != 0).sum())
+            for c in (True, False):
+                for r in (1, -1):
+                    m = (d["black"] == c) & (d["value"] == r)
+                    if m.any():
+                        w[m] = n_dec / (4 * int(m.sum()))
+            lo, hi = vw.get("clip", (0.5, 2.0))
+            w = np.clip(w, lo, hi).astype(np.float32)
+        if float(vw.get("proof", 1.0)) != 1.0:
+            w[d["proven"]] *= float(vw["proof"])
+        return w
+
+    def value_cells(self) -> dict:
+        """Replay value targets per (colour to move, result) cell: share of positions and mean weight."""
+        d = self._concat()
+        out = {}
+        for c, cn in ((True, "black"), (False, "white")):
+            for r, rn in ((1, "win"), (-1, "loss")):
+                m = (d["black"] == c) & (d["value"] == r)
+                out[f"{cn}_{rn}"] = {"share": round(float(m.mean()), 4),
+                                     "weight": round(float(d["value_w"][m].mean()), 3) if m.any() else None}
+        out["proven"] = int(d["proven"].sum())
+        return out
 
     def sample(self, batch_size: int, seed: int, step: int, device, augment: bool = True) -> dict:
         data = self._concat()
@@ -208,6 +248,7 @@ class ReplayBuffer:
             "has_policy": torch.ones(b, dtype=torch.bool, device=device),
             "value": to(data["value"][idx], torch.int64),
             "has_value": torch.ones(b, dtype=torch.bool, device=device),
+            "value_w": to(data["value_w"][idx], torch.float32),
             "aux": to(aux, torch.float32),
             "head": to(data["head"][idx], torch.int64),
             "tgt2": to(data["tgt2"][idx], torch.float32),
