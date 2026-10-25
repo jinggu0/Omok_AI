@@ -18,6 +18,8 @@ solver budgets and split statistics.
 | `visits_{baseline,candidate}.json` | fixed 64/256/1024 sims vs Pela 2023 / Yixin 2018 (opponent 500 ms), 12 pairs each |
 | `ab_e4_reanalysis_holdout.json` | external paired A/B on the fresh holdout `renju_holdout_e4_v1` (60 pairs per opponent) |
 | `e5/` | E5: RL arms T/C registries and logs, held-out diagnosis of both bests, final A/Bs (T vs C, T vs E4, C vs E4), load logs, `value_drift.json` (why proven-win values fell: 14 checkpoints on proven positions, `python -m dojozero.tools.value_drift`) |
+| `e5b/` | E5b balanced value gate: gate set manifest (`gate_balanced_v1.json`, E4 val 468 per colour x result cell) and the E5 counterfactual (`gate_counterfactual_e5.json`, `python -m dojozero.tools.balanced_gate`) |
+| `e5c/` | E5c fixed-data screen of colour x result balanced value weights (`screen_*.json`, `python -m dojozero.tools.fixed_replay_screen`; pre-registered judge: STOP) |
 | `background_load_e4_*.csv` | CPU used by other processes during each phase (sleep gaps visible as time jumps) |
 
 Label codes: PROVEN_UNSAFE / PROVEN_WINNING are exact; UNREFUTED_EXHAUSTED is a heuristic negative (the threat-space
