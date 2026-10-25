@@ -8,6 +8,12 @@ Each generation:
   3. continue training the learner on replay (+ optional Stage A tactical mix) -> models/gen_NNN.pt
   4. paired SPRT match: candidate vs best; promote on H1 (registry.json is the single source of truth)
   5. anchor match vs the heuristic bot for the best model (external reference, echo-chamber watch)
+Phase 8 E5 (`tactical_aux`, ADR-11): after self-play a background thread solver-labels a share of the
+new chunk (rl.tactical.label_chunk); the labels are attached at the end of the generation, so they
+train from the next generation on (lag 1). Proven positions take the proof as value target, the
+danger/refute heads get their targets, and a fixed E4 reanalysis buffer is mixed into every batch.
+`gate`: a candidate is promoted only if the SPRT accepts it AND its value calibration on the E4
+held-out test split (ECE on proven positions) is not worse than the best's by more than a margin.
 Phase 7 (TRAINING.md §2.5-§2.6): self-play may start from the empty board / opening prefixes and
 record every Taraguchi-10 decision; a share of games is played against a league pool (fixed
 anchors + past best models) chosen by PFSP; matches can start from opening prefixes so the
@@ -43,7 +49,20 @@ from ..trainer.data import TacticalDataset
 from ..trainer.losses import LossWeights, total_loss
 from ..trainer.train import REPO, environment, git, pick_device
 
-KEYS = ("x", "legal", "policy", "has_policy", "value", "has_value", "aux", "head", "tgt2")
+KEYS = ("x", "legal", "policy", "has_policy", "value", "has_value", "aux", "head", "tgt2",
+        "danger_t", "danger_w", "refute_t", "refute_w")
+
+
+def _complete(b: dict, device) -> dict:
+    """Fill the keys a source does not produce (opening heads, tactical labels) with no-op values."""
+    n = b["x"].shape[0]
+    b.setdefault("head", torch.zeros(n, dtype=torch.int64, device=device))  # HEAD_POLICY
+    b.setdefault("tgt2", torch.zeros(n, 2, dtype=torch.float32, device=device))
+    b.setdefault("danger_t", torch.zeros(n, dtype=torch.float32, device=device))
+    b.setdefault("danger_w", torch.zeros(n, dtype=torch.float32, device=device))
+    b.setdefault("refute_t", torch.zeros(n, 225, dtype=torch.float32, device=device))
+    b.setdefault("refute_w", torch.zeros(n, 225, dtype=torch.float32, device=device))
+    return b
 
 
 def rel(p: Path) -> str:
@@ -260,6 +279,23 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
     replay = ReplayBuffer(spec, window=cfg["replay"]["window"], capacity=cfg["replay"]["capacity"])
     for rec in reg.data["generations"][-cfg["replay"]["window"]:]:
         replay.ingest(REPO / rec["chunk"], rec["generation"])
+    tac = cfg.get("tactical_aux") or {}
+    tac_on = bool(tac.get("enabled", False))
+    gate = cfg.get("gate") or {}
+    from . import tactical as tacmod
+    if tac_on:
+        for rec in reg.data["generations"][-cfg["replay"]["window"]:]:
+            lp = Path(REPO / rec["chunk"]).with_suffix("").with_suffix(".labels.npz")
+            if lp.exists():
+                replay.attach_labels(rec["generation"], lp, bool(tac.get("override_value", True)))
+    reana = None
+    n_re = 0
+    if tac_on and tac.get("reanalysis"):
+        from ..trainer.reanalysis import ReanalysisData
+        reana = ReanalysisData(REPO / tac["reanalysis"])
+        reana_pool = reana.indices("train")
+        n_re = int(round(o["batch_size"] * float(tac.get("reanalysis_mix", 0.15))))
+    gate_best: dict = {}
     tactical = None
     mix = float(o.get("tactical_mix", 0.0))
     if mix > 0:
@@ -292,6 +328,15 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
         black_wins = sum(1 for g in games if g["meta"]["winner"] is not None and g["meta"]["winner"] == g["meta"]["black_holder"])
         t_sp = time.time() - t0
         n_pos = replay.ingest(chunk, gen)
+        label_thread = None
+        if tac_on:  # lag-1 labelling: runs while this generation trains and evaluates
+            import threading
+            label_out: dict = {}
+            label_thread = threading.Thread(target=lambda: label_out.update(path=tacmod.label_chunk(
+                chunk, gen, float(tac.get("label_fraction", 0.3)), cfg["seed"], int(tac.get("top_k", 8)),
+                int(tac.get("threads", 7)))), daemon=True)
+            t_label = time.time()
+            label_thread.start()
         log(f"  self-play: {len(games)} games, {n_pos} target positions in {t_sp:.0f}s; black wins "
             f"{black_wins}/{len(games)}, draws {winners.count(None)}; mean plies "
             f"{np.mean([g['meta']['plies'] for g in games]):.1f}; replay {len(replay)} positions {replay.value_balance()} "
@@ -315,14 +360,16 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
         n_tac = int(round(bs * mix)) if tactical is not None else 0
         agg: dict[str, list[float]] = {}
         for k in range(o["steps_per_generation"]):
-            b = replay.sample(bs - n_tac, cfg["seed"], step, device)
+            parts_b = [_complete(replay.sample(bs - n_tac - n_re, cfg["seed"], step, device), device)]
             if n_tac:
                 rng = np.random.default_rng([cfg["seed"], step, 11])
-                tb = tactical.batch(tactical_pool[rng.integers(0, len(tactical_pool), n_tac)],
-                                    rng.integers(0, 8, n_tac), device)
-                tb["head"] = torch.zeros(n_tac, dtype=torch.int64, device=device)  # HEAD_POLICY
-                tb["tgt2"] = torch.zeros(n_tac, 2, dtype=torch.float32, device=device)
-                b = {key: torch.cat([b[key], tb[key]]) for key in KEYS}
+                parts_b.append(_complete(tactical.batch(tactical_pool[rng.integers(0, len(tactical_pool), n_tac)],
+                                                        rng.integers(0, 8, n_tac), device), device))
+            if n_re:
+                rng = np.random.default_rng([cfg["seed"], step, 13])
+                parts_b.append(_complete(reana.batch(reana_pool[rng.integers(0, len(reana_pool), n_re)],
+                                                     rng.integers(0, 8, n_re), device), device))
+            b = parts_b[0] if len(parts_b) == 1 else {key: torch.cat([pb[key] for pb in parts_b]) for key in KEYS}
             ctx = torch.autocast(device_type="xpu", dtype=torch.bfloat16) if amp else torch.autocast("cpu", enabled=False)
             with ctx:
                 out = learner(b["x"])
@@ -348,6 +395,21 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
         ev = evaluate_pair(str(REPO / cand_rel), str(REPO / best["checkpoint"]), cfg["eval"], str(device),
                            cfg["seed"] * 7 + gen, log)
         promoted = ev["decision"] == "H1"
+        gate_rec = None
+        if gate.get("arrays"):
+            if best["sha"] not in gate_best:
+                bm, _, _ = load_model(str(REPO / best["checkpoint"]), device)
+                gate_best = {best["sha"]: tacmod.value_calibration(bm, REPO / gate["arrays"], device)}
+                del bm
+            cm, _, _ = load_model(str(REPO / cand_rel), device)
+            gate_rec = {"candidate": tacmod.value_calibration(cm, REPO / gate["arrays"], device),
+                        "best": gate_best[best["sha"]], "margin": float(gate.get("ece_margin", 0.03))}
+            del cm
+            gate_rec["pass"] = gate_rec["candidate"]["ece5"] <= gate_rec["best"]["ece5"] + gate_rec["margin"]
+            log(f"  tactical gate: ECE cand {gate_rec['candidate']['ece5']:.3f} vs best {gate_rec['best']['ece5']:.3f}"
+                f" (margin {gate_rec['margin']}), proven-loss value {gate_rec['candidate']['proven_loss_value']},"
+                f" proven-win value {gate_rec['candidate']['proven_win_value']} -> {'pass' if gate_rec['pass'] else 'FAIL'}")
+            promoted = promoted and gate_rec["pass"]
         log(f"  promotion: {ev} -> {'PROMOTED' if promoted else 'kept best'} ({time.time() - t0:.0f}s)")
         if promoted:
             reg.data["best"] = {"version": best["version"] + 1, "checkpoint": str(cand_rel).replace("\\", "/"),
@@ -363,8 +425,14 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
             "candidate": str(cand_rel).replace("\\", "/"), "candidate_sha": cand_sha, "selfplay_model": best["sha"],
             "games": len(games), "positions": n_pos, "black_wins": black_wins, "draws": winners.count(None),
             "train": train_metrics, "step": step, "eval": ev, "promoted": promoted, "anchor": anchor,
-            "league": lres, "opening": ostats, "proposal_regret": regret,
+            "league": lres, "opening": ostats, "proposal_regret": regret, "gate": gate_rec,
             "seconds": time.time() - t_gen})
+        if label_thread is not None:
+            label_thread.join()
+            att = replay.attach_labels(gen, label_out["path"], bool(tac.get("override_value", True)))
+            stats = tacmod.label_stats(label_out["path"])
+            log(f"  labels gen {gen}: {stats} attached {att} ({time.time() - t_label:.0f}s incl. overlap)")
+            reg.data["generations"][-1]["labels"] = {"file": rel(label_out["path"]), **stats, **att}
         reg.save()
         del best_model, best_eval
     return reg

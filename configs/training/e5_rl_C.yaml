@@ -1,0 +1,78 @@
+# Phase 8 E5 arm C: control: unchanged RL loop (same start, seeds, self-play, league, eval as taraguchi_v1; 6 generations).
+run_name: e5_rl_C
+run_dir: runs
+seed: 7
+device: auto
+amp_bf16: true
+init_checkpoint: runs/e4_reanalysis_v1/checkpoints/step_1500.pt
+generations: 6
+regret_positions: 20
+selfplay:
+  games: 256
+  sims_full: 64
+  sims_fast: 16
+  p_full: 0.75
+  root: GUMBEL
+  gumbel_m: 16
+  root_tactics_nodes: 2000
+  max_inflight: 8
+  max_plies: 225
+  profile: OMOKDOJANG_DAN
+  start: mixed
+  prefix_prob: 0.5
+  record_opening: true
+  league_fraction: 0.25
+  opponent_sims: 32
+league:
+  pfsp_eps: 0.05
+  past_best: 2
+  fixed:
+  - name: heuristic
+    spec: heuristic
+  - name: stage_b_v0
+    spec: engine:runs/stage_b_b6c64_v1/checkpoints/step_6000.pt
+  - name: selfplay_v2_best
+    spec: engine:runs/selfplay_v2/models/gen_003.pt
+replay:
+  window: 4
+  capacity: 200000
+train:
+  steps_per_generation: 150
+  batch_size: 256
+  lr: 0.0005
+  weight_decay: 0.0001
+  betas:
+  - 0.9
+  - 0.999
+  grad_clip: 5.0
+  tactical_mix: 0.25
+  tactical_data: data/stage_a_v1
+  loss:
+    policy: 1.0
+    value: 1.0
+    aux: 0.5
+    opening: 1.0
+    danger: 0.0
+    refute: 0.0
+eval:
+  openings: prefix
+  sims: 64
+  pairs_per_round: 20
+  min_pairs: 20
+  max_pairs: 80
+  elo0: 0
+  elo1: 30
+  alpha: 0.05
+  beta: 0.05
+  anchor_pairs: 20
+tactical_aux:
+  enabled: false
+  label_fraction: 0.3
+  top_k: 8
+  threads: 7
+  override_value: true
+  reanalysis: data/reanalysis_v1/arrays.npz
+  reanalysis_mix: 0.15
+gate:
+  arrays: data/reanalysis_v1/arrays.npz
+  ece_margin: 0.03

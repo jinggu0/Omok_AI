@@ -55,6 +55,12 @@ class _Block:
     head: np.ndarray = field(default_factory=lambda: np.zeros(0, np.int8))
     tgt2: np.ndarray = field(default_factory=lambda: np.zeros((0, 2), np.float32))  # swap / branch
     root_value: np.ndarray = field(default_factory=lambda: np.zeros(0, np.float32))
+    # Solver tactical labels (Phase 8 E5, rl.tactical.label_chunk); weight 0 = unlabelled.
+    danger_t: np.ndarray = field(default_factory=lambda: np.zeros(0, np.float32))
+    danger_w: np.ndarray = field(default_factory=lambda: np.zeros(0, np.float32))
+    refute_t: np.ndarray = field(default_factory=lambda: np.zeros((0, 225), np.float16))
+    refute_w: np.ndarray = field(default_factory=lambda: np.zeros((0, 225), np.float16))
+    value_overridden: int = 0
 
 
 class ReplayBuffer:
@@ -129,6 +135,32 @@ class ReplayBuffer:
         self._evict()
         return len(val)
 
+    def attach_labels(self, generation: int, labels_path, override_value: bool) -> dict:
+        """Attach a generation's solver labels (rl.tactical.label_chunk, ingest order). With
+        override_value, proven positions take the proof (+1/-1 for the actor) as value target instead
+        of the game result; UNKNOWN positions keep the game result."""
+        blk = next((b for b in self.blocks if b.generation == generation), None)
+        if blk is None:
+            return {"attached": 0}
+        z = np.load(labels_path)
+        n = len(blk.value)
+        if len(blk.danger_t) != n:
+            blk.danger_t, blk.danger_w = np.zeros(n, np.float32), np.zeros(n, np.float32)
+            blk.refute_t, blk.refute_w = np.zeros((n, NUM_POINTS), np.float16), np.zeros((n, NUM_POINTS), np.float16)
+        idx = z["idx"]
+        if len(idx) and idx.max() >= n:
+            raise RecordError(f"labels for generation {generation} do not match the replay block")
+        blk.danger_t[idx], blk.danger_w[idx] = z["danger_t"], z["danger_w"]
+        blk.refute_t[idx], blk.refute_w[idx] = z["refute_t"], z["refute_w"]
+        changed = 0
+        if override_value:
+            proven = z["proof"] != 0
+            changed = int((blk.value[idx[proven]] != z["proof"][proven]).sum())
+            blk.value[idx[proven]] = z["proof"][proven]
+            blk.value_overridden = changed
+        self._cache_key = None
+        return {"attached": int(len(idx)), "proven": int((z["proof"] != 0).sum()), "value_changed": changed}
+
     def _evict(self) -> None:
         newest = max(b.generation for b in self.blocks)
         self.blocks = [b for b in self.blocks if b.generation > newest - self.window]
@@ -137,8 +169,14 @@ class ReplayBuffer:
 
     def _concat(self):
         if not hasattr(self, "_cache_key") or self._cache_key != tuple(id(b) for b in self.blocks):
+            for b in self.blocks:  # unlabelled blocks: zero targets with zero weight
+                if len(b.danger_t) != len(b.value):
+                    n = len(b.value)
+                    b.danger_t, b.danger_w = np.zeros(n, np.float32), np.zeros(n, np.float32)
+                    b.refute_t, b.refute_w = np.zeros((n, NUM_POINTS), np.float16), np.zeros((n, NUM_POINTS), np.float16)
             self._cat = {k: np.concatenate([getattr(b, k) for b in self.blocks])
-                         for k in ("feats", "legal", "aux", "policy", "value", "head", "tgt2")}
+                         for k in ("feats", "legal", "aux", "policy", "value", "head", "tgt2",
+                                   "danger_t", "danger_w", "refute_t", "refute_w")}
             self._cache_key = tuple(id(b) for b in self.blocks)
         return self._cat
 
@@ -150,6 +188,8 @@ class ReplayBuffer:
         aux = data["aux"][idx]
         legal = data["legal"][idx].copy()
         policy = data["policy"][idx].copy()
+        rt = data["refute_t"][idx].astype(np.float32)
+        rw = data["refute_w"][idx].astype(np.float32)
         if augment:
             t = rng.integers(0, 8, size=batch_size)
             gi = GATHER[t]
@@ -157,6 +197,8 @@ class ReplayBuffer:
             aux = np.take_along_axis(aux, gi[:, None, :], axis=2)
             legal[:, :NUM_POINTS] = np.take_along_axis(legal[:, :NUM_POINTS], gi, axis=1)
             policy[:, :NUM_POINTS] = np.take_along_axis(policy[:, :NUM_POINTS], gi, axis=1)
+            rt = np.take_along_axis(rt, gi, axis=1)
+            rw = np.take_along_axis(rw, gi, axis=1)
         to = lambda a, dt: torch.from_numpy(np.ascontiguousarray(a)).to(device=device, dtype=dt)  # noqa: E731
         b = len(idx)
         return {
@@ -169,6 +211,10 @@ class ReplayBuffer:
             "aux": to(aux, torch.float32),
             "head": to(data["head"][idx], torch.int64),
             "tgt2": to(data["tgt2"][idx], torch.float32),
+            "danger_t": to(data["danger_t"][idx], torch.float32),
+            "danger_w": to(data["danger_w"][idx], torch.float32),
+            "refute_t": to(rt, torch.float32),
+            "refute_w": to(rw, torch.float32),
         }
 
     def head_counts(self) -> dict:
