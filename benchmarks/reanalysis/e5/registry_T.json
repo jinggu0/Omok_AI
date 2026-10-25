@@ -1,0 +1,885 @@
+{
+  "best": {
+    "version": 1,
+    "checkpoint": "runs/e5_rl_T/models/gen_002.pt",
+    "sha": "9cff58c579a5b8f118fff4527120aa4df9130948a0267262aca93b2a22e964da",
+    "generation": 2
+  },
+  "generations": [
+    {
+      "generation": 1,
+      "chunk": "runs/e5_rl_T/selfplay/gen_001.jsonl.gz",
+      "candidate": "runs/e5_rl_T/models/gen_001.pt",
+      "candidate_sha": "ff8f22e679118157ef2289ace862ed54734314cb2eef0eb82a3747c0923c18f2",
+      "selfplay_model": "52d1cbaeb96faac91bacc9d341a8ee17d3fede38b185b67592842295f732c472",
+      "games": 256,
+      "positions": 5762,
+      "black_wins": 151,
+      "draws": 0,
+      "train": {
+        "loss": 9.887294607162476,
+        "policy": 1.876252674261729,
+        "value": 0.49098005453745525,
+        "aux": 0.010920964454611142,
+        "opening": 6.887930943171184,
+        "danger": 0.24318476945161818,
+        "refute": 0.3834856732686361
+      },
+      "step": 150,
+      "eval": {
+        "pairs": 80,
+        "score": 0.525,
+        "llr": 0.11166649663856527,
+        "decision": "continue"
+      },
+      "promoted": false,
+      "anchor": {
+        "score": 0.9,
+        "score_ci95": [
+          0.6989617935882066,
+          0.9899309676772602
+        ],
+        "elo": 381.69700377572985,
+        "elo_ci95": [
+          146.3327277391822,
+          797.0468701436864
+        ],
+        "a_score_as_black": 0.8888888888888888,
+        "a_score_as_white": 0.9230769230769231
+      },
+      "league": {
+        "stage_b_v0": {
+          "score": 13.0,
+          "games": 19
+        },
+        "selfplay_v2_best": {
+          "score": 13.0,
+          "games": 17
+        },
+        "heuristic": {
+          "score": 16.0,
+          "games": 16
+        }
+      },
+      "opening": {
+        "games": 204,
+        "p0_score": 0.5098039215686274,
+        "black_holder_score": 0.6176470588235294,
+        "decisions/SWAP_AFTER_1": {
+          "keep": 1.0,
+          "n": 107
+        },
+        "decisions/SWAP_AFTER_2": {
+          "keep": 0.258,
+          "swap": 0.742,
+          "n": 120
+        },
+        "decisions/SWAP_AFTER_3": {
+          "keep": 0.036,
+          "swap": 0.964,
+          "n": 140
+        },
+        "decisions/CHOICE_AFTER_4": {
+          "direct5": 0.327,
+          "offer10": 0.673,
+          "n": 153
+        },
+        "decisions/SWAP_BEFORE_DIRECT_5": {
+          "keep": 0.736,
+          "swap": 0.264,
+          "n": 53
+        },
+        "decisions/SWAP_AFTER_DIRECT_5": {
+          "keep": 0.393,
+          "swap": 0.607,
+          "n": 61
+        },
+        "distinct_normal_starts": 204,
+        "normal_start_entropy_bits": 7.672425341971496
+      },
+      "proposal_regret": {
+        "positions": 20,
+        "mean_regret": 0.3290248861967223,
+        "max_regret": 0.4793803034901365
+      },
+      "gate": {
+        "candidate": {
+          "n": 1983,
+          "ece5": 0.15722554534358082,
+          "brier": 0.08394785395130998,
+          "proven_loss_value": -0.5634950399398804,
+          "proven_win_value": 0.5842766165733337,
+          "proven_loss_ge0": 0.10300176574455562,
+          "black_proven_loss_value": -0.5664737224578857,
+          "white_proven_loss_value": -0.5597706437110901
+        },
+        "best": {
+          "n": 1983,
+          "ece5": 0.12348123836324962,
+          "brier": 0.0692064287783719,
+          "proven_loss_value": -0.6626759767532349,
+          "proven_win_value": 0.7063837647438049,
+          "proven_loss_ge0": 0.09005297233666863,
+          "black_proven_loss_value": -0.6478636264801025,
+          "white_proven_loss_value": -0.6811961531639099
+        },
+        "margin": 0.03,
+        "pass": false
+      },
+      "seconds": 3370.1746485233307,
+      "labels": {
+        "file": "runs/e5_rl_T/selfplay/gen_001.labels.npz",
+        "labelled": 1101,
+        "proof_win": 337,
+        "proof_loss": 232,
+        "moves": {
+          "PROVEN_UNSAFE": 2840,
+          "PROVEN_WINNING": 124,
+          "UNREFUTED_EXHAUSTED": 1758,
+          "UNKNOWN_BUDGET": 755
+        },
+        "sha256": "7b16036d2b3d672724f5052efb806d7c22fd43e65436196eb70101ca9780bbf3",
+        "attached": 1101,
+        "proven": 569,
+        "value_changed": 9
+      }
+    },
+    {
+      "generation": 2,
+      "chunk": "runs/e5_rl_T/selfplay/gen_002.jsonl.gz",
+      "candidate": "runs/e5_rl_T/models/gen_002.pt",
+      "candidate_sha": "9cff58c579a5b8f118fff4527120aa4df9130948a0267262aca93b2a22e964da",
+      "selfplay_model": "52d1cbaeb96faac91bacc9d341a8ee17d3fede38b185b67592842295f732c472",
+      "games": 256,
+      "positions": 5489,
+      "black_wins": 134,
+      "draws": 0,
+      "train": {
+        "loss": 9.675838861465454,
+        "policy": 1.8819518820444743,
+        "value": 0.4730838574965795,
+        "aux": 0.010786370343218247,
+        "opening": 6.718152535756429,
+        "danger": 0.23697472150127094,
+        "refute": 0.36028272241353987
+      },
+      "step": 300,
+      "eval": {
+        "pairs": 60,
+        "score": 0.6333333333333333,
+        "llr": 3.454971282437506,
+        "decision": "H1"
+      },
+      "promoted": true,
+      "anchor": {
+        "score": 0.975,
+        "score_ci95": [
+          0.7995418578360503,
+          1.024
+        ],
+        "elo": 636.4258428105987,
+        "elo_ci95": [
+          240.32700158446633,
+          1599.982627352221
+        ],
+        "a_score_as_black": 0.9629629629629629,
+        "a_score_as_white": 1.0
+      },
+      "league": {
+        "selfplay_v2_best": {
+          "score": 14.0,
+          "games": 24
+        },
+        "stage_b_v0": {
+          "score": 32.0,
+          "games": 39
+        },
+        "heuristic": {
+          "score": 7.0,
+          "games": 8
+        }
+      },
+      "opening": {
+        "games": 185,
+        "p0_score": 0.5135135135135135,
+        "black_holder_score": 0.5675675675675675,
+        "decisions/SWAP_AFTER_1": {
+          "keep": 1.0,
+          "n": 100
+        },
+        "decisions/SWAP_AFTER_2": {
+          "keep": 0.12,
+          "swap": 0.88,
+          "n": 117
+        },
+        "decisions/SWAP_AFTER_3": {
+          "keep": 0.024,
+          "swap": 0.976,
+          "n": 127
+        },
+        "decisions/CHOICE_AFTER_4": {
+          "direct5": 0.293,
+          "offer10": 0.707,
+          "n": 140
+        },
+        "decisions/SWAP_BEFORE_DIRECT_5": {
+          "keep": 0.659,
+          "swap": 0.341,
+          "n": 44
+        },
+        "decisions/SWAP_AFTER_DIRECT_5": {
+          "keep": 0.268,
+          "swap": 0.732,
+          "n": 56
+        },
+        "distinct_normal_starts": 184,
+        "normal_start_entropy_bits": 7.52057064970549
+      },
+      "proposal_regret": {
+        "positions": 20,
+        "mean_regret": 0.32260429351801356,
+        "max_regret": 0.42500403261196584
+      },
+      "gate": {
+        "candidate": {
+          "n": 1983,
+          "ece5": 0.10962244396370827,
+          "brier": 0.06829267805985241,
+          "proven_loss_value": -0.6693200469017029,
+          "proven_win_value": 0.5525966286659241,
+          "proven_loss_ge0": 0.07239552678045909,
+          "black_proven_loss_value": -0.6442868709564209,
+          "white_proven_loss_value": -0.7006198763847351
+        },
+        "best": {
+          "n": 1983,
+          "ece5": 0.12348123836324962,
+          "brier": 0.0692064287783719,
+          "proven_loss_value": -0.6626759767532349,
+          "proven_win_value": 0.7063837647438049,
+          "proven_loss_ge0": 0.09005297233666863,
+          "black_proven_loss_value": -0.6478636264801025,
+          "white_proven_loss_value": -0.6811961531639099
+        },
+        "margin": 0.03,
+        "pass": true
+      },
+      "seconds": 1147.3503997325897,
+      "labels": {
+        "file": "runs/e5_rl_T/selfplay/gen_002.labels.npz",
+        "labelled": 945,
+        "proof_win": 306,
+        "proof_loss": 185,
+        "moves": {
+          "PROVEN_UNSAFE": 2358,
+          "PROVEN_WINNING": 97,
+          "UNREFUTED_EXHAUSTED": 1553,
+          "UNKNOWN_BUDGET": 651
+        },
+        "sha256": "a965f83f04b9acad2a230e39773b62630d6e51aaf8da08a0ce4b0efdb9704f1b",
+        "attached": 945,
+        "proven": 491,
+        "value_changed": 16
+      }
+    },
+    {
+      "generation": 3,
+      "chunk": "runs/e5_rl_T/selfplay/gen_003.jsonl.gz",
+      "candidate": "runs/e5_rl_T/models/gen_003.pt",
+      "candidate_sha": "b923fcf9ffcdb1ea37386aa6626296c5d2d3c12dde6c6e03a5ca8d4b1ab4a840",
+      "selfplay_model": "9cff58c579a5b8f118fff4527120aa4df9130948a0267262aca93b2a22e964da",
+      "games": 256,
+      "positions": 5568,
+      "black_wins": 135,
+      "draws": 0,
+      "train": {
+        "loss": 9.883363348642986,
+        "policy": 1.8665849375724792,
+        "value": 0.47960133055845894,
+        "aux": 0.010904481199880441,
+        "opening": 6.961496280034383,
+        "danger": 0.22658974135915438,
+        "refute": 0.3436388908823331
+      },
+      "step": 450,
+      "eval": {
+        "pairs": 80,
+        "score": 0.525,
+        "llr": 0.1462917669140893,
+        "decision": "continue"
+      },
+      "promoted": false,
+      "anchor": {
+        "score": 0.975,
+        "score_ci95": [
+          0.7995418578360503,
+          1.024
+        ],
+        "elo": 636.4258428105987,
+        "elo_ci95": [
+          240.32700158446633,
+          1599.982627352221
+        ],
+        "a_score_as_black": 0.9583333333333334,
+        "a_score_as_white": 1.0
+      },
+      "league": {
+        "selfplay_v2_best": {
+          "score": 9.0,
+          "games": 15
+        },
+        "heuristic": {
+          "score": 5.0,
+          "games": 5
+        },
+        "best_v0": {
+          "score": 28.0,
+          "games": 37
+        },
+        "stage_b_v0": {
+          "score": 7.0,
+          "games": 9
+        }
+      },
+      "opening": {
+        "games": 190,
+        "p0_score": 0.5789473684210527,
+        "black_holder_score": 0.5105263157894737,
+        "decisions/SWAP_AFTER_1": {
+          "keep": 1.0,
+          "n": 115
+        },
+        "decisions/SWAP_AFTER_2": {
+          "keep": 0.46,
+          "swap": 0.54,
+          "n": 126
+        },
+        "decisions/SWAP_AFTER_3": {
+          "keep": 0.568,
+          "swap": 0.432,
+          "n": 139
+        },
+        "decisions/CHOICE_AFTER_4": {
+          "direct5": 0.747,
+          "offer10": 0.253,
+          "n": 150
+        },
+        "decisions/SWAP_BEFORE_DIRECT_5": {
+          "keep": 0.07,
+          "swap": 0.93,
+          "n": 114
+        },
+        "decisions/SWAP_AFTER_DIRECT_5": {
+          "keep": 0.258,
+          "swap": 0.742,
+          "n": 120
+        },
+        "distinct_normal_starts": 187,
+        "normal_start_entropy_bits": 7.538276660962539
+      },
+      "proposal_regret": {
+        "positions": 20,
+        "mean_regret": 0.34031833888295926,
+        "max_regret": 0.4693063767774682
+      },
+      "gate": {
+        "candidate": {
+          "n": 1983,
+          "ece5": 0.16152223636571408,
+          "brier": 0.08367587324846194,
+          "proven_loss_value": -0.5602757334709167,
+          "proven_win_value": 0.6250200867652893,
+          "proven_loss_ge0": 0.10594467333725721,
+          "black_proven_loss_value": -0.5246232748031616,
+          "white_proven_loss_value": -0.6048531532287598
+        },
+        "best": {
+          "n": 1983,
+          "ece5": 0.10962244396370827,
+          "brier": 0.06829267805985241,
+          "proven_loss_value": -0.6693200469017029,
+          "proven_win_value": 0.5525966286659241,
+          "proven_loss_ge0": 0.07239552678045909,
+          "black_proven_loss_value": -0.6442868709564209,
+          "white_proven_loss_value": -0.7006198763847351
+        },
+        "margin": 0.03,
+        "pass": false
+      },
+      "seconds": 1184.6227958202362,
+      "labels": {
+        "file": "runs/e5_rl_T/selfplay/gen_003.labels.npz",
+        "labelled": 1092,
+        "proof_win": 352,
+        "proof_loss": 257,
+        "moves": {
+          "PROVEN_UNSAFE": 2812,
+          "PROVEN_WINNING": 112,
+          "UNREFUTED_EXHAUSTED": 1461,
+          "UNKNOWN_BUDGET": 764
+        },
+        "sha256": "8393192f2b38cfdb7e1529156e0884221d1616a8e84bf0298f7b217461067434",
+        "attached": 1092,
+        "proven": 609,
+        "value_changed": 13
+      }
+    },
+    {
+      "generation": 4,
+      "chunk": "runs/e5_rl_T/selfplay/gen_004.jsonl.gz",
+      "candidate": "runs/e5_rl_T/models/gen_004.pt",
+      "candidate_sha": "304c7e04cab920a0c43f770bfd0a4dd9448e6bf03e84208483dc7664e29ab7a6",
+      "selfplay_model": "9cff58c579a5b8f118fff4527120aa4df9130948a0267262aca93b2a22e964da",
+      "games": 256,
+      "positions": 5172,
+      "black_wins": 139,
+      "draws": 0,
+      "train": {
+        "loss": 9.783620115915934,
+        "policy": 1.8660704215367636,
+        "value": 0.4685572365919749,
+        "aux": 0.011208160283664862,
+        "opening": 6.906478945414225,
+        "danger": 0.21257685666282972,
+        "refute": 0.3243325520555178
+      },
+      "step": 600,
+      "eval": {
+        "pairs": 80,
+        "score": 0.5125,
+        "llr": -0.27356561592866385,
+        "decision": "continue"
+      },
+      "promoted": false,
+      "anchor": {
+        "score": 0.975,
+        "score_ci95": [
+          0.7995418578360503,
+          1.024
+        ],
+        "elo": 636.4258428105987,
+        "elo_ci95": [
+          240.32700158446633,
+          1599.982627352221
+        ],
+        "a_score_as_black": 1.0,
+        "a_score_as_white": 0.9411764705882353
+      },
+      "league": {
+        "heuristic": {
+          "score": 6.0,
+          "games": 6
+        },
+        "stage_b_v0": {
+          "score": 18.0,
+          "games": 19
+        },
+        "best_v0": {
+          "score": 17.0,
+          "games": 22
+        },
+        "selfplay_v2_best": {
+          "score": 17.0,
+          "games": 28
+        }
+      },
+      "opening": {
+        "games": 181,
+        "p0_score": 0.5303867403314917,
+        "black_holder_score": 0.5911602209944752,
+        "decisions/SWAP_AFTER_1": {
+          "keep": 1.0,
+          "n": 94
+        },
+        "decisions/SWAP_AFTER_2": {
+          "keep": 0.495,
+          "swap": 0.505,
+          "n": 103
+        },
+        "decisions/SWAP_AFTER_3": {
+          "keep": 0.658,
+          "swap": 0.342,
+          "n": 114
+        },
+        "decisions/CHOICE_AFTER_4": {
+          "direct5": 0.843,
+          "offer10": 0.157,
+          "n": 134
+        },
+        "decisions/SWAP_BEFORE_DIRECT_5": {
+          "keep": 0.084,
+          "swap": 0.916,
+          "n": 119
+        },
+        "decisions/SWAP_AFTER_DIRECT_5": {
+          "keep": 0.246,
+          "swap": 0.754,
+          "n": 126
+        },
+        "distinct_normal_starts": 178,
+        "normal_start_entropy_bits": 7.466696715812455
+      },
+      "proposal_regret": {
+        "positions": 20,
+        "mean_regret": 0.3510972550579977,
+        "max_regret": 0.4606232081391113
+      },
+      "gate": {
+        "candidate": {
+          "n": 1983,
+          "ece5": 0.18666768329527061,
+          "brier": 0.098896235884491,
+          "proven_loss_value": -0.5186103582382202,
+          "proven_win_value": 0.7269120812416077,
+          "proven_loss_ge0": 0.13713949381989404,
+          "black_proven_loss_value": -0.47963935136795044,
+          "white_proven_loss_value": -0.5673370361328125
+        },
+        "best": {
+          "n": 1983,
+          "ece5": 0.10962244396370827,
+          "brier": 0.06829267805985241,
+          "proven_loss_value": -0.6693200469017029,
+          "proven_win_value": 0.5525966286659241,
+          "proven_loss_ge0": 0.07239552678045909,
+          "black_proven_loss_value": -0.6442868709564209,
+          "white_proven_loss_value": -0.7006198763847351
+        },
+        "margin": 0.03,
+        "pass": false
+      },
+      "seconds": 4447.724125623703,
+      "labels": {
+        "file": "runs/e5_rl_T/selfplay/gen_004.labels.npz",
+        "labelled": 1080,
+        "proof_win": 356,
+        "proof_loss": 252,
+        "moves": {
+          "PROVEN_UNSAFE": 2695,
+          "PROVEN_WINNING": 109,
+          "UNREFUTED_EXHAUSTED": 1527,
+          "UNKNOWN_BUDGET": 843
+        },
+        "sha256": "f6613719f3962ba315a2ba1e768a2a174b49e3111045f95ffd01c335da919eec",
+        "attached": 1080,
+        "proven": 608,
+        "value_changed": 12
+      }
+    },
+    {
+      "generation": 5,
+      "chunk": "runs/e5_rl_T/selfplay/gen_005.jsonl.gz",
+      "candidate": "runs/e5_rl_T/models/gen_005.pt",
+      "candidate_sha": "aab9dd84b5ffd1b869c7c56d8ac819add63b8eb2fb9096093d31fb98fd2e6106",
+      "selfplay_model": "9cff58c579a5b8f118fff4527120aa4df9130948a0267262aca93b2a22e964da",
+      "games": 256,
+      "positions": 5546,
+      "black_wins": 137,
+      "draws": 0,
+      "train": {
+        "loss": 9.686751998265585,
+        "policy": 1.8636898803710937,
+        "value": 0.47107051392396293,
+        "aux": 0.011378008654961984,
+        "opening": 6.829272785186768,
+        "danger": 0.20441386878490447,
+        "refute": 0.31261599212884905
+      },
+      "step": 750,
+      "eval": {
+        "pairs": 80,
+        "score": 0.58125,
+        "llr": 2.1048928933053417,
+        "decision": "continue"
+      },
+      "promoted": false,
+      "anchor": {
+        "score": 0.925,
+        "score_ci95": [
+          0.730551627690361,
+          1.0052794461470944
+        ],
+        "elo": 436.4321877389334,
+        "elo_ci95": [
+          173.27013930759009,
+          1599.982627352221
+        ],
+        "a_score_as_black": 0.8888888888888888,
+        "a_score_as_white": 1.0
+      },
+      "league": {
+        "best_v0": {
+          "score": 11.0,
+          "games": 15
+        },
+        "selfplay_v2_best": {
+          "score": 16.0,
+          "games": 29
+        },
+        "stage_b_v0": {
+          "score": 15.0,
+          "games": 15
+        },
+        "heuristic": {
+          "score": 9.0,
+          "games": 9
+        }
+      },
+      "opening": {
+        "games": 188,
+        "p0_score": 0.44680851063829785,
+        "black_holder_score": 0.5585106382978723,
+        "decisions/SWAP_AFTER_1": {
+          "keep": 1.0,
+          "n": 110
+        },
+        "decisions/SWAP_AFTER_2": {
+          "keep": 0.387,
+          "swap": 0.613,
+          "n": 119
+        },
+        "decisions/SWAP_AFTER_3": {
+          "keep": 0.581,
+          "swap": 0.419,
+          "n": 129
+        },
+        "decisions/CHOICE_AFTER_4": {
+          "direct5": 0.77,
+          "offer10": 0.23,
+          "n": 139
+        },
+        "decisions/SWAP_BEFORE_DIRECT_5": {
+          "keep": 0.127,
+          "swap": 0.873,
+          "n": 110
+        },
+        "decisions/SWAP_AFTER_DIRECT_5": {
+          "keep": 0.211,
+          "swap": 0.789,
+          "n": 123
+        },
+        "distinct_normal_starts": 181,
+        "normal_start_entropy_bits": 7.472090048463152
+      },
+      "proposal_regret": {
+        "positions": 20,
+        "mean_regret": 0.35108277094790885,
+        "max_regret": 0.47813624622210904
+      },
+      "gate": {
+        "candidate": {
+          "n": 1983,
+          "ece5": 0.10243627579297553,
+          "brier": 0.0566911103989193,
+          "proven_loss_value": -0.6957311034202576,
+          "proven_win_value": 0.5557822585105896,
+          "proven_loss_ge0": 0.051206592113007654,
+          "black_proven_loss_value": -0.6584458351135254,
+          "white_proven_loss_value": -0.7423498034477234
+        },
+        "best": {
+          "n": 1983,
+          "ece5": 0.10962244396370827,
+          "brier": 0.06829267805985241,
+          "proven_loss_value": -0.6693200469017029,
+          "proven_win_value": 0.5525966286659241,
+          "proven_loss_ge0": 0.07239552678045909,
+          "black_proven_loss_value": -0.6442868709564209,
+          "white_proven_loss_value": -0.7006198763847351
+        },
+        "margin": 0.03,
+        "pass": true
+      },
+      "seconds": 1855.961308002472,
+      "labels": {
+        "file": "runs/e5_rl_T/selfplay/gen_005.labels.npz",
+        "labelled": 1090,
+        "proof_win": 367,
+        "proof_loss": 252,
+        "moves": {
+          "PROVEN_UNSAFE": 2757,
+          "PROVEN_WINNING": 96,
+          "UNREFUTED_EXHAUSTED": 1443,
+          "UNKNOWN_BUDGET": 698
+        },
+        "sha256": "b88168f832eb3c5d175637084bc9a047ab837dc4b6a5f2b5923470428ea2d672",
+        "attached": 1090,
+        "proven": 619,
+        "value_changed": 8
+      }
+    },
+    {
+      "generation": 6,
+      "chunk": "runs/e5_rl_T/selfplay/gen_006.jsonl.gz",
+      "candidate": "runs/e5_rl_T/models/gen_006.pt",
+      "candidate_sha": "0b4c40d2371bfd56d2c0cb3899b5b4f6f3f2c94267cad1f79cf90195cd5791c9",
+      "selfplay_model": "9cff58c579a5b8f118fff4527120aa4df9130948a0267262aca93b2a22e964da",
+      "games": 256,
+      "positions": 5720,
+      "black_wins": 129,
+      "draws": 0,
+      "train": {
+        "loss": 9.479591099421183,
+        "policy": 1.8403243978818258,
+        "value": 0.4856614687045415,
+        "aux": 0.011865961315731208,
+        "opening": 6.624817485809326,
+        "danger": 0.2229900036752224,
+        "refute": 0.2998647195100784
+      },
+      "step": 900,
+      "eval": {
+        "pairs": 80,
+        "score": 0.61875,
+        "llr": 3.471649485166899,
+        "decision": "H1"
+      },
+      "promoted": false,
+      "anchor": {
+        "score": 0.925,
+        "score_ci95": [
+          0.730551627690361,
+          1.0052794461470944
+        ],
+        "elo": 436.4321877389334,
+        "elo_ci95": [
+          173.27013930759009,
+          1599.982627352221
+        ],
+        "a_score_as_black": 0.9629629629629629,
+        "a_score_as_white": 0.8461538461538461
+      },
+      "league": {
+        "best_v0": {
+          "score": 6.0,
+          "games": 12
+        },
+        "heuristic": {
+          "score": 6.0,
+          "games": 7
+        },
+        "selfplay_v2_best": {
+          "score": 17.0,
+          "games": 29
+        },
+        "stage_b_v0": {
+          "score": 12.0,
+          "games": 12
+        }
+      },
+      "opening": {
+        "games": 196,
+        "p0_score": 0.5561224489795918,
+        "black_holder_score": 0.5102040816326531,
+        "decisions/SWAP_AFTER_1": {
+          "keep": 1.0,
+          "n": 95
+        },
+        "decisions/SWAP_AFTER_2": {
+          "keep": 0.397,
+          "swap": 0.603,
+          "n": 121
+        },
+        "decisions/SWAP_AFTER_3": {
+          "keep": 0.576,
+          "swap": 0.424,
+          "n": 139
+        },
+        "decisions/CHOICE_AFTER_4": {
+          "direct5": 0.785,
+          "offer10": 0.215,
+          "n": 149
+        },
+        "decisions/SWAP_BEFORE_DIRECT_5": {
+          "keep": 0.089,
+          "swap": 0.911,
+          "n": 124
+        },
+        "decisions/SWAP_AFTER_DIRECT_5": {
+          "keep": 0.233,
+          "swap": 0.767,
+          "n": 133
+        },
+        "distinct_normal_starts": 194,
+        "normal_start_entropy_bits": 7.594301680849886
+      },
+      "proposal_regret": {
+        "positions": 20,
+        "mean_regret": 0.3124464190999076,
+        "max_regret": 0.46589660712673747
+      },
+      "gate": {
+        "candidate": {
+          "n": 1983,
+          "ece5": 0.2844969477322266,
+          "brier": 0.161649118549123,
+          "proven_loss_value": -0.30109328031539917,
+          "proven_win_value": 0.7918040752410889,
+          "proven_loss_ge0": 0.28134196586227195,
+          "black_proven_loss_value": -0.20357991755008698,
+          "white_proven_loss_value": -0.423017293214798
+        },
+        "best": {
+          "n": 1983,
+          "ece5": 0.10962244396370827,
+          "brier": 0.06829267805985241,
+          "proven_loss_value": -0.6693200469017029,
+          "proven_win_value": 0.5525966286659241,
+          "proven_loss_ge0": 0.07239552678045909,
+          "black_proven_loss_value": -0.6442868709564209,
+          "white_proven_loss_value": -0.7006198763847351
+        },
+        "margin": 0.03,
+        "pass": false
+      },
+      "seconds": 1489.401386499405,
+      "labels": {
+        "file": "runs/e5_rl_T/selfplay/gen_006.labels.npz",
+        "labelled": 1127,
+        "proof_win": 362,
+        "proof_loss": 253,
+        "moves": {
+          "PROVEN_UNSAFE": 2797,
+          "PROVEN_WINNING": 106,
+          "UNREFUTED_EXHAUSTED": 1457,
+          "UNKNOWN_BUDGET": 846
+        },
+        "sha256": "b2e4b44528e65dca355b6ee44cb979603eb8c2b10c073b4974ac3452609c7419",
+        "attached": 1127,
+        "proven": 615,
+        "value_changed": 16
+      }
+    }
+  ],
+  "best_history": [
+    {
+      "version": 0,
+      "checkpoint": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+      "sha": "52d1cbaeb96faac91bacc9d341a8ee17d3fede38b185b67592842295f732c472"
+    },
+    {
+      "version": 1,
+      "checkpoint": "runs/e5_rl_T/models/gen_002.pt",
+      "sha": "9cff58c579a5b8f118fff4527120aa4df9130948a0267262aca93b2a22e964da",
+      "generation": 2
+    }
+  ],
+  "league": {
+    "stage_b_v0": {
+      "score": 97.0,
+      "games": 113
+    },
+    "selfplay_v2_best": {
+      "score": 86.0,
+      "games": 142
+    },
+    "heuristic": {
+      "score": 49.0,
+      "games": 51
+    },
+    "best_v0": {
+      "score": 62.0,
+      "games": 86
+    }
+  }
+}

@@ -17,6 +17,7 @@ solver budgets and split statistics.
 | `replay_{blunder,decision}_{baseline,candidate}.json` | 247 blunder positions and the 247 first losing decisions replayed at 500 ms (proof/filter off) |
 | `visits_{baseline,candidate}.json` | fixed 64/256/1024 sims vs Pela 2023 / Yixin 2018 (opponent 500 ms), 12 pairs each |
 | `ab_e4_reanalysis_holdout.json` | external paired A/B on the fresh holdout `renju_holdout_e4_v1` (60 pairs per opponent) |
+| `e5/` | E5: RL arms T/C registries and logs, held-out diagnosis of both bests, final A/Bs (T vs C, T vs E4), load logs |
 | `background_load_e4_*.csv` | CPU used by other processes during each phase (sleep gaps visible as time jumps) |
 
 Label codes: PROVEN_UNSAFE / PROVEN_WINNING are exact; UNREFUTED_EXHAUSTED is a heuristic negative (the threat-space
