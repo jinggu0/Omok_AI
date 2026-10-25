@@ -14,6 +14,8 @@ train from the next generation on (lag 1). Proven positions take the proof as va
 danger/refute heads get their targets, and a fixed E4 reanalysis buffer is mixed into every batch.
 `gate`: a candidate is promoted only if the SPRT accepts it AND its value calibration on the E4
 held-out test split (ECE on proven positions) is not worse than the best's by more than a margin.
+`gate.mode: balanced` (E5b): instead, separation / |bias| (black and white separately) and AUROC on a
+win / loss x colour balanced set from the E4 val split (rl.tactical.balanced_gate_pass).
 Phase 7 (TRAINING.md §2.5-§2.6): self-play may start from the empty board / opening prefixes and
 record every Taraguchi-10 decision; a share of games is played against a league pool (fixed
 anchors + past best models) chosen by PFSP; matches can start from opening prefixes so the
@@ -396,7 +398,25 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
                            cfg["seed"] * 7 + gen, log)
         promoted = ev["decision"] == "H1"
         gate_rec = None
-        if gate.get("arrays"):
+        if gate.get("arrays") and gate.get("mode", "ece") == "balanced":
+            if best["sha"] not in gate_best:
+                bm, _, _ = load_model(str(REPO / best["checkpoint"]), device)
+                gate_best = {best["sha"]: tacmod.value_balance(bm, REPO / gate["arrays"], device)}
+                del bm
+            cm, _, _ = load_model(str(REPO / cand_rel), device)
+            th = {k: float(gate.get(k, d)) for k, d in (("separation_margin", 0.03), ("bias_max", 0.10), ("auroc_margin", 0.01))}
+            gate_rec = {"mode": "balanced", "candidate": tacmod.value_balance(cm, REPO / gate["arrays"], device),
+                        "best": gate_best[best["sha"]], "thresholds": th}
+            del cm
+            gate_rec["pass"], gate_rec["fails"] = tacmod.balanced_gate_pass(gate_rec["candidate"], gate_rec["best"], **th)
+            c = gate_rec["candidate"]
+            log(f"  balanced gate: sep B {c['black']['separation']:.3f} W {c['white']['separation']:.3f}"
+                f" (best {gate_rec['best']['black']['separation']:.3f} / {gate_rec['best']['white']['separation']:.3f}),"
+                f" bias B {c['black']['bias']:+.3f} W {c['white']['bias']:+.3f}, auroc {c['auroc']:.3f}"
+                f" (best {gate_rec['best']['auroc']:.3f}), ece {c['ece5']:.3f}"
+                f" -> {'pass' if gate_rec['pass'] else 'FAIL ' + '; '.join(gate_rec['fails'])}")
+            promoted = promoted and gate_rec["pass"]
+        elif gate.get("arrays"):
             if best["sha"] not in gate_best:
                 bm, _, _ = load_model(str(REPO / best["checkpoint"]), device)
                 gate_best = {best["sha"]: tacmod.value_calibration(bm, REPO / gate["arrays"], device)}

@@ -104,7 +104,7 @@ def tiny_tactical(tmp_path_factory):
     for k, m in enumerate(["H8", "H9", "I9", "G7", "J10", "I8", "J8", "K11"]):
         assert g.apply(m)
         feats.append(np.asarray(_core.encode(g, spec.core())).reshape(-1, NUM_POINTS))
-        res.append(1 if k % 2 else -1)
+        res.append(1 if (k // 2) % 2 else -1)  # both results for each colour
         side.append(0 if g.side_to_move == "BLACK" else 1)
     arr = root / "gate.npz"
     np.savez(arr, feats=np.stack(feats), pos_result=np.array(res, np.int8), side=np.array(side, np.int8),
@@ -112,10 +112,11 @@ def tiny_tactical(tmp_path_factory):
     return root, data, tck, arr
 
 
-def test_two_generation_loop_with_labels_and_gate(tiny_tactical, small_solver):
+@pytest.mark.parametrize("mode", ["ece", "balanced"])
+def test_two_generation_loop_with_labels_and_gate(tiny_tactical, small_solver, mode):
     root, data, ck, arr = tiny_tactical
     from dojozero.rl import loop
-    cfg = {"run_name": "looptac", "run_dir": str(root), "seed": 2, "device": "cpu", "amp_bf16": False,
+    cfg = {"run_name": f"looptac_{mode}", "run_dir": str(root), "seed": 2, "device": "cpu", "amp_bf16": False,
            "init_checkpoint": str(ck), "generations": 2,
            "selfplay": {"games": 3, "sims_full": 6, "sims_fast": 3, "p_full": 0.6, "root": "GUMBEL", "gumbel_m": 8,
                         "root_tactics_nodes": 100, "max_inflight": 2, "max_plies": 225, "profile": "OMOKDOJANG_DAN"},
@@ -126,12 +127,49 @@ def test_two_generation_loop_with_labels_and_gate(tiny_tactical, small_solver):
            "eval": {"sims": 4, "pairs_per_round": 2, "min_pairs": 2, "max_pairs": 2, "elo0": 0, "elo1": 30,
                     "alpha": 0.05, "beta": 0.05, "anchor_pairs": 1},
            "tactical_aux": {"enabled": True, "label_fraction": 1.0, "top_k": 4, "threads": 2, "override_value": True},
-           "gate": {"arrays": str(arr), "ece_margin": 0.03}}
+           "gate": {"arrays": str(arr), "ece_margin": 0.03, "mode": mode}}
     reg = loop.run(cfg, quiet=True)
     gens = reg.data["generations"]
     assert [g["generation"] for g in gens] == [1, 2]
     for g in gens:
-        assert g["labels"]["labelled"] > 0 and Path(root / "looptac" / "selfplay").exists()
+        assert g["labels"]["labelled"] > 0 and Path(root / f"looptac_{mode}" / "selfplay").exists()
         assert g["gate"] is not None and "ece5" in g["gate"]["candidate"]
+        if mode == "balanced":
+            assert {"black", "white", "auroc"} <= set(g["gate"]["candidate"]) and isinstance(g["gate"]["fails"], list)
         assert g["promoted"] == (g["eval"]["decision"] == "H1" and g["gate"]["pass"])
     assert "danger" in gens[1]["train"] and "refute" in gens[1]["train"]
+
+
+def _bal(bias_b, sep_b, bias_w, sep_w, auroc):
+    return {"auroc": auroc, "black": {"bias": bias_b, "separation": sep_b}, "white": {"bias": bias_w, "separation": sep_w}}
+
+
+def test_balanced_gate_rule():
+    best = _bal(0.02, 0.65, -0.05, 0.66, 0.96)
+    assert tactical.balanced_gate_pass(_bal(0.0, 0.63, 0.0, 0.64, 0.955), best) == (True, [])
+    ok, fails = tactical.balanced_gate_pass(_bal(0.0, 0.61, -0.11, 0.66, 0.96), best)
+    assert not ok and len(fails) == 2 and fails[0].startswith("black separation") and "white |bias|" in fails[1]
+    ok, fails = tactical.balanced_gate_pass(_bal(0.0, 0.70, 0.0, 0.70, 0.94), best)
+    assert not ok and fails[0].startswith("auroc")
+    # pessimism is no longer rewarded: a symmetric shift of every value fails the bias bound
+    ok, fails = tactical.balanced_gate_pass(_bal(-0.2, 0.65, -0.2, 0.66, 0.96), best)
+    assert not ok and len(fails) == 2
+    ok, fails = tactical.balanced_gate_pass({"black": {}, "white": best["white"]}, best)
+    assert not ok and fails == ["black: a win or loss cell is empty", "auroc: a win or loss cell is empty"]
+
+
+def test_balanced_gate_set_is_stratified(tmp_path):
+    rng = np.random.default_rng(0)
+    n = 200
+    arr = tmp_path / "a.npz"
+    np.savez(arr, feats=rng.integers(0, 2, (n, 3, NUM_POINTS)).astype(np.uint8), pos_result=rng.choice([1, -1, 0], n).astype(np.int8),
+             side=rng.integers(0, 2, n).astype(np.int8), ids=np.arange(n), split=rng.integers(0, 3, n).astype(np.int8))
+    m = tactical.build_balanced_gate_set(arr, tmp_path / "g.npz", split="val", seed=1)
+    g = np.load(tmp_path / "g.npz")
+    z = np.load(arr)
+    assert m["n"] == 4 * m["per_cell"] == len(g["pos_result"]) and m["per_cell"] == min(m["cells_available"].values())
+    assert (z["split"][g["source_index"]] == 1).all() and (g["pos_result"] != 0).all()
+    for c in (0, 1):
+        for r in (1, -1):
+            assert ((g["side"] == c) & (g["pos_result"] == r)).sum() == m["per_cell"]
+    assert m == tactical.build_balanced_gate_set(arr, tmp_path / "g2.npz", split="val", seed=1) | {"sha256": m["sha256"]}

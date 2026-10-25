@@ -1,0 +1,386 @@
+{
+ "gate": "data/reanalysis_v1/gate_balanced_v1.npz",
+ "init": {
+  "checkpoint": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+  "n": 1872,
+  "ece5": 0.025266811936202192,
+  "n_win": 936,
+  "n_loss": 936,
+  "win": 0.6429253220558167,
+  "loss": -0.6699127554893494,
+  "bias": -0.013493716716766357,
+  "separation": 0.656419038772583,
+  "auroc": 0.9605899353495507,
+  "black": {
+   "n_win": 468,
+   "n_loss": 468,
+   "win": 0.6790605783462524,
+   "loss": -0.6268101930618286,
+   "bias": 0.026125192642211914,
+   "separation": 0.6529353857040405,
+   "auroc": 0.9583698590108847
+  },
+  "white": {
+   "n_win": 468,
+   "n_loss": 468,
+   "win": 0.6067900061607361,
+   "loss": -0.7130153179168701,
+   "bias": -0.05311265587806702,
+   "separation": 0.6599026918411255,
+   "auroc": 0.9637208707721528
+  }
+ },
+ "arms": {
+  "T": {
+   "rows": [
+    {
+     "generation": 1,
+     "sprt": "continue",
+     "e5_promoted": false,
+     "balanced_pass": false,
+     "fails": [
+      "black separation 0.601 < 0.653 - 0.03",
+      "white separation 0.617 < 0.660 - 0.03"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.06304497397544548,
+      "auroc": 0.9626022718971436,
+      "bias": 0.055307626724243164,
+      "separation": 0.6090546250343323,
+      "black": {
+       "bias": 0.09686246514320374,
+       "separation": 0.6010531187057495,
+       "auroc": 0.9601276572430418
+      },
+      "white": {
+       "bias": 0.013752788305282593,
+       "separation": 0.617056131362915,
+       "auroc": 0.9662046168456425
+      }
+     }
+    },
+    {
+     "generation": 2,
+     "sprt": "H1",
+     "e5_promoted": true,
+     "balanced_pass": false,
+     "fails": [
+      "white |bias| 0.103 > 0.1"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.04961334147418919,
+      "auroc": 0.9699153973993717,
+      "bias": -0.03799960017204285,
+      "separation": 0.6610480546951294,
+      "black": {
+       "bias": 0.026866257190704346,
+       "separation": 0.6663739085197449,
+       "auroc": 0.9725326904814084
+      },
+      "white": {
+       "bias": -0.10286548733711243,
+       "separation": 0.6557222604751587,
+       "auroc": 0.971267988896194
+      }
+     }
+    },
+    {
+     "generation": 3,
+     "sprt": "continue",
+     "e5_promoted": false,
+     "balanced_pass": true,
+     "fails": [],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.07007058154250312,
+      "auroc": 0.972741571699905,
+      "bias": 0.03883391618728638,
+      "separation": 0.6450185179710388,
+      "black": {
+       "bias": 0.09155973792076111,
+       "separation": 0.6362793445587158,
+       "auroc": 0.9705876981518007
+      },
+      "white": {
+       "bias": -0.013891875743865967,
+       "separation": 0.653757631778717,
+       "auroc": 0.9766783548834831
+      }
+     }
+    },
+    {
+     "generation": 4,
+     "sprt": "continue",
+     "e5_promoted": false,
+     "balanced_pass": false,
+     "fails": [
+      "black |bias| 0.102 > 0.1"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.052148091626695835,
+      "auroc": 0.9672124972605742,
+      "bias": 0.04608011245727539,
+      "separation": 0.6396922469139099,
+      "black": {
+       "bias": 0.10214361548423767,
+       "separation": 0.6356595754623413,
+       "auroc": 0.9721080794798743
+      },
+      "white": {
+       "bias": -0.009983360767364502,
+       "separation": 0.643724799156189,
+       "auroc": 0.9643783329680765
+      }
+     }
+    },
+    {
+     "generation": 5,
+     "sprt": "continue",
+     "e5_promoted": false,
+     "balanced_pass": false,
+     "fails": [
+      "white |bias| 0.143 > 0.1"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.06736210905986592,
+      "auroc": 0.9723283749726057,
+      "bias": -0.09025958180427551,
+      "separation": 0.6479288339614868,
+      "black": {
+       "bias": -0.03735768795013428,
+       "separation": 0.6541721820831299,
+       "auroc": 0.9711310176053766
+      },
+      "white": {
+       "bias": -0.14316140115261078,
+       "separation": 0.641685426235199,
+       "auroc": 0.9753816933304112
+      }
+     }
+    },
+    {
+     "generation": 6,
+     "sprt": "H1",
+     "e5_promoted": false,
+     "balanced_pass": false,
+     "fails": [
+      "black separation 0.549 < 0.653 - 0.03",
+      "black |bias| 0.280 > 0.1"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.10107286517213807,
+      "auroc": 0.9697498904229673,
+      "bias": 0.18311099708080292,
+      "separation": 0.5973139405250549,
+      "black": {
+       "bias": 0.2797289788722992,
+       "separation": 0.5493670701980591,
+       "auroc": 0.9709346920885382
+      },
+      "white": {
+       "bias": 0.08649298548698425,
+       "separation": 0.6452608108520508,
+       "auroc": 0.9762080867850098
+      }
+     }
+    }
+   ],
+   "final_best": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt"
+  },
+  "C": {
+   "rows": [
+    {
+     "generation": 1,
+     "sprt": "continue",
+     "e5_promoted": false,
+     "balanced_pass": false,
+     "fails": [
+      "black separation 0.391 < 0.653 - 0.03",
+      "black |bias| 0.220 > 0.1",
+      "white separation 0.402 < 0.660 - 0.03",
+      "auroc 0.840 < 0.961 - 0.01"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.07368560367797174,
+      "auroc": 0.8402035849952516,
+      "bias": 0.10397063195705414,
+      "separation": 0.39673906564712524,
+      "black": {
+       "bias": 0.22000083327293396,
+       "separation": 0.3913516700267792,
+       "auroc": 0.8506054131054132
+      },
+      "white": {
+       "bias": -0.012059584259986877,
+       "separation": 0.4021264910697937,
+       "auroc": 0.8407708744247205
+      }
+     }
+    },
+    {
+     "generation": 2,
+     "sprt": "continue",
+     "e5_promoted": false,
+     "balanced_pass": false,
+     "fails": [
+      "black separation 0.443 < 0.653 - 0.03",
+      "black |bias| 0.145 > 0.1",
+      "white separation 0.434 < 0.660 - 0.03",
+      "auroc 0.868 < 0.961 - 0.01"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.03049433547366635,
+      "auroc": 0.8679813627730294,
+      "bias": 0.03279779851436615,
+      "separation": 0.4382578730583191,
+      "black": {
+       "bias": 0.14505431056022644,
+       "separation": 0.44283029437065125,
+       "auroc": 0.888665169113887
+      },
+      "white": {
+       "bias": -0.07945874333381653,
+       "separation": 0.43368539214134216,
+       "auroc": 0.8600883921396741
+      }
+     }
+    },
+    {
+     "generation": 3,
+     "sprt": "continue",
+     "e5_promoted": false,
+     "balanced_pass": false,
+     "fails": [
+      "black separation 0.461 < 0.653 - 0.03",
+      "white separation 0.427 < 0.660 - 0.03",
+      "white |bias| 0.183 > 0.1",
+      "auroc 0.853 < 0.961 - 0.01"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.053483422829681965,
+      "auroc": 0.8528757122507122,
+      "bias": -0.041676297783851624,
+      "separation": 0.44414716958999634,
+      "black": {
+       "bias": 0.09977571666240692,
+       "separation": 0.46128928661346436,
+       "auroc": 0.8784608079479874
+      },
+      "white": {
+       "bias": -0.18312829732894897,
+       "separation": 0.42700499296188354,
+       "auroc": 0.8439851340492366
+      }
+     }
+    },
+    {
+     "generation": 4,
+     "sprt": "continue",
+     "e5_promoted": false,
+     "balanced_pass": false,
+     "fails": [
+      "black separation 0.459 < 0.653 - 0.03",
+      "white separation 0.420 < 0.660 - 0.03",
+      "white |bias| 0.292 > 0.1",
+      "auroc 0.856 < 0.961 - 0.01"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.09144964156688276,
+      "auroc": 0.8562486302870919,
+      "bias": -0.18289929628372192,
+      "separation": 0.43954193592071533,
+      "black": {
+       "bias": -0.07388341426849365,
+       "separation": 0.4592447280883789,
+       "auroc": 0.877785082913288
+      },
+      "white": {
+       "bias": -0.2919151782989502,
+       "separation": 0.41983914375305176,
+       "auroc": 0.8491215574548908
+      }
+     }
+    },
+    {
+     "generation": 5,
+     "sprt": "continue",
+     "e5_promoted": false,
+     "balanced_pass": false,
+     "fails": [
+      "black separation 0.462 < 0.653 - 0.03",
+      "white separation 0.447 < 0.660 - 0.03",
+      "auroc 0.871 < 0.961 - 0.01"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.03221663816744447,
+      "auroc": 0.8714535849952516,
+      "bias": 0.004047036170959473,
+      "separation": 0.4548511207103729,
+      "black": {
+       "bias": 0.08909370005130768,
+       "separation": 0.46240758895874023,
+       "auroc": 0.8871539192052013
+      },
+      "white": {
+       "bias": -0.08099968731403351,
+       "separation": 0.4472947120666504,
+       "auroc": 0.8628232522463292
+      }
+     }
+    },
+    {
+     "generation": 6,
+     "sprt": "H1",
+     "e5_promoted": true,
+     "balanced_pass": false,
+     "fails": [
+      "black separation 0.488 < 0.653 - 0.03",
+      "white separation 0.446 < 0.660 - 0.03",
+      "white |bias| 0.306 > 0.1",
+      "auroc 0.879 < 0.961 - 0.01"
+     ],
+     "would_promote": false,
+     "best_before": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt",
+     "candidate": {
+      "ece5": 0.09799220908082958,
+      "auroc": 0.8793979198626635,
+      "bias": -0.19598443806171417,
+      "separation": 0.46664291620254517,
+      "black": {
+       "bias": -0.08640263974666595,
+       "separation": 0.48759621381759644,
+       "auroc": 0.8974404631455913
+      },
+      "white": {
+       "bias": -0.3055661916732788,
+       "separation": 0.44568949937820435,
+       "auroc": 0.8758400905836803
+      }
+     }
+    }
+   ],
+   "final_best": "runs/e4_reanalysis_v1/checkpoints/step_1500.pt"
+  }
+ }
+}
