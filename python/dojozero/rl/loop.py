@@ -14,6 +14,7 @@ train from the next generation on (lag 1). Proven positions take the proof as va
 danger/refute heads get their targets, and a fixed E4 reanalysis buffer is mixed into every batch.
 `gate`: a candidate is promoted only if the SPRT accepts it AND its value calibration on the E4
 held-out test split (ECE on proven positions) is not worse than the best's by more than a margin.
+`train.ema` (E5e): the candidate is an exponential moving average of the learner weights.
 `gate.mode: balanced` (E5b): instead, separation / |bias| (black and white separately) and AUROC on a
 win / loss x colour balanced set from the E4 val split (rl.tactical.balanced_gate_pass).
 Phase 7 (TRAINING.md §2.5-§2.6): self-play may start from the empty board / opening prefixes and
@@ -321,7 +322,9 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
     env_small = {"git_commit": git("rev-parse", "HEAD"), "torch": str(torch.__version__), "device": str(device)}
 
     # Learner: initialised from the init checkpoint, or the latest generation on resume.
-    learner_ckpt = cfg["init_checkpoint"] if not reg.data["generations"] else reg.data["generations"][-1]["candidate"]
+    # With `train.ema` the candidate is the weight EMA and the raw learner is kept in gen_NNN.learner.pt.
+    last = reg.data["generations"][-1] if reg.data["generations"] else None
+    learner_ckpt = cfg["init_checkpoint"] if last is None else last.get("learner", last["candidate"])
     learner, spec, ck = load_model(str(REPO / learner_ckpt), device)
     mcfg = ck["model_config"]
     learner.train()
@@ -331,6 +334,13 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
     if reg.data["generations"]:
         opt.load_state_dict(ck["optimizer"])
     step = ck["step"] if reg.data["generations"] else 0
+    ema = None
+    if cfg["train"].get("ema"):
+        ema = WeightEMA(learner, float(cfg["train"]["ema"]))
+        if last is not None:  # resume: the EMA state is the last candidate
+            em, _, _ = load_model(str(REPO / last["candidate"]), device)
+            ema.state = {k: v.detach().clone() for k, v in em.state_dict().items()}
+            del em
     if reg.data["best"] is None:
         reg.data["best"] = {"version": 0, "checkpoint": cfg["init_checkpoint"], "sha": model_sha(learner)}
         reg.data["best_history"] = [dict(reg.data["best"])]
@@ -426,12 +436,20 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
         t0 = time.time()
         if replay.value_weighting["balance"] or replay.value_weighting["proof"] != 1.0:
             log(f"  value weights: {replay.value_cells()}")
-        step, train_metrics = train_generation(learner, opt, replay, o, cfg["seed"], step, weights, amp, device,
+        step, train_metrics = train_generation(learner, opt, replay, o, cfg["seed"], step, weights, amp, device, ema=ema,
                                                tactical=(tactical, tactical_pool, mix) if tactical is not None else None,
                                                reana=(reana, reana_pool, n_re) if n_re else None)
         cand_rel = Path(cfg["run_dir"]) / cfg["run_name"] / "models" / f"gen_{gen:03d}.pt"
-        save_model(REPO / cand_rel, learner, opt, spec, mcfg, cfg, step, env_small, train_metrics)
-        cand_sha = model_sha(learner)
+        learner_rel = None
+        if ema is not None:
+            learner_rel = cand_rel.with_suffix(".learner.pt")
+            save_model(REPO / learner_rel, learner, opt, spec, mcfg, cfg, step, env_small, train_metrics)
+            cand_model = ema.averaged(learner)
+        else:
+            cand_model = learner
+        save_model(REPO / cand_rel, cand_model, opt, spec, mcfg, cfg, step, env_small, train_metrics)
+        cand_sha = model_sha(cand_model)
+        del cand_model
         log(f"  train: {o['steps_per_generation']} steps in {time.time() - t0:.0f}s, {train_metrics}")
         # 3. SPRT promotion
         t0 = time.time()
@@ -483,7 +501,8 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
             log(f"  anchor (best vs heuristic): {anchor}")
         reg.data["generations"].append({
             "generation": gen, "chunk": rel(chunk),
-            "candidate": str(cand_rel).replace("\\", "/"), "candidate_sha": cand_sha, "selfplay_model": best["sha"],
+            "candidate": str(cand_rel).replace("\\", "/"), "candidate_sha": cand_sha,
+            **({"learner": str(learner_rel).replace("\\", "/")} if learner_rel is not None else {}), "selfplay_model": best["sha"],
             "games": len(games), "positions": n_pos, "black_wins": black_wins, "draws": winners.count(None),
             "train": train_metrics, "step": step, "eval": ev, "promoted": promoted, "anchor": anchor,
             "league": lres, "opening": ostats, "proposal_regret": regret, "gate": gate_rec,
@@ -508,7 +527,9 @@ def main(argv: list[str] | None = None) -> int:
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
     if args.generations:
         cfg["generations"] = args.generations
-    run(cfg, resume=args.resume)
+    from ..evaluation.tournament import keep_awake
+    with keep_awake():  # no idle sleep, no EcoQoS throttling (speed only)
+        run(cfg, resume=args.resume)
     return 0
 
 

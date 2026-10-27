@@ -124,7 +124,7 @@ def test_two_generation_loop_with_labels_and_gate(tiny_tactical, small_solver, m
            "train": {"steps_per_generation": 3, "batch_size": 16, "lr": 0.001, "weight_decay": 0.0001,
                      "betas": [0.9, 0.999], "grad_clip": 5.0, "tactical_mix": 0.25, "tactical_data": str(data),
                      "loss": {"policy": 1.0, "value": 1.0, "aux": 0.5, "danger": 1.0, "refute": 1.0},
-                     **({"value_weighting": {"balance": True}} if mode == "balanced" else {})},
+                     **({"value_weighting": {"balance": True}, "ema": 0.9} if mode == "balanced" else {})},
            "eval": {"sims": 4, "pairs_per_round": 2, "min_pairs": 2, "max_pairs": 2, "elo0": 0, "elo1": 30,
                     "alpha": 0.05, "beta": 0.05, "anchor_pairs": 1},
            "tactical_aux": {"enabled": True, "label_fraction": 1.0, "top_k": 4, "threads": 2, "override_value": True},
@@ -137,8 +137,16 @@ def test_two_generation_loop_with_labels_and_gate(tiny_tactical, small_solver, m
         assert g["gate"] is not None and "ece5" in g["gate"]["candidate"]
         if mode == "balanced":
             assert {"black", "white", "auroc"} <= set(g["gate"]["candidate"]) and isinstance(g["gate"]["fails"], list)
+            # EMA: the candidate is the averaged model, the raw learner is kept for resume
+            from dojozero.model.load import load_model, model_sha
+            lm, _, _ = load_model(str(Path(loop.REPO) / g["learner"]), "cpu")
+            assert Path(loop.REPO / g["learner"]).exists() and model_sha(lm) != g["candidate_sha"]
         assert g["promoted"] == (g["eval"]["decision"] == "H1" and g["gate"]["pass"])
     assert "danger" in gens[1]["train"] and "refute" in gens[1]["train"]
+    if mode == "balanced":  # resume continues the raw learner and the EMA from the last candidate
+        reg = loop.run(cfg | {"generations": 1}, resume=True, quiet=True)
+        assert [g["generation"] for g in reg.data["generations"]] == [1, 2, 3]
+        assert reg.data["generations"][2]["step"] == 3 * cfg["train"]["steps_per_generation"]
 
 
 def _bal(bias_b, sep_b, bias_w, sep_w, auroc):
