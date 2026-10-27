@@ -1,0 +1,49 @@
+{
+ "groups": {
+  "base": {
+   "seeds": [
+    7,
+    8,
+    9
+   ],
+   "passes_g2_6": 3,
+   "n": 15,
+   "mean_max_abs_bias_g2_6": 0.16578653653462727
+  },
+  "ema": {
+   "seeds": [
+    7,
+    8,
+    9
+   ],
+   "passes_g2_6": 4,
+   "n": 15,
+   "mean_max_abs_bias_g2_6": 0.10734285612901052
+  },
+  "lr_half": {
+   "seeds": [
+    7,
+    8,
+    9
+   ],
+   "passes_g2_6": 3,
+   "n": 15,
+   "mean_max_abs_bias_g2_6": 0.15154379804929097
+  }
+ },
+ "verdicts": {
+  "ema": {
+   "passes>=8": false,
+   "passes>=base+4": false,
+   "bias<base": true,
+   "proceed": false
+  },
+  "lr_half": {
+   "passes>=8": false,
+   "passes>=base+4": false,
+   "bias<base": true,
+   "proceed": false
+  }
+ },
+ "decision": "STOP"
+}

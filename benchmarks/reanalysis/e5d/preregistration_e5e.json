@@ -1,0 +1,9 @@
+{
+ "phase": "Phase 8 E5e (fixed-data screen, written after the E5d STOP and before any E5e run)",
+ "origin": "Hypothesis formed from E5d data (post hoc): EMA removed most generation-to-generation swings, but the EMA candidates keep a systematic black-to-move bias of +0.08..+0.13 (white ~0), just above the 0.10 bound; E5c colour x result balanced weights reduced the black-white bias gap (0.12 -> 0.08). Combination tested on new runs.",
+ "data": "same as E5d (E5 T chunks + labels gens 1-6, init E4 candidate, e5b_rl_T.yaml, balanced gate vs init)",
+ "groups": {"base": "E5c/E5d base seeds 7, 8, 9 (existing)", "ema_balance": "EMA 0.99 + colour x result balanced value weights (clip 0.5-2.0), seeds 7, 8, 9"},
+ "rule": "same as E5d: over generations 2-6 of the 3 seeds, proceed if passes >= 8 of 15, passes >= base + 4, and mean max(|bias_black|,|bias_white|) < base",
+ "next_if_proceed": "implement EMA in rl.loop, run T'' (e5b_rl_T + value_weighting.balance + EMA 0.99) 6 generations with the balanced gate; holdout v3 + paired A/B vs E4 candidate only if promoted",
+ "known_confound": "EMA candidates stay close to the init (= gate reference); strength is checked only by the SPRT in the T'' run"
+}

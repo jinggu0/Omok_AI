@@ -38,6 +38,8 @@ from ..trainer.train import REPO, pick_device
 
 
 def screen(args) -> int:
+    from ..evaluation.tournament import disable_power_throttling
+    disable_power_throttling()  # Windows EcoQoS: speed only, results are fixed-step
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
     device = pick_device(cfg.get("device", "auto"))
     o = cfg["train"]
