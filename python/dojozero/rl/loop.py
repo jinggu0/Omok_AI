@@ -68,10 +68,33 @@ def _complete(b: dict, device) -> dict:
     return b
 
 
+class WeightEMA:
+    """Exponential moving average of a model's floating-point state (parameters and BatchNorm
+    statistics; integer buffers are copied). PROGRESS Phase 8 E5d."""
+
+    def __init__(self, model, decay: float):
+        self.decay = decay
+        self.state = {k: v.detach().clone() for k, v in model.state_dict().items()}
+
+    @torch.no_grad()
+    def update(self, model) -> None:
+        for k, v in model.state_dict().items():
+            if v.dtype.is_floating_point:
+                self.state[k].mul_(self.decay).add_(v.detach(), alpha=1.0 - self.decay)
+            else:
+                self.state[k].copy_(v)
+
+    def averaged(self, model):
+        m = copy.deepcopy(model)
+        m.load_state_dict(self.state)
+        return m
+
+
 def train_generation(learner, opt, replay, o: dict, seed: int, step: int, weights, amp: bool, device,
-                     tactical=None, reana=None) -> tuple[int, dict]:
+                     tactical=None, reana=None, ema: WeightEMA | None = None) -> tuple[int, dict]:
     """One generation of learner updates on replay (+ Stage A tactical mix, + E4 reanalysis buffer).
-    tactical = (dataset, pool, mix share); reana = (data, pool, rows per batch). Returns (step, metrics)."""
+    tactical = (dataset, pool, mix share); reana = (data, pool, rows per batch); ema is updated after
+    every optimizer step. Returns (step, metrics)."""
     learner.train()
     bs = o["batch_size"]
     n_tac = int(round(bs * tactical[2])) if tactical is not None else 0
@@ -100,6 +123,8 @@ def train_generation(learner, opt, replay, o: dict, seed: int, step: int, weight
         if not torch.isfinite(gn):
             raise RuntimeError(f"non-finite gradient at step {step}")
         opt.step()
+        if ema is not None:
+            ema.update(learner)
         step += 1
         for kk, v in parts.items():
             agg.setdefault(kk, []).append(float(v))

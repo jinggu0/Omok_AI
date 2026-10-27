@@ -31,7 +31,7 @@ import yaml
 from ..model.load import load_model
 from ..replay import ReplayBuffer
 from ..rl import tactical as tacmod
-from ..rl.loop import save_model, train_generation
+from ..rl.loop import WeightEMA, save_model, train_generation
 from ..trainer.data import TacticalDataset
 from ..trainer.losses import LossWeights
 from ..trainer.train import REPO, pick_device
@@ -41,6 +41,8 @@ def screen(args) -> int:
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
     device = pick_device(cfg.get("device", "auto"))
     o = cfg["train"]
+    if args.lr is not None:
+        o["lr"] = args.lr
     gate = REPO / cfg["gate"]["arrays"]
     learner, spec, ck = load_model(str(REPO / cfg["init_checkpoint"]), device)
     mcfg = ck["model_config"]
@@ -60,6 +62,7 @@ def screen(args) -> int:
         rd = ReanalysisData(REPO / tac["reanalysis"])
         reana = (rd, rd.indices("train"), int(round(o["batch_size"] * float(tac.get("reanalysis_mix", 0.15)))))
     weights = LossWeights(**o["loss"])
+    ema = WeightEMA(learner, args.ema) if args.ema else None
     amp = bool(cfg.get("amp_bf16", True)) and device.type == "xpu"
     src = json.loads((REPO / args.source_registry).read_text(encoding="utf-8"))
     out_dir = REPO / "runs" / "e5c_screen" / args.arm
@@ -71,10 +74,12 @@ def screen(args) -> int:
         replay.ingest(REPO / rec["chunk"], g)
         cells = replay.value_cells()
         step, metrics = train_generation(learner, opt, replay, o, args.seed, step, weights, amp, device,
-                                         tactical=tactical, reana=reana)
-        save_model(out_dir / f"gen_{g:03d}.pt", learner, opt, spec, mcfg, cfg, step, {}, metrics)
-        m = tacmod.value_balance(learner, gate, device)
-        test = tacmod.value_calibration(learner, REPO / "data/reanalysis_v1/arrays.npz", device)
+                                         tactical=tactical, reana=reana, ema=ema)
+        cand = ema.averaged(learner) if ema is not None else learner  # the model that would be gated / promoted
+        save_model(out_dir / f"gen_{g:03d}.pt", cand, opt, spec, mcfg, cfg, step, {}, metrics)
+        m = tacmod.value_balance(cand, gate, device)
+        test = tacmod.value_calibration(cand, REPO / "data/reanalysis_v1/arrays.npz", device)
+        learner.train()
         ok, fails = tacmod.balanced_gate_pass(m, init)
         rows.append({"generation": g, "pass": ok, "fails": fails, "train": metrics, "replay_cells": cells,
                      "gate": m, "colour_gap": m["black"]["bias"] - m["white"]["bias"],
@@ -87,6 +92,7 @@ def screen(args) -> int:
             lp = (REPO / rec["chunk"]).with_suffix("").with_suffix(".labels.npz")
             replay.attach_labels(g, lp, bool(tac.get("override_value", True)))
     rep = {"arm": args.arm, "seed": args.seed, "value_weighting": {"balance": args.balance, "proof": args.proof},
+           "ema": args.ema, "lr": o["lr"],
            "config": args.config, "source_registry": args.source_registry, "init": init, "rows": rows,
            "passes": sum(r["pass"] for r in rows),
            "mean_abs_colour_gap": float(np.mean([abs(r["colour_gap"]) for r in rows]))}
@@ -114,11 +120,44 @@ def judge(paths: list[str]) -> int:
     return 0
 
 
+def _group_stats(reps: list[dict]) -> dict:
+    later = [r for rep in reps for r in rep["rows"] if r["generation"] >= 2]
+    return {"seeds": [rep["seed"] for rep in reps], "passes_g2_6": int(sum(r["pass"] for r in later)),
+            "n": len(later),
+            "mean_max_abs_bias_g2_6": float(np.mean([max(abs(r["gate"]["black"]["bias"]), abs(r["gate"]["white"]["bias"]))
+                                                      for r in later]))}
+
+
+def judge_groups(argv: list[str]) -> int:
+    """E5d pre-registered rule. argv: NAME=file,file,file ... ; the group named `base` is the reference.
+    A group proceeds if over generations 2-6 of its seeds (1) passes >= 8 of 15, (2) passes >= base + 4,
+    (3) mean max(|bias_black|, |bias_white|) < base. Several proceed -> more passes, then smaller bias."""
+    groups = {}
+    for a in argv:
+        name, files = a.split("=", 1)
+        groups[name] = _group_stats([json.loads(Path(f).read_text(encoding="utf-8")) for f in files.split(",")])
+    base = groups["base"]
+    out = {"groups": groups, "verdicts": {}}
+    for name, gs in groups.items():
+        if name == "base":
+            continue
+        c = {"passes>=8": gs["passes_g2_6"] >= 8, "passes>=base+4": gs["passes_g2_6"] >= base["passes_g2_6"] + 4,
+             "bias<base": gs["mean_max_abs_bias_g2_6"] < base["mean_max_abs_bias_g2_6"]}
+        out["verdicts"][name] = c | {"proceed": all(c.values())}
+    ok = [n for n, v in out["verdicts"].items() if v["proceed"]]
+    ok.sort(key=lambda n: (-groups[n]["passes_g2_6"], groups[n]["mean_max_abs_bias_g2_6"]))
+    out["decision"] = ok[0] if ok else "STOP"
+    print(json.dumps(out, indent=1))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     import sys
     argv = sys.argv[1:] if argv is None else argv
     if argv and argv[0] == "judge":
         return judge(argv[1:])
+    if argv and argv[0] == "judge-groups":
+        return judge_groups(argv[1:])
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
     ap.add_argument("--source-registry", default="benchmarks/reanalysis/e5/registry_T.json")
@@ -126,6 +165,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--seed", type=int, required=True)
     ap.add_argument("--balance", action="store_true")
     ap.add_argument("--proof", type=float, default=1.0)
+    ap.add_argument("--ema", type=float, default=None, help="EMA decay of the learner weights (candidate = EMA)")
+    ap.add_argument("--lr", type=float, default=None, help="override train.lr")
     ap.add_argument("--out", required=True)
     return screen(ap.parse_args(argv))
 

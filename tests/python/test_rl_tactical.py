@@ -210,3 +210,21 @@ def test_value_cell_weights_and_weighted_loss(tmp_path, small_solver):
     assert torch.isclose(value_loss(logits, v, has), value_loss(logits, v, has, torch.full((6,), 2.0)))
     w2 = torch.tensor([1.0, 0, 0, 0, 0, 0])
     assert torch.isclose(value_loss(logits, v, has, w2), value_loss(logits[:1], v[:1], has[:1]))
+
+
+def test_weight_ema():
+    import torch
+    from dojozero.rl.loop import WeightEMA
+    m = torch.nn.Sequential(torch.nn.Linear(2, 2), torch.nn.BatchNorm1d(2))
+    ema = WeightEMA(m, decay=0.5)
+    w0 = m[0].weight.detach().clone()
+    with torch.no_grad():
+        m[0].weight.add_(2.0)
+    m.train()
+    m(torch.randn(4, 2))  # updates BN running stats and num_batches_tracked
+    ema.update(m)
+    a = ema.averaged(m)
+    assert torch.allclose(a[0].weight, w0 + 1.0)
+    assert torch.allclose(a[1].running_mean, m[1].running_mean * 0.5)
+    assert int(a[1].num_batches_tracked) == int(m[1].num_batches_tracked) == 1
+    assert torch.allclose(m[0].weight, w0 + 2.0)  # the learner itself is untouched

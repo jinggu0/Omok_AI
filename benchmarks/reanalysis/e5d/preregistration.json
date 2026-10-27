@@ -1,0 +1,13 @@
+{
+ "phase": "Phase 8 E5d (fixed-data screen, written before any E5d run)",
+ "question": "Does smoothing the learner (weight EMA, or a lower learning rate) reduce the per-generation value bias swings so that more generations pass the balanced gate?",
+ "data": "E5 T self-play chunks + labels, gens 1-6 (benchmarks/reanalysis/e5/registry_T.json); init E4 candidate 52d1cbae; config configs/training/e5b_rl_T.yaml (balanced gate vs init)",
+ "groups": {
+  "base": "unchanged learner (seeds 7, 8 from E5c screen_base_s7/s8 + new seed 9)",
+  "ema": "candidate = EMA of learner weights, decay 0.99 (time constant 100 steps = 2/3 generation), seeds 7, 8, 9",
+  "lr_half": "train.lr 0.0005 -> 0.00025, seeds 7, 8, 9"
+ },
+ "rule": "Over generations 2-6 of the 3 seeds (15 checks): proceed if (1) passes >= 8, (2) passes >= base + 4, (3) mean max(|bias_black|,|bias_white|) < base. If both proceed: more passes, then smaller bias. Generation 1 excluded (an EMA candidate still carries the init weights after 150 steps).",
+ "next_if_proceed": "implement the chosen change in rl.loop (EMA: candidate = EMA, raw learner kept for resume), run T'' 6 generations (e5b_rl_T + change, balanced gate), then holdout v3 (seed 203) + paired A/B T'' best vs E4 candidate only if something is promoted",
+ "known_confound": "Smoothing keeps candidates closer to the init model, which is also the gate reference; gate passes alone do not show strength. The SPRT in the T'' run is the strength check."
+}
