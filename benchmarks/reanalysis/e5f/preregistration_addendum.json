@@ -1,0 +1,8 @@
+{
+ "written": "2026-10-28 23:25, before any generation > 12 (generations 7-10 already ran: all gate pass, SPRT continue)",
+ "user_instruction": "continue training until 2026-10-29 11:00 (user wrote 2026-10-19, read as the next 11:00), taking necessary actions autonomously",
+ "run": "same config and run directory (configs/training/e5e_rl_T.yaml, runs/e5e_rl_T), resumed in chunks of <= 3 generations; a chunk starts only if it can finish before 11:00 at ~22 min per generation; nothing else changes",
+ "operations": "on battery: wait for AC; on a failed chunk: resume (stale lock is removed by the loop), stop after 3 consecutive failures; laptop sleep cannot be prevented (lid) and is recorded from time gaps",
+ "external_check": "replaces the per-promotion check of preregistration.json: once, after the training deadline, only if the final best differs from gen_002: new holdout renju_holdout_e5_v4 (seed 204, excluding all 7 existing sets), paired A/B final best vs T'' best gen_002, Pela 2023 + Yixin 2018, 60 pairs each, 500 ms, proof/filter off; same ACCEPT / REJECT / INCONCLUSIVE rule",
+ "if_no_promotion": "no external A/B; report all generations (gate, SPRT)"
+}
