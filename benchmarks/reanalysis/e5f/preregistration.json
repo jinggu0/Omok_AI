@@ -1,0 +1,9 @@
+{
+ "phase": "Phase 8 E5f (written before the run): T'' continued for generations 7-12",
+ "question": "Does more self-play with the E5e setting (balanced gate + colour x result balanced value weights + weight EMA 0.99) make the model stronger than the T'' best?",
+ "run": "python -m dojozero.rl.loop --config configs/training/e5e_rl_T.yaml --resume --generations 6 (same config, seeds, gate; resumes learner from gen_006.learner.pt and the EMA from gen_006.pt)",
+ "promotion": "unchanged: SPRT H1 vs the current best AND the balanced gate",
+ "external_check": "only if a generation 7-12 model is promoted: new holdout renju_holdout_e5_v4 (seed 204, excluding all 7 existing sets, same filter), paired A/B new best vs T'' best (runs/e5e_rl_T/models/gen_002.pt), Pela 2023 + Yixin 2018, 60 pairs each, 500 ms, proof/filter off",
+ "decision": "ACCEPT if the 95% CI of the pooled paired difference is above 0 and the candidate has 0 failures; REJECT if below 0 or failures; else INCONCLUSIVE",
+ "if_no_promotion": "no external A/B; report generations 7-12 (gate, SPRT) and the held-out diagnosis of the last candidate"
+}
