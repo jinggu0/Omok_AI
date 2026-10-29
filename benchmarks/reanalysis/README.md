@@ -22,6 +22,7 @@ solver budgets and split statistics.
 | `e5c/` | E5c fixed-data screen of colour x result balanced value weights (`screen_*.json`, `python -m dojozero.tools.fixed_replay_screen`; pre-registered judge: STOP) |
 | `e5d/` | E5d/E5e fixed-data screens (EMA, lr/2, EMA + balanced weights; seeds 7-9), pre-registrations, group judges |
 | `e5e/` | E5e T'' run (registry, log), held-out diagnosis, value balance on test / gate, external A/B on `renju_holdout_e5_v3` (INCONCLUSIVE), load logs |
+| `e5f/` | E5f T'' continued to generation 47: pre-registration + addendum, registry, loop / driver logs, held-out diagnosis and value balance on test / gate of the final best gen_045, external A/B gen_045 vs gen_002 on `renju_holdout_e5_v4` (ACCEPT, CI lower bound +0.003), load logs |
 | `background_load_e4_*.csv` | CPU used by other processes during each phase (sleep gaps visible as time jumps) |
 
 Label codes: PROVEN_UNSAFE / PROVEN_WINNING are exact; UNREFUTED_EXHAUSTED is a heuristic negative (the threat-space
