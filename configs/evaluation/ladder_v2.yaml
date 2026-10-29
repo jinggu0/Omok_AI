@@ -1,0 +1,24 @@
+# Ladder v2 (PROGRESS Phase 8 E5h): ladder v1 settings, engine round robin v1b, anchor Yixin 2018 (as the v1b refit).
+openings: renju_balanced_v1      # approximate balance filter (Rapfi 2025 vs AlphaGomoku 2026, 2 games each)
+tier: A                          # calibration, not a feature-adoption decision (Tier B needs >= 100 pairs)
+time_ms: 500                     # per move, both sides; externals single-threaded CPU (PRD OQ-13 still open)
+probe_pairs: 4                   # last 4 openings of the set
+main_pairs: 24                   # first openings of the set, disjoint from the probe openings
+lo: 0.25
+hi: 0.75
+max_primary: 3
+prior_sd: 600
+anchor: yixin_2018              # fixed, as ladder v1b
+include_matches: runs/evaluation/round_robin_v1b.json
+seed: 1
+ladder:
+  - pela_2023
+  - yixin_2018
+  - rapfi_2021
+  - embryo_2021r
+  - katagomo_2021r
+  - alphagomoku_2023
+  - embryo_2026
+  - katagomo_2026
+  - alphagomoku_2026
+  - rapfi_2025

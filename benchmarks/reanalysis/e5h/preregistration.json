@@ -1,0 +1,13 @@
+{
+ "written": "2026-10-29, before any game of this measurement",
+ "user_instruction": "2026-10-29 'Measure the ladder' (re-measure the external ladder with T'' gen_045)",
+ "question": "where does T'' gen_045 (sha 8181290b..., E5g: +0.142 [+0.083, +0.200] vs the E4 candidate) sit on the external engine ladder? (last ladder v1b, 2026-10-19: DojoZero taraguchi v1 -491 [-634, -348], anchor Yixin 2018 = 0)",
+ "type": "measurement, not a promotion / adoption decision; the default model stays unchanged (user decision)",
+ "player": "dojo:runs/e5e_rl_T/models/gen_045.pt with the current default search (as in the E5f / E5g A/Bs; proof / filter off), XPU",
+ "command": "python -m dojozero.evaluation.ladder calibrate --dojo dojo:runs/e5e_rl_T/models/gen_045.pt --config configs/evaluation/ladder_v2.yaml --out benchmarks/reanalysis/e5h/ladder_v2_gen045.json",
+ "config": "configs/evaluation/ladder_v2.yaml = ladder_v1.yaml (renju_balanced_v1, 500 ms per move, externals single-threaded CPU, probe 4 pairs per engine on the last 4 openings, main 24 pairs vs up to 3 engines with probe score in [0.25, 0.75], else the nearest rungs; prior sd 600) with the v1b engine round robin (360 games, 2026-10-19) and anchor Yixin 2018 fixed",
+ "reported": "dojo_external_elo of gen_045 with 95% CI from all games (primary) and from decided games only (refit --decided-only); probe scores per engine; main match scores; failures and forbidden-move losses separately",
+ "caveats_known_in_advance": "(1) the comparison with taraguchi v1 -491 mixes model and search defaults (search changed since 10-19); (2) engine ratings come from the 10-19 round robin, not re-played; (3) renju_balanced_v1 openings 0-23 (main) and 116-119 (probe) were used for evaluation before (0-11 built the E4 reanalysis test split), never for training",
+ "no_change": "one run; no reruns or extra pairs based on the result; failures and sleep gaps are reported, not silently dropped",
+ "operations": "AC power and no duplicate processes checked before start; CPU load of other processes logged every 30 s; sleep checked from Kernel-Power events and time gaps"
+}
