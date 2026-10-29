@@ -18,10 +18,54 @@ and what is still open. Newest phase first.
 | weakest opponent with score < 50% | Pela 2023 (사다리 최하위 엔진, −411; DojoZero 프로브 0.125) |
 | Rapfi / KataGomo / AlphaGomoku / JAX / Embryo score | 균형 corpus 4쌍 프로브: Rapfi 2025 0.0 / KataGomo 2026 0.0 / AlphaGomoku 2026 0.0 / JAX 사용 불가 / Embryo 2026 0.0 |
 | `dojo_external_elo` (CI) | **−491 [−634, −348]** (anchor Yixin 2018 = 0; Rapfi 2025 +357, Pela 2023 −411) — 500 ms/수 기준 |
+| 후보 재측정 (기본 모델 아님) | T″ gen_045 (`runs/e5e_rl_T/models/gen_045.pt`): ladder v2 **−318 [−410, −226]** (2026-10-29, 같은 corpus·시간, 엔진 rating은 v1b 라운드로빈; Pela 2023 −369, Rapfi 2025 +361) — PROGRESS Phase 8 (E5h) |
 | `dojo_internal_elo` | taraguchi v1 vs selfplay v2: +7 [−88, +102] (무작위 오프닝을 NORMAL까지 진행한 시작점, 50쌍, 64 sims); selfplay v2 vs v0 +210 [+97, +322]; heuristic 대비 0.95–0.975 (20쌍 앵커) |
 | `dojo_taraguchi_elo` | taraguchi v1 vs selfplay v2: **+123 [+22, +224]** (prefix 오프닝 50쌍, 64 sims, 엔진이 opening 결정) — 절대 척도 아님(기준점 = selfplay v2) |
 | tactical score | 네트워크 단독 83.6%, 탐색 포함 91.8% (102문제, Phase 4–5; 이후 모델은 미측정) |
 | primary known weakness | **방어 전술**: 패배의 87%가 상대에게 솔버가 증명하는 강제승(VCF/VCT)을 허용한 한 수, value망은 그 직전 평균 +0.52로 과신. 탐색량 10배로도 개선 없음(Phase 8 E2c). 흑에서 더 약함(Pela 상대 흑 ~0.12 / 백 ~0.41). E3b: 솔버 5× 가속 후에도 블런더 대부분 남음. E3c: 블런더 직전 국면의 74.5%는 전 합법수가 강제패(2–4 ply 전에 이미 짐), 대안이 top-32 밖에만 있는 국면 1.6% → 병목은 후보 범위가 아니라 수 사이에 걸친 깊은(5k–100k 노드) 패배 증명 |
+
+---
+
+## Phase 8 (E5h) — 외부 사다리 재측정: T″ gen_045 (ladder v2, 2026-10-29)
+
+질문: E5g에서 E4 후보를 이긴 T″ gen_045는 외부 엔진 사다리에서 어디에 있는가? (사용자 지시 2026-10-29 "Measure the ladder")
+
+### 사전 등록 (`benchmarks/reanalysis/e5h/preregistration.json`, `f577006`, 대국 전)
+측정이며 승격·채택 판단이 아님(기본 모델은 사용자 결정). `python -m dojozero.evaluation.ladder calibrate --dojo dojo:runs/e5e_rl_T/models/gen_045.pt --config configs/evaluation/ladder_v2.yaml`. `ladder_v2.yaml` = `ladder_v1.yaml`(`renju_balanced_v1`, 500 ms/수, 외부 엔진 단일 스레드 CPU, 엔진당 프로브 4쌍(마지막 4 opening), 프로브 점수 [0.25, 0.75] 엔진 최대 3개와 주 매치 24쌍, prior sd 600)에 엔진 간 라운드로빈 v1b(360판, 10-19)와 anchor Yixin 2018 고정. 탐색은 현재 기본값(E5f·E5g A/B와 같음, 증명·필터 끔). 1회 실행, 결과에 따른 재실행·쌍 추가 없음.
+
+### 실행
+AC 대기 14:43–19:45(배터리; 대기 중 절전 3회 — 대국 전이라 무관), 대국 19:45–20:21. 대국 중 Kernel-Power 절전 이벤트 없음(마지막 복귀 19:34:47), 부하 기록 최대 간격 66초, 다른 프로세스 평균 3.1코어(최대 4.2; OneDrive, Discord) — `e5h/background_load_e5h.csv`. DojoZero 224판 모두 정상 종료(`NORMAL_WIN`): 실패 0, 금수 패 0.
+
+### 결과 (`e5h/ladder_v2_gen045.json`, `ladder_v2_gen045_decided.json`; anchor Yixin 2018 = 0)
+| 상대 | 프로브 4쌍 | 주 매치 24쌍 [95%] |
+|---|---|---|
+| Pela 2023 | 0.500 | **0.521** [0.332, 0.704] |
+| Yixin 2018 | 0.250 | 0.167 [0.067, 0.359] |
+| KataGomo 2021r | 0.250 | 0.167 [0.067, 0.359] |
+| Rapfi 2021 / Embryo 2021r / KataGomo 2026 | 0.125 / 0.125 / 0.125 | – |
+| AlphaGomoku 2023·2026 / Embryo 2026 / Rapfi 2025 | 0.0 | – |
+
+| 엔진 | Elo [95%] (전체 대국) |
+|---|---|
+| Rapfi 2025 | +361 [+229, +492] |
+| Embryo 2026 | +246 [+127, +364] |
+| Embryo 2021r | +202 [+86, +317] |
+| AlphaGomoku 2026 | +191 [+76, +306] |
+| KataGomo 2026 | +93 [−18, +204] |
+| Rapfi 2021 | +38 [−73, +148] |
+| AlphaGomoku 2023 | +27 [−83, +138] |
+| Yixin 2018 | 0 (anchor) |
+| KataGomo 2021r | −21 [−122, +80] |
+| **DojoZero T″ gen_045** | **−318 [−410, −226]** (실패 제외 적합 −324 [−417, −231]) |
+| Pela 2023 | −369 [−481, −256] |
+- `dojo_external_elo` **−318 [−410, −226]**: 11개 중 10위. Pela 2023보다 위(+51, CI 겹침), Yixin 2018보다 약 320, Rapfi 2025보다 약 680 아래.
+- 흑 / 백 점수(224판): 흑 0.241 (27 / 112), 백 0.223 (25 / 112). Pela 상대는 흑 0.357 / 백 0.679, Yixin 상대는 흑 0.286 / 백 0.071 — 상대마다 방향이 다름(표본 28판씩).
+- 10-19 ladder v1b의 `taraguchi_v1`(−491 [−634, −348], 128판)과 같은 opening·같은 프로브/주 매치 구성: 프로브 평균 0.063 → 0.138, Yixin 주 매치 0.062 → 0.167, 흑 0.094 → 0.241 / 백 0.031 → 0.223. 점추정 차이는 약 +170 Elo이지만 CI가 겹치고, **모델과 탐색 기본값이 함께 바뀌었으며 측정 날짜가 다르다** — 모델만의 효과로 읽지 않는다.
+
+### 결론
+- T″ gen_045의 외부 Elo는 **−318 [−410, −226]**(anchor Yixin 2018, 500 ms/수). 여전히 Pela를 제외한 9개 엔진보다 아래이고, 최상위(Rapfi 2025)와 약 680 Elo 차이.
+- 엔진 rating은 10-19 라운드로빈에서 왔고 다시 두지 않았다. 공개 Gomocup rating이 아니다.
+- 기본 모델은 바꾸지 않았다(사용자 결정 대기). E4 후보의 사다리 위치는 재지 않았다(**UNKNOWN**).
 
 ---
 

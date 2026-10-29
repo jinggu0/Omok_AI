@@ -24,6 +24,7 @@ solver budgets and split statistics.
 | `e5e/` | E5e T'' run (registry, log), held-out diagnosis, value balance on test / gate, external A/B on `renju_holdout_e5_v3` (INCONCLUSIVE), load logs |
 | `e5f/` | E5f T'' continued to generation 47: pre-registration + addendum, registry, loop / driver logs, held-out diagnosis and value balance on test / gate of the final best gen_045, external A/B gen_045 vs gen_002 on `renju_holdout_e5_v4` (ACCEPT, CI lower bound +0.003), load logs |
 | `e5g/` | E5g pre-registration, run log (attempt 1 stopped before any A/B game), external A/B T'' gen_045 vs E4 candidate on `renju_holdout_e5_v5` (ACCEPT, +0.142 [+0.083, +0.200]), load log |
+| `e5h/` | E5h external ladder v2 of T'' gen_045 (`python -m dojozero.evaluation.ladder calibrate --config configs/evaluation/ladder_v2.yaml`): pre-registration, calibration output (all games and decided-only refit; -318 [-410, -226], anchor Yixin 2018), load log |
 | `background_load_e4_*.csv` | CPU used by other processes during each phase (sleep gaps visible as time jumps) |
 
 Label codes: PROVEN_UNSAFE / PROVEN_WINNING are exact; UNREFUTED_EXHAUSTED is a heuristic negative (the threat-space
