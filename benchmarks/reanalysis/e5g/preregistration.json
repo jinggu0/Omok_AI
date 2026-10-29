@@ -1,0 +1,12 @@
+{
+ "written": "2026-10-29, after the E5f A/B (gen_045 vs gen_002 ACCEPT +0.067 [+0.003, +0.133]) and before any game of this check",
+ "user_instruction": "2026-10-29 'E4와 직접 A/B' (answer to: A/B gen_045 directly against the E4 candidate on a new holdout?)",
+ "question": "is the E5f final best (T'' gen_045) stronger than the E4 candidate against external engines? (gen_045 vs E4 was not measured; gen_002 vs E4 on holdout v3 was +0.021 [-0.033, +0.075])",
+ "baseline": "dojo:runs/e4_reanalysis_v1/checkpoints/step_1500.pt (sha 52d1cbae...)",
+ "candidate": "dojo:runs/e5e_rl_T/models/gen_045.pt (sha 8181290b...)",
+ "holdout": "new renju_holdout_e5_v5: engine_games balance --candidates 200 --target 60 --seed 205, excluding all 8 existing sets (balanced_v1, provisional_v0, smoke_v0, train_reanalysis_v1, holdout_e4_v1, holdout_e5_v2, holdout_e5_v3, holdout_e5_v4); used for this A/B only, never for training",
+ "ab": "evaluation.ab, Pela 2023 + Yixin 2018, 60 pairs each, 500 ms per move, proof / filter off (defaults), colours and arms alternated",
+ "rule": "pooled 120 pairs: ACCEPT if 95% CI lower bound > 0 and 0 candidate failures; REJECT if CI upper bound < 0 or any candidate failure; otherwise INCONCLUSIVE",
+ "no_change": "a single run; no extra pairs or reruns based on the result; default model unchanged whatever the result (user decision)",
+ "operations": "AC power and no duplicate processes checked before start; CPU load of other processes logged every 30 s; laptop sleep recorded from time gaps"
+}
