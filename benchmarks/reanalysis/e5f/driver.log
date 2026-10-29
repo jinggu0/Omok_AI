@@ -1,0 +1,32 @@
+[10-28 23:22:41] driver start, deadline 10-29 11:00
+[10-28 23:49:36] chunk start: generations 13-15
+[10-29 00:33:47] chunk end rc=0, completed generations now 15
+[10-29 00:33:49] chunk start: generations 16-18
+[10-29 01:25:26] chunk end rc=0, completed generations now 18
+[10-29 01:25:28] on battery - waiting for AC
+[10-29 01:30:31] on battery - waiting for AC
+[10-29 01:35:33] on battery - waiting for AC
+[10-29 01:40:34] on battery - waiting for AC
+[10-29 01:45:35] on battery - waiting for AC
+[10-29 01:50:38] chunk start: generations 19-21
+[10-29 02:45:40] chunk end rc=0, completed generations now 21
+[10-29 02:45:42] chunk start: generations 22-24
+[10-29 03:40:59] chunk end rc=0, completed generations now 24
+[10-29 03:41:01] chunk start: generations 25-27
+[10-29 04:32:14] chunk end rc=0, completed generations now 27
+[10-29 04:32:16] chunk start: generations 28-30
+[10-29 05:26:35] chunk end rc=0, completed generations now 30
+[10-29 05:26:38] chunk start: generations 31-33
+[10-29 06:19:13] chunk end rc=0, completed generations now 33
+[10-29 06:19:15] chunk start: generations 34-36
+[10-29 07:10:33] chunk end rc=0, completed generations now 36
+[10-29 07:10:38] chunk start: generations 37-39
+[10-29 08:01:45] chunk end rc=0, completed generations now 39
+[10-29 08:01:48] chunk start: generations 40-42
+[10-29 08:58:10] chunk end rc=0, completed generations now 42
+[10-29 08:58:14] chunk start: generations 43-45
+[10-29 09:55:40] chunk end rc=0, completed generations now 45
+[10-29 09:55:44] chunk start: generations 46-47
+[10-29 10:36:47] chunk end rc=0, completed generations now 47
+[10-29 10:36:48] no time for another generation (remaining 18 min)
+[10-29 10:36:48] DRIVER DONE
