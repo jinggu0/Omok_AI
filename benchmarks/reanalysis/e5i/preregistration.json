@@ -1,0 +1,9 @@
+{
+ "written": "2026-10-30 ~18:35, before any generation > 47",
+ "user_instruction": "2026-10-30 18:16 'proceed with the next step, keep going on your own for about 2 hours'",
+ "diagnosis_first": "value_drift_gate_test.json (E4 candidate + T'' generations 1-47 on the balanced gate set and the E4 test proven positions): the gate set (E4 val = DojoZero games of the training-opening family) stays within |bias| 0.06 while the test split (DojoZero blunder games vs engines, balanced_v1 openings 0-11) drifts to black bias -0.13..-0.18 from generation 23 on (gen 2 +0.054). Recorded as a diagnosis only; the test split is not used for selection.",
+ "run": "continue runs/e5e_rl_T with configs/training/e5e_rl_T.yaml unchanged (balanced gate + EMA 0.99 + colour-balanced value weights), resume in chunks of <= 3 generations; a chunk starts only if it can finish before 2026-10-30 20:00 at ~22 min per generation; on battery wait for AC; stop after 3 consecutive failures",
+ "promotion": "as before (SPRT H1 and the balanced gate); internal only",
+ "external_check": "none inside this 2-hour window (an A/B needs ~1.2 h more). If a new best appears, the follow-up check is the E5f rule: new holdout (seed 206, excluding all 9 existing sets), paired A/B new best vs gen_045, Pela 2023 + Yixin 2018, 60 pairs each, 500 ms; run only after the user's go-ahead",
+ "reported": "per generation: gate (bias, separation, AUROC), SPRT, promotion, anchor; test-side value drift of the new generations (diagnosis only)"
+}
