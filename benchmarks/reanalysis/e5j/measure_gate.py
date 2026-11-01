@@ -2,8 +2,8 @@
 
     PYTHONPATH=python python benchmarks/reanalysis/e5j/measure_gate.py <gate.npz> <out.json>
 
-Network-only value; game-level bootstrap CI of the colour bias for the pre-registered checkpoints, and
-the same by the arm that played the game when the gate has an `arm` source (gate_pool arrays).
+Network-only value; game-level bootstrap CI of the colour bias for the pre-registered checkpoints.
+The same by the arm that played the game is in measure_by_arm.py.
 """
 
 import json

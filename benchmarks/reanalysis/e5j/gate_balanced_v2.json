@@ -1,0 +1,16 @@
+{
+ "source": "data/gate_e5_v1/arrays.npz",
+ "split": "val",
+ "seed": 0,
+ "dojo_only": true,
+ "per_cell": 730,
+ "cells_available": {
+  "black_win": 730,
+  "black_loss": 2476,
+  "white_win": 911,
+  "white_loss": 1787
+ },
+ "n": 2920,
+ "sha256": "f2b7ac9f945d4dec76d4194224bf27f0b54e68b0c20f493c67ef4f92c3c183eb",
+ "out": "data/gate_e5_v1/gate_balanced_v2.npz"
+}

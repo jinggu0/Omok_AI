@@ -26,6 +26,7 @@ solver budgets and split statistics.
 | `e5g/` | E5g pre-registration, run log (attempt 1 stopped before any A/B game), external A/B T'' gen_045 vs E4 candidate on `renju_holdout_e5_v5` (ACCEPT, +0.142 [+0.083, +0.200]), load log |
 | `e5h/` | E5h external ladder v2 of T'' gen_045 (`python -m dojozero.evaluation.ladder calibrate --config configs/evaluation/ladder_v2.yaml`): pre-registration, calibration output (all games and decided-only refit; -318 [-410, -226], anchor Yixin 2018), load log |
 | `e5i/` | E5i value drift diagnosis (E4 candidate + T'' generations 1-52 on the balanced gate set vs the E4 test proven positions), pre-registration, T'' generations 48-52 (registry snapshot, loop / driver logs; no promotion, best stays gen_045), load log |
+| `e5j/` | E5j rebuilt balanced gate: pre-registration, gate v2a (E4 val, DojoZero-to-move) and v2 (fresh `renju_gate_e5_v1` games, 730 per cell) manifests, measurements of E4 candidate + T'' generations 1-52 (`measure_gate.py`), bias by arm (`measure_by_arm.py`), pool games and manifest, load log. Gate arrays are in `data/` (git-ignored) |
 | `background_load_e4_*.csv` | CPU used by other processes during each phase (sleep gaps visible as time jumps) |
 
 Label codes: PROVEN_UNSAFE / PROVEN_WINNING are exact; UNREFUTED_EXHAUSTED is a heuristic negative (the threat-space

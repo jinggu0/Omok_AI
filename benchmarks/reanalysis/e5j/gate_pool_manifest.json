@@ -1,0 +1,39 @@
+{
+ "collect": {
+  "set": "renju_gate_e5_v1",
+  "games": 960,
+  "duplicates_removed": 1148,
+  "positions": 14075,
+  "by_side": {
+   "WHITE": 6023,
+   "BLACK": 8052
+  },
+  "by_arm": {
+   "dojo-52d1cbaeb96f": 7033,
+   "dojo-8181290b1a1a": 7042
+  },
+  "sha256": "cfd000e072d6c1963c427d10ed27c5ea62682d723ea0411b1217810002b43f76"
+ },
+ "label": {
+  "labelled": 14075,
+  "cells": {
+   "WHITE_UNKNOWN": 3325,
+   "WHITE_LOSS": 1787,
+   "BLACK_UNKNOWN": 4846,
+   "BLACK_LOSS": 2476,
+   "BLACK_WIN": 730,
+   "WHITE_WIN": 911
+  },
+  "solver": {
+   "vcf_nodes": 50000,
+   "vct_nodes": 30000,
+   "loss_nodes": 30000
+  },
+  "sha256": "3bea251f3a37123b1692463ea9876582611c1706952cfe6d912026521e40f728"
+ },
+ "arrays": {
+  "positions": 14075,
+  "feature_hash": 13444356769359776542,
+  "sha256": "2e0c266618b92652c738acf54261a6b35e233f51a028befd11fe5d0e7816fb89"
+ }
+}
