@@ -1,0 +1,16 @@
+{
+ "source": "data/reanalysis_v1/arrays.npz",
+ "split": "val",
+ "seed": 0,
+ "dojo_only": true,
+ "per_cell": 99,
+ "cells_available": {
+  "black_win": 139,
+  "black_loss": 386,
+  "white_win": 99,
+  "white_loss": 359
+ },
+ "n": 396,
+ "sha256": "cbba1d3e1a3280d8600ef969cb9ab94366b78c98edde5f65a642672c392608bd",
+ "out": "data/reanalysis_v1/gate_balanced_v2a.npz"
+}
