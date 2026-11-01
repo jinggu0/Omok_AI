@@ -30,6 +30,7 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--arrays", default="data/reanalysis_v1/arrays.npz")
     b.add_argument("--split", default="val")
     b.add_argument("--seed", type=int, default=0)
+    b.add_argument("--dojo-only", action="store_true", help="DojoZero-to-move positions only (E5j)")
     b.add_argument("--out", required=True)
     b.add_argument("--manifest", required=True)
     r = sub.add_parser("replay")
@@ -38,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--out", required=True)
     args = ap.parse_args(argv)
     if args.cmd == "build":
-        m = tactical.build_balanced_gate_set(REPO / args.arrays, REPO / args.out, args.split, args.seed)
+        m = tactical.build_balanced_gate_set(REPO / args.arrays, REPO / args.out, args.split, args.seed, args.dojo_only)
         m["source"], m["out"] = args.arrays, args.out
         Path(args.manifest).parent.mkdir(parents=True, exist_ok=True)
         Path(args.manifest).write_text(json.dumps(m, indent=1), encoding="utf-8")

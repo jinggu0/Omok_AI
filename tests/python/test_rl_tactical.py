@@ -184,6 +184,44 @@ def test_balanced_gate_set_is_stratified(tmp_path):
     assert m == tactical.build_balanced_gate_set(arr, tmp_path / "g2.npz", split="val", seed=1) | {"sha256": m["sha256"]}
 
 
+def test_balanced_gate_set_dojo_only(tmp_path):
+    rng = np.random.default_rng(0)
+    n = 400
+    arr = tmp_path / "a.npz"
+    np.savez(arr, feats=rng.integers(0, 2, (n, 3, NUM_POINTS)).astype(np.uint8), pos_result=rng.choice([1, -1, 0], n).astype(np.int8),
+             side=rng.integers(0, 2, n).astype(np.int8), ids=np.arange(n), split=np.full(n, 1, np.int8),
+             dojo_to_move=rng.integers(0, 2, n).astype(np.int8))
+    m = tactical.build_balanced_gate_set(arr, tmp_path / "g.npz", split="val", seed=1, dojo_only=True)
+    g = np.load(tmp_path / "g.npz")
+    assert m["dojo_only"] and (np.load(arr)["dojo_to_move"][g["source_index"]] == 1).all() and m["n"] == 4 * m["per_cell"]
+
+
+def test_gate_pool_positions_are_dojo_to_move_and_unknown_stays_unknown(tmp_path):
+    import gzip
+    import json
+    from dojozero import _core
+    from dojozero.tools import gate_pool
+    g = _core.GameState(gate_pool.PROFILE)
+    moves = []
+    while not g.is_terminal and len(moves) < 14:
+        legal = np.flatnonzero(np.asarray(_core.legal_mask(g))[:225])
+        m = _core.point_to_str(int(legal[(len(moves) * 7) % len(legal)]))
+        assert g.apply(m)
+        moves.append(m)
+    pos = gate_pool.game_positions("g1", moves, "BLACK", "dojo-a", "pela_2023")
+    assert pos and all(p["side"] == "BLACK" and p["arm"] == "dojo-a" and p["ply"] >= 5 for p in pos)
+    other = gate_pool.game_positions("g1", moves, "BLACK", "pela_2023", "dojo-a")  # DojoZero is engine_b: white
+    assert other and all(p["side"] == "WHITE" for p in other)
+    assert gate_pool.game_positions("g1", moves, "BLACK", "pela_2023", "yixin_2018") == []
+    with gzip.open(tmp_path / "positions.jsonl.gz", "wt", encoding="utf-8") as fh:
+        fh.write(json.dumps(pos[0]) + "\n")
+    with gzip.open(tmp_path / "labels.jsonl.gz", "wt", encoding="utf-8") as fh:
+        fh.write(json.dumps({"id": pos[0]["id"], "result": "UNKNOWN", "reason": "", "nodes": 1}) + "\n")
+    gate_pool.arrays(tmp_path, "runs/e5e_rl_T/models/gen_045.pt")
+    z = np.load(tmp_path / "arrays.npz")
+    assert z["pos_result"].tolist() == [0] and z["dojo_to_move"].tolist() == [1]
+
+
 def test_value_cell_weights_and_weighted_loss(tmp_path, small_solver):
     import torch
     from dojozero.trainer.losses import value_loss

@@ -119,19 +119,24 @@ def value_calibration(model, arrays_path: str | Path, device, split: str = "test
     return out
 
 
-def build_balanced_gate_set(arrays_path: str | Path, out_path: str | Path, split: str = "val", seed: int = 0) -> dict:
+def build_balanced_gate_set(arrays_path: str | Path, out_path: str | Path, split: str = "val", seed: int = 0,
+                            dojo_only: bool = False) -> dict:
     """Stratified gate set: the same number of proven positions in each (colour to move) x (win / loss)
-    cell of one E4 split (the smallest cell's size), sampled without replacement with a fixed seed."""
+    cell of one E4 split (the smallest cell's size), sampled without replacement with a fixed seed.
+    dojo_only keeps DojoZero-to-move positions (E5j: pooled gate win cells were mostly engine-to-move)."""
     z = np.load(arrays_path, allow_pickle=False)
     rng = np.random.default_rng(seed)
-    cells = {(c, r): np.flatnonzero((z["split"] == SPLITS[split]) & (z["side"] == c) & (z["pos_result"] == r))
+    base = z["split"] == SPLITS[split]
+    if dojo_only:
+        base = base & (z["dojo_to_move"] == 1)
+    cells = {(c, r): np.flatnonzero(base & (z["side"] == c) & (z["pos_result"] == r))
              for c in (0, 1) for r in (1, -1)}
     n = min(len(ix) for ix in cells.values())
     sel = np.sort(np.concatenate([rng.choice(ix, n, replace=False) for ix in cells.values()]))
     out_path = Path(out_path)
     np.savez_compressed(out_path, feats=z["feats"][sel], pos_result=z["pos_result"][sel], side=z["side"][sel],
                         ids=z["ids"][sel], split=z["split"][sel], source_index=sel.astype(np.int32))
-    return {"source": str(arrays_path).replace("\\", "/"), "split": split, "seed": seed, "per_cell": int(n),
+    return {"source": str(arrays_path).replace("\\", "/"), "split": split, "seed": seed, "dojo_only": dojo_only, "per_cell": int(n),
             "cells_available": {f"{'black' if c == 0 else 'white'}_{'win' if r == 1 else 'loss'}": int(len(ix))
                                 for (c, r), ix in cells.items()},
             "n": int(len(sel)), "sha256": hashlib.sha256(out_path.read_bytes()).hexdigest()}
