@@ -112,6 +112,26 @@ def test_collected_positions_do_not_leak_across_splits():
             assert not (24 <= p["opening_index"] < 104), "external A/B openings must not be used"
 
 
+def test_collect_dojo_engine_filter_keeps_only_that_engine_on_the_training_set(tmp_path):
+    import sqlite3
+    from dojozero.tools.reanalysis_data import TRAIN_SET, collect
+    db = tmp_path / "db.sqlite"
+    con = sqlite3.connect(db)
+    con.executescript("""create table match(match_id text, engine_a text, engine_b text, opening_set_id text, rule_profile text);
+                         create table game(game_id text, match_id text, moves text, a_color text, opening_id text);
+                         create table analysis(game_id text, kind text, result_json text);""")
+    moves = json.dumps(["H8", "I8", "H10", "I6", "K7", "A1", "O15"])  # trainre1-0000 + two legal moves
+    for mid, ea, sid in (("m1", "dojo-new", TRAIN_SET), ("m2", "dojo-old", TRAIN_SET), ("m3", "dojo-new", "renju_balanced_v1")):
+        con.execute("insert into match values (?, ?, 'pela_2023', ?, 'RENJU_GOMOCUP')", (mid, ea, sid))
+        op = "trainre1-0000" if sid == TRAIN_SET else "bal1-0000"
+        con.execute("insert into game values (?, ?, ?, 'WHITE', ?)", (f"g{mid}", mid, moves, op))
+    con.commit()
+    con.close()
+    collect(str(db), tmp_path / "out", "dojo-new")
+    pos = [json.loads(l) for l in gzip.open(tmp_path / "out" / "positions.jsonl.gz", "rt", encoding="utf-8")]
+    assert pos and {p["game_id"] for p in pos} == {"gm1"}
+
+
 def test_d4_batch_moves_labels_with_the_board():
     n = 2
     a = {"feats": np.zeros((n, 3, NUM_POINTS), np.uint8), "aux": np.zeros((n, 5, NUM_POINTS), np.uint8),

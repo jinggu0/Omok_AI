@@ -1,0 +1,43 @@
+{
+ "source": {
+  "e5f": "benchmarks/reanalysis/e5f/ab_e5f_final_vs_T2.json",
+  "e5g": "benchmarks/reanalysis/e5g/ab_e5g_gen045_vs_E4.json",
+  "e5l": "benchmarks/reanalysis/e5l/ab_e5l_gen055_vs_gen045.json"
+ },
+ "seconds_per_game": 18.25,
+ "rows": {
+  "e5f": {
+   "pairs": 120,
+   "mean_diff": 0.06666666666666667,
+   "sd_diff": 0.35464109762300433
+  },
+  "e5g": {
+   "pairs": 120,
+   "mean_diff": 0.14166666666666666,
+   "sd_diff": 0.3252880645366073
+  },
+  "e5l": {
+   "pairs": 120,
+   "mean_diff": -0.004166666666666667,
+   "sd_diff": 0.3751516966751014
+  }
+ },
+ "sd_used": 0.351693619611571,
+ "pairs_needed": {
+  "0.03": {
+   "pairs": 1079,
+   "games": 4316,
+   "hours": 21.879722222222224
+  },
+  "0.05": {
+   "pairs": 389,
+   "games": 1556,
+   "hours": 7.888055555555556
+  },
+  "0.10": {
+   "pairs": 98,
+   "games": 392,
+   "hours": 1.9872222222222222
+  }
+ }
+}

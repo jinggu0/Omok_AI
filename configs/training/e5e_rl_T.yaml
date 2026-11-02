@@ -76,7 +76,7 @@ tactical_aux:
   top_k: 8
   threads: 7
   override_value: true
-  reanalysis: data/reanalysis_v1/arrays.npz
+  reanalysis: data/reanalysis_e5o/arrays.npz  # E5o: from generation 58, gen_045's games vs external engines (generations 1-57: data/reanalysis_v1/arrays.npz)
   reanalysis_mix: 0.15
 gate:
   mode: balanced

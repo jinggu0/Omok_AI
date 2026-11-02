@@ -76,7 +76,9 @@ def split_for(set_id: str, opening_id: str, index: int) -> str:
     return "val" if zlib.crc32(f"{set_id}/{opening_id}".encode()) % 7 == 0 else "train"
 
 
-def collect(db: str, out: Path) -> dict:
+def collect(db: str, out: Path, dojo_engine: str | None = None) -> dict:
+    """dojo_engine: keep only games of that DojoZero engine id on the training opening set (E5o refresh:
+    the current model's own games against external engines)."""
     idx = _opening_index()
     con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
     rows = con.execute("""select g.game_id, g.moves, g.a_color, m.engine_a, m.engine_b, m.opening_set_id, g.opening_id,
@@ -89,6 +91,9 @@ def collect(db: str, out: Path) -> dict:
     for gid, mv, a_color, ea, eb, sid, op, prof in rows:
         if prof != PROFILE:
             skipped["profile"] += 1
+            continue
+        if dojo_engine and (sid != TRAIN_SET or dojo_engine not in (ea, eb)):
+            skipped["other_engine_or_set"] += 1
             continue
         i = idx.get((sid, op))
         if i is None:
@@ -267,6 +272,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--device", default="xpu")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--threads", type=int, default=7)
+    ap.add_argument("--dojo-engine", help="collect: only this DojoZero engine's games on the training opening set")
     ap.add_argument("--all-legal-247", action="store_true",
                     help="also label every legal move at the 247 blunder positions (E3c already did, other budget)")
     args = ap.parse_args(argv)
@@ -278,7 +284,7 @@ def main(argv: list[str] | None = None) -> int:
             build_train_openings(args.n)
             return 0
         if args.cmd == "collect":
-            man["collect"] = collect(args.db, out)
+            man["collect"] = collect(args.db, out, args.dojo_engine) | {"dojo_engine": args.dojo_engine}
             man["positions_sha256"] = sha256_file(out / "positions.jsonl.gz")
         else:
             blunder_ids = set()
