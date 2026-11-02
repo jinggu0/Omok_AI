@@ -16,7 +16,7 @@ danger/refute heads get their targets, and a fixed E4 reanalysis buffer is mixed
 held-out test split (ECE on proven positions) is not worse than the best's by more than a margin.
 `train.ema` (E5e): the candidate is an exponential moving average of the learner weights.
 `gate.mode: balanced` (E5b): instead, separation / |bias| (black and white separately) and AUROC on a
-win / loss x colour balanced set from the E4 val split (rl.tactical.balanced_gate_pass).
+win / loss x colour balanced set `gate.arrays` (rl.tactical.balanced_gate_pass).
 Phase 7 (TRAINING.md §2.5-§2.6): self-play may start from the empty board / opening prefixes and
 record every Taraguchi-10 decision; a share of games is played against a league pool (fixed
 anchors + past best models) chosen by PFSP; matches can start from opening prefixes so the
@@ -464,7 +464,7 @@ def run(cfg: dict, resume: bool = False, quiet: bool = False) -> Registry:
                 del bm
             cm, _, _ = load_model(str(REPO / cand_rel), device)
             th = {k: float(gate.get(k, d)) for k, d in (("separation_margin", 0.03), ("bias_max", 0.10), ("auroc_margin", 0.01))}
-            gate_rec = {"mode": "balanced", "candidate": tacmod.value_balance(cm, REPO / gate["arrays"], device),
+            gate_rec = {"mode": "balanced", "arrays": gate["arrays"], "candidate": tacmod.value_balance(cm, REPO / gate["arrays"], device),
                         "best": gate_best[best["sha"]], "thresholds": th}
             del cm
             gate_rec["pass"], gate_rec["fails"] = tacmod.balanced_gate_pass(gate_rec["candidate"], gate_rec["best"], **th)

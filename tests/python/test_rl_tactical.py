@@ -137,6 +137,7 @@ def test_two_generation_loop_with_labels_and_gate(tiny_tactical, small_solver, m
         assert g["gate"] is not None and "ece5" in g["gate"]["candidate"]
         if mode == "balanced":
             assert {"black", "white", "auroc"} <= set(g["gate"]["candidate"]) and isinstance(g["gate"]["fails"], list)
+            assert g["gate"]["arrays"] == str(arr)
             # EMA: the candidate is the averaged model, the raw learner is kept for resume
             from dojozero.model.load import load_model, model_sha
             lm, _, _ = load_model(str(Path(loop.REPO) / g["learner"]), "cpu")

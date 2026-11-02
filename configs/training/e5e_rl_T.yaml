@@ -80,7 +80,7 @@ tactical_aux:
   reanalysis_mix: 0.15
 gate:
   mode: balanced
-  arrays: data/reanalysis_v1/gate_balanced_v1.npz
+  arrays: data/gate_e5_v1/gate_balanced_v2.npz  # E5j: from generation 53 (generations 1-52: data/reanalysis_v1/gate_balanced_v1.npz)
   separation_margin: 0.03
   bias_max: 0.10
   auroc_margin: 0.01
