@@ -1,0 +1,13 @@
+{
+ "written": "2026-11-02 ~13:15, before any generation > 52",
+ "user_instruction": "2026-11-02 'v2로 교체' (gate v2 from the next training), then 'proceed with the next step'; no duration given, so the earlier 2-hour window is reused",
+ "question": "With the promotion gate on gate_balanced_v2 and nothing else changed, does T'' produce a new best within 2 hours? Does the v2 gate run correctly in the real loop (not yet exercised at the time of the switch)?",
+ "run": "continue runs/e5e_rl_T with configs/training/e5e_rl_T.yaml (commit 0650abc: only the gate set differs from generations 48-52), resume in chunks of <= 3 generations; a chunk starts only if it can finish before 2026-11-02 15:20 at ~22 min per generation; on battery wait for AC; stop after 3 consecutive failures",
+ "promotion": "unchanged rule: SPRT H1 against best (gen_045) and the balanced gate on v2 with unchanged thresholds (separation margin 0.03, |bias| 0.10, AUROC margin 0.01); bars from gen_045 are separation black >= 0.667, white >= 0.661, AUROC >= 0.968. Internal only; a promotion is not a claim of strength.",
+ "external_check": "none inside this window. If a new best appears, the follow-up is the E5f rule: new holdout (seed 206, excluding all 10 existing sets including renju_gate_e5_v1), paired A/B new best vs gen_045, Pela 2023 + Yixin 2018, 60 pairs each, 500 ms; run only after the user's go-ahead.",
+ "gate_run_check": "pass if every new generation records gate.arrays = data/gate_e5_v1/gate_balanced_v2.npz, gate.best equals the gen_045 row of gate_v2_measure.json, and no chunk fails.",
+ "reported": "per generation: gate (bias, separation, AUROC, pass / fails), SPRT, promotion, anchor, self-play black wins; network-only v1 gate values of the new generations as a diagnostic that decides nothing; a v2 failure caused only by white |bias| is reported as such.",
+ "not_decided_here": "no change of thresholds, gate set or training config during or after the window based on its results; default model unchanged",
+ "no_change": "a single window; if no new best appears the result is reported as no promotion and the run is not extended without the user",
+ "operations": "AC and no duplicate process checked before start; user processes untouched; keep-awake requested, lid must stay open; CPU load of other processes logged every 30 s; sleep recorded from Kernel-Power events and time gaps"
+}
