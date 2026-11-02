@@ -1,0 +1,20 @@
+﻿time,other_cpu_sec_per_30s,own_cpu_sec_per_30s,top_other
+2026-11-02T17:18:26,113.84,24.45,claude:27.4 chrome:23.1 Taskmgr:14.8
+2026-11-02T17:19:05,101.77,42.72,claude:22.9 chrome:17.7 Taskmgr:15.8
+2026-11-02T17:19:42,109.95,49.98,chrome:27.5 Taskmgr:16.5 claude:14.8
+2026-11-02T17:20:19,123.48,43.86,chrome:42.2 claude:18.3 Taskmgr:16.7
+2026-11-02T17:20:55,99.42,77.42,chrome:21.8 OneDrive:18.4 Taskmgr:14.3
+2026-11-02T17:21:31,103.61,71.89,OneDrive:24.1 chrome:17.4 Taskmgr:15.7
+2026-11-02T17:22:05,94.89,97.64,OneDrive:30.8 OneDrive.Sync.Service:15.5 Taskmgr:14.3
+2026-11-02T17:22:40,104.14,82.39,OneDrive:33.2 OneDrive.Sync.Service:16.6 Taskmgr:14.1
+2026-11-02T17:23:16,98.45,97.52,OneDrive:24.8 Taskmgr:14.4 chrome:14.0
+2026-11-02T17:23:52,109.19,83.47,OneDrive:26.5 chrome:23.8 Taskmgr:14.3
+2026-11-02T17:24:29,104.78,84.45,OneDrive:30.1 Taskmgr:14.8 OneDrive.Sync.Service:14.6
+2026-11-02T17:25:05,93.94,91.56,OneDrive:20.9 Taskmgr:15.5 claude:13.5
+2026-11-02T17:25:44,97.78,79.55,chrome:26.7 Taskmgr:16.5 OneDrive:16.3
+2026-11-02T17:26:24,114.16,84.59,chrome:48.4 OneDrive:17.9 Taskmgr:15.5
+2026-11-02T17:26:59,82.16,106.25,OneDrive:25.7 Taskmgr:14.8 OneDrive.Sync.Service:13.3
+2026-11-02T17:27:34,84.36,106.58,OneDrive:28.0 Taskmgr:14.4 OneDrive.Sync.Service:14.3
+2026-11-02T17:28:09,80.89,117.55,OneDrive:28.4 OneDrive.Sync.Service:14.1 Taskmgr:13.5
+2026-11-02T17:28:45,80.38,106.38,OneDrive:28.2 OneDrive.Sync.Service:14.5 Taskmgr:13.0
+2026-11-02T17:29:18,93.08,0.06,OneDrive:39.5 OneDrive.Sync.Service:19.4 Taskmgr:12.2

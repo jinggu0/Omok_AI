@@ -1,0 +1,17 @@
+{
+ "games": 400,
+ "a_as_black": {
+  "games": 193,
+  "score": 0.6683937823834197
+ },
+ "a_as_white": {
+  "games": 207,
+  "score": 0.45410628019323673
+ },
+ "black_wins": 242,
+ "white_wins": 158,
+ "draws": 0,
+ "black_win_share": 0.605,
+ "pairs_split_by_colour": 86,
+ "pairs": 200
+}
