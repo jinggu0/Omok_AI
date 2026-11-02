@@ -1,0 +1,11 @@
+{
+ "written": "2026-11-02, after E5m (8f771a8) and before any game of this check",
+ "user_instruction": "2026-11-02 'proceed' (answer to: run the internal match at 500 ms on renju openings that separates cause 1?)",
+ "question": "Does gen_055's internal edge over gen_045 (E5m: 0.558 at 64 sims on Taraguchi-10 prefix openings) remain when the two play each other under the external A/B conditions (500 ms per move with the same player settings as evaluation.ab, fixed 5-stone renju openings, no Taraguchi opening decisions)?",
+ "match": "python -m dojozero.evaluation.tournament --engine-a dojo:runs/e5e_rl_T/models/gen_055.pt --engine-b dojo:runs/e5e_rl_T/models/gen_045.pt --time-ms 500 --tier B --pairs 60, once with --openings renju_holdout_e5_v6 and once with --openings renju_holdout_e5_v5; 120 pairs pooled (240 games). Same player construction as evaluation.ab (make_tournament_player, PUCT root, time-limited).",
+ "openings_note": "v6 (E5l) and v5 (E5g) were each used once for an external A/B. Here they are reused for evaluation only: no training, no selection or promotion depends on this match. tournament has no offset option, so renju_balanced_v1 24-103 is not used.",
+ "rule": "unit = pair score of gen_055 (mean of the two games of an opening, colours swapped). 95% CI = wider of normal and bootstrap percentile (5000 resamples), the same interval as evaluation.ab.paired_stats; Wilson is not used because it treats pair scores as 0/1 and was much too wide in E5m when most pairs were 0.5. Lower bound > 0.5 -> 'edge remains under external conditions' (then the gap is about external opponents); upper bound < 0.5 -> 'reversed'; otherwise 'no edge shown at this size'. Secondary: upper bound < 0.558 -> 'smaller than at 64 sims Taraguchi-10' (supports a condition gap).",
+ "also_reported": "gen_055 score as black and as white; failures (any DojoZero failure raises and is reported as a failure of the run).",
+ "no_change": "a single run; no extra pairs or reruns; nothing in training, loop, gate or SPRT changes; default model unchanged (user decision).",
+ "operations": "battery: starts only with charge >= 50%, stops if < 25% (a stopped run is reported as stopped; finished sets are kept but the rule is applied only to the full 120 pairs); load of other processes logged every 30 s; duplicate processes checked before start"
+}
