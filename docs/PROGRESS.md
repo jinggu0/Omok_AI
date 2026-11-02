@@ -26,6 +26,38 @@ and what is still open. Newest phase first.
 
 ---
 
+## Phase 8 (E5l) — T″ gen_055 vs gen_045 외부 A/B (holdout v6, 2026-11-02)
+
+질문: E5k 내부 best(T″ gen_055, v5)는 이전 best gen_045보다 외부 엔진 상대로 강한가? (사용자 지시 2026-11-02 "외부 A/B 실행")
+
+### 사전 등록 (`benchmarks/reanalysis/e5l/preregistration.json`, `629b50b`, 오프닝 생성·대국 전)
+기준 gen_045 (`8181290b…`), 후보 gen_055 (`c205bcad…`). 새 holdout `renju_holdout_e5_v6` (seed 206, 기존 10세트 제외, 같은 필터). Pela 2023 + Yixin 2018 각 60쌍, 500 ms, 증명·필터 끔, 색·arm 교대. 규칙: 합산 120쌍 CI 하한 > 0 그리고 후보 실패 0 → ACCEPT; CI 상한 < 0 또는 후보 실패 → REJECT; 그 외 INCONCLUSIVE. 실행 전에 "과거 120쌍 CI 반폭이 약 0.06이라 작은 차이는 INCONCLUSIVE로 읽힌다 — 쌍 추가 사유가 아님"을 적었다. 1회 실행, 기본 모델은 결과와 무관하게 사용자 결정.
+
+### 실행 (AC, 15:41–17:13)
+- holdout v6: 400판 → 균형 60 채택, 실패 0 (`02553400…`, 15:41–15:59).
+- A/B 15:59–17:13. 시작 직전 AC 연결 이벤트(Kernel-Power 105, 15:40) 외에 절전 이벤트 없음, 부하 기록 최대 간격 87초. 다른 프로세스 평균 3.2코어(최대 4.6; OneDrive, Taskmgr) — `e5l/background_load_e5l.csv`.
+- 시작 시 이 세션이 띄우지 않은 python 프로세스(PID 272720, `build.py`)가 돌고 있었고 건드리지 않았다. 종료 시점에는 없었다. 부하 기록기는 python 프로세스를 "own"으로 세므로 이 프로세스의 부하는 "other"에 들어가지 않았고, 언제 끝났는지는 **UNKNOWN**. 500 ms 시간 기반 대국이라 부하는 두 arm에 같이 걸린다.
+
+### 결과 (`e5l/ab_e5l_gen055_vs_gen045.json`)
+| 비교 | Pela 2023 | Yixin 2018 | 합산 120쌍 [95%] | 판정 |
+|---|---|---|---|---|
+| **T″ gen_055 vs gen_045** | 0.500 → 0.517, +0.017 [−0.100, +0.133] | 0.133 → 0.108, −0.025 [−0.093, +0.043] | **−0.004 [−0.071, +0.063]** | **INCONCLUSIVE** (후보·기준 실패 0) |
+- 쌍 차이 분포: Pela +1 2 / +0.5 17 / 0 25 / −0.5 13 / −1 3, Yixin +0.5 7 / 0 43 / −0.5 10.
+- 점 추정은 0에 가깝고 CI 양쪽 끝이 ±0.07이다. 이 holdout·이 두 엔진·500 ms 기준으로 gen_055가 gen_045보다 외부에서 강하다는 증거는 없고, 약하다는 증거도 없다. "같다"는 뜻도 아니다 — 약 ±0.07보다 작은 차이는 이 표본으로 구분할 수 없다.
+- 흑/백 별 점수: 쌍 단위로만 저장돼 **UNKNOWN**.
+- 이 holdout에서 gen_045의 Pela 점수(0.500)는 E5g holdout v5의 0.467보다 높다. holdout이 달라 직접 비교하지 않는다.
+- 공개 Elo·사다리는 재지 않았다(**UNKNOWN**; 후보 재측정은 E5h gen_045 −318).
+
+### 결론
+- **사전 등록 규칙으로 INCONCLUSIVE.** E5k 내부 SPRT 승격(gen_055 vs gen_045 0.625)은 외부 점수 차이로 확인되지 않았다. 내부 승격이 외부 강도를 뜻하지 않는다는 점이 다시 확인됐다(E5k에서 적었듯 10번째 후보에서 나온 H1이고, 뒤 두 세대는 v5 대비 0.500 / 0.475).
+- **기본 모델 변경 없음.** 외부 근거가 가장 강한 checkpoint는 여전히 gen_045(E5g ACCEPT vs E4 후보, E5h 사다리 −318)다. 무엇을 기본으로 쓸지는 사용자 결정.
+- 다음 후보(실행 안 함): (1) T″ 학습을 더 이어가기 전에, 내부 승격 규칙이 외부 점수와 어긋나는 원인 점검(SPRT 임계·셀프플레이 흑 승률 66% 상승), (2) 더 큰 효과를 노리는 구조적 변경 — 같은 루프를 더 돌리는 것만으로는 외부에서 구분되는 차이가 나오지 않았다.
+
+### 재현성
+코드·설정 변경 없음(`629b50b`). holdout `python -m dojozero.evaluation.engine_games balance --candidates 200 --target 60 --seed 206 --set-id renju_holdout_e5_v6 --exclude-sets <기존 10세트>`; A/B `python -m dojozero.evaluation.ab --baseline dojo:runs/e5e_rl_T/models/gen_045.pt --candidate dojo:runs/e5e_rl_T/models/gen_055.pt --opponents pela_2023 yixin_2018 --openings renju_holdout_e5_v6 --pairs 60 --time-ms 500`. 실행 스크립트는 세션 scratchpad에만 있음.
+
+---
+
 ## Phase 8 (E5k) — T″ 53–57세대 (승격 게이트 v2, 2026-11-02)
 
 질문: 승격 게이트만 `gate_balanced_v2`로 바꾸고 2시간 더 이어가면 새 best가 나오는가? v2 게이트가 실제 루프에서 제대로 도는가? (사용자 지시 2026-11-02 "v2로 교체", "다음 단계를 진행해"; 기간 지정이 없어 이전 2시간 창을 재사용)
@@ -50,7 +82,7 @@ and what is still open. Newest phase first.
 - AC 전원, 시작 후 Kernel-Power 절전 이벤트 없음, 부하 기록 최대 간격 325초(시스템 부하로 기록기가 밀린 것으로 보며 절전 아님), 다른 프로세스 평균 2.7코어(최대 6.0; chrome, Taskmgr, OneDrive) — `e5k/background_load_e5k.csv`.
 
 ### 결론
-- 사전 등록대로 다음은 gen_055 vs gen_045 외부 A/B(새 holdout seed 206)이며 사용자 승인 대기. 창을 연장하지 않았다.
+- 사전 등록대로 다음은 gen_055 vs gen_045 외부 A/B(새 holdout seed 206)이며 사용자 승인 대기. 창을 연장하지 않았다. (승인 후 E5l에서 실행: INCONCLUSIVE.)
 
 ---
 
