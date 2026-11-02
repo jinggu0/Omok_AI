@@ -1,0 +1,13 @@
+{
+ "written": "2026-11-02 15:41, after E5k and before any opening or game of this check",
+ "user_instruction": "2026-11-02 'external A/B run' (answer to: run the external A/B of gen_055 vs gen_045?)",
+ "question": "Is the E5k internal best (T'' gen_055) stronger than the previous best (gen_045) against external engines?",
+ "baseline": "dojo:runs/e5e_rl_T/models/gen_045.pt (sha 8181290b...)",
+ "candidate": "dojo:runs/e5e_rl_T/models/gen_055.pt (sha c205bcad...)",
+ "holdout": "new renju_holdout_e5_v6: engine_games balance --candidates 200 --target 60 --seed 206, excluding all 10 existing sets (balanced_v1, provisional_v0, smoke_v0, train_reanalysis_v1, holdout_e4_v1, holdout_e5_v2, holdout_e5_v3, holdout_e5_v4, holdout_e5_v5, gate_e5_v1); used for this A/B only, never for training",
+ "ab": "evaluation.ab, Pela 2023 + Yixin 2018, 60 pairs each, 500 ms per move, proof / filter off (defaults), colours and arms alternated",
+ "rule": "pooled 120 pairs: ACCEPT if 95% CI lower bound > 0 and 0 candidate failures; REJECT if CI upper bound < 0 or any candidate failure; otherwise INCONCLUSIVE",
+ "power_note": "written before the run: past 120-pair A/Bs had a CI half width of about 0.06, so a small real difference will read INCONCLUSIVE; that is a valid outcome, not a reason for more pairs",
+ "no_change": "a single run; no extra pairs or reruns based on the result, except a restart from scratch if the laptop sleeps or the run fails before any game; default model unchanged whatever the result (user decision)",
+ "operations": "AC power and no duplicate process checked before start; CPU load of other processes logged every 30 s; sleep recorded from Kernel-Power events and time gaps; a python process not started here (PID 272720, build.py) was running at the start and is left untouched"
+}
