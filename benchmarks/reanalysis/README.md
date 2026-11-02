@@ -30,6 +30,7 @@ solver budgets and split statistics.
 | `e5k/` | E5k T'' generations 53-57 with the promotion gate on gate v2: pre-registration, registry snapshot, loop / driver logs, gate v1 and v2 values (`measure_generations.py`; v1 is a diagnostic), load log. New internal best v5 gen_055 |
 | `e5l/` | E5l pre-registration, external A/B T'' gen_055 vs gen_045 on `renju_holdout_e5_v6` (INCONCLUSIVE, -0.004 [-0.071, +0.063]), load log |
 | `e5m/` | E5m why the internal promotion of gen_055 did not show externally: pre-registration, fresh internal replay gen_055 vs gen_045 (64 sims, prefix openings, 200 pairs; 0.558, Wilson CI [0.488, 0.625]), SPRT Monte Carlo (`simulate_sprt.py`), colour split (`colour_split.py`), load log |
+| `e5n/` | E5n gen_055 vs gen_045 head-to-head under the external A/B conditions (`evaluation.tournament`, 500 ms, renju holdouts v6 + v5, 120 pairs; 0.546 [0.490, 0.601], no edge shown; one standby hit the last v5 pair), pre-registration, load log |
 | `background_load_e4_*.csv` | CPU used by other processes during each phase (sleep gaps visible as time jumps) |
 
 Label codes: PROVEN_UNSAFE / PROVEN_WINNING are exact; UNREFUTED_EXHAUSTED is a heuristic negative (the threat-space
