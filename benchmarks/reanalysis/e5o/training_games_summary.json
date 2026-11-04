@@ -1,0 +1,35 @@
+{
+ "pela_2023": {
+  "games": 240,
+  "dojo_score": 0.5,
+  "dojo_as_black": 0.375,
+  "dojo_as_white": 0.625,
+  "failures": {
+   "B:FORBIDDEN_MOVE": 4
+  },
+  "games_with_standby_move": [],
+  "match_id": "c325376593ab4348"
+ },
+ "yixin_2018": {
+  "games": 240,
+  "dojo_score": 0.2125,
+  "dojo_as_black": 0.25833333333333336,
+  "dojo_as_white": 0.16666666666666666,
+  "failures": {},
+  "games_with_standby_move": [
+   "trainre1-0110",
+   "trainre1-0111",
+   "trainre1-0113"
+  ],
+  "match_id": "c822a837c2a74526"
+ },
+ "katagomo_2021r": {
+  "games": 240,
+  "dojo_score": 0.2833333333333333,
+  "dojo_as_black": 0.25833333333333336,
+  "dojo_as_white": 0.30833333333333335,
+  "failures": {},
+  "games_with_standby_move": [],
+  "match_id": "3d4558d604684f41"
+ }
+}

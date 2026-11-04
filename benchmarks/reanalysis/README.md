@@ -31,6 +31,7 @@ solver budgets and split statistics.
 | `e5l/` | E5l pre-registration, external A/B T'' gen_055 vs gen_045 on `renju_holdout_e5_v6` (INCONCLUSIVE, -0.004 [-0.071, +0.063]), load log |
 | `e5m/` | E5m why the internal promotion of gen_055 did not show externally: pre-registration, fresh internal replay gen_055 vs gen_045 (64 sims, prefix openings, 200 pairs; 0.558, Wilson CI [0.488, 0.625]), SPRT Monte Carlo (`simulate_sprt.py`), colour split (`colour_split.py`), load log |
 | `e5n/` | E5n gen_055 vs gen_045 head-to-head under the external A/B conditions (`evaluation.tournament`, 500 ms, renju holdouts v6 + v5, 120 pairs; 0.546 [0.490, 0.601], no edge shown; one standby hit the last v5 pair), pre-registration, load log |
+| `e5o/` | E5o reanalysis buffer rebuilt from gen_045's games vs external engines (`reanalysis_data collect --dojo-engine`), T'' generations 58-63: pre-registration, external power sizing (`external_power.py`), training game summary, buffer manifest, registry snapshot, loop / driver logs, external A/B gen_063 vs gen_045 on `renju_holdout_e5_v7` (INCONCLUSIVE, +0.017 [-0.051, +0.084]), load log. Buffer arrays are in `data/reanalysis_e5o` (git-ignored) |
 | `background_load_e4_*.csv` | CPU used by other processes during each phase (sleep gaps visible as time jumps) |
 
 Label codes: PROVEN_UNSAFE / PROVEN_WINNING are exact; UNREFUTED_EXHAUSTED is a heuristic negative (the threat-space

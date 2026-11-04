@@ -1,0 +1,136 @@
+{
+ "collect": {
+  "positions": 19252,
+  "skipped_games": {
+   "other_engine_or_set": 9648
+  },
+  "duplicates_removed": {
+   "same_split": 1785
+  },
+  "by_split": {
+   "val": 3812,
+   "train": 15440
+  },
+  "by_split_source": {
+   "val/dojo_game": 3812,
+   "train/dojo_game": 15440
+  },
+  "by_split_side": {
+   "val/WHITE": 1909,
+   "val/BLACK": 1903,
+   "train/WHITE": 7747,
+   "train/BLACK": 7693
+  },
+  "groups": {
+   "train": 98,
+   "val": 22,
+   "test": 0
+  },
+  "games": {
+   "train": 588,
+   "val": 132,
+   "test": 0
+  },
+  "dojo_engine": "dojo-8181290b1a1a"
+ },
+ "positions_sha256": "8c1fff852e4a2879e5d83aba9c82a51edcdafeffda14e00d7c47922422fae9d8",
+ "label": {
+  "labelled": 19252,
+  "wall_s": 7729.164283037186,
+  "file": "labels.jsonl.gz",
+  "move_codes": {
+   "UNREFUTED_EXHAUSTED": 52634,
+   "PROVEN_UNSAFE": 99183,
+   "UNKNOWN_BUDGET": 29292,
+   "PROVEN_WINNING": 4615
+  },
+  "position_results": {
+   "UNKNOWN": 10245,
+   "WIN": 4880,
+   "LOSS": 4127
+  },
+  "ms_per_position_mean": 2808.74009368303,
+  "ms_per_position_p95": 8752.443704998592,
+  "solver": {
+   "vcf_nodes": 50000,
+   "vct_nodes": 30000,
+   "loss_nodes": 30000,
+   "top_k": {
+    "train": 8,
+    "val": 16,
+    "test": 16
+   }
+  },
+  "ckpt": "runs/e5e_rl_T/models/gen_045.pt",
+  "codes": [
+   "PROVEN_UNSAFE",
+   "PROVEN_WINNING",
+   "UNREFUTED_EXHAUSTED",
+   "UNKNOWN_BUDGET"
+  ],
+  "sha256": "4d8b4dfde94f0df4ea1f466f650123fa74bdd4815e2a2e1102e84cdc301bdcb0"
+ },
+ "arrays": {
+  "file": "arrays.npz",
+  "sha256": "914defb88a6c187c882ab2ebbef303947e2cb36051fd9bdc560c1bccb0da006d",
+  "positions": 19252,
+  "baseline_ckpt": "runs/e5e_rl_T/models/gen_045.pt",
+  "baseline_model_sha": "8181290b1a1ae77fadb72ad6c092f330dce29f855ab11e8053c7679930309a5e",
+  "feature_hash": 13444356769359776542,
+  "heuristic_weight": 0.3,
+  "by_split": {
+   "train": 15440,
+   "val": 3812,
+   "test": 0
+  },
+  "labelled_moves": {
+   "PROVEN_UNSAFE": 99183,
+   "PROVEN_WINNING": 4615,
+   "UNREFUTED_EXHAUSTED": 52634,
+   "UNKNOWN_BUDGET": 29292
+  },
+  "positions_with_unsafe": 13467,
+  "has_policy": 11857,
+  "has_value": 9007,
+  "danger_pos": 4127,
+  "danger_labelled": 15488,
+  "per_split": {
+   "train": {
+    "positions": 15440,
+    "pos_result": {
+     "WIN": 3980,
+     "LOSS": 3369,
+     "UNKNOWN": 8091
+    },
+    "unsafe_moves": 63235,
+    "unrefuted_moves": 38086,
+    "black": 7693,
+    "white": 7747
+   },
+   "val": {
+    "positions": 3812,
+    "pos_result": {
+     "WIN": 900,
+     "LOSS": 758,
+     "UNKNOWN": 2154
+    },
+    "unsafe_moves": 35948,
+    "unrefuted_moves": 14548,
+    "black": 1903,
+    "white": 1909
+   },
+   "test": {
+    "positions": 0,
+    "pos_result": {
+     "WIN": 0,
+     "LOSS": 0,
+     "UNKNOWN": 0
+    },
+    "unsafe_moves": 0,
+    "unrefuted_moves": 0,
+    "black": 0,
+    "white": 0
+   }
+  }
+ }
+}
