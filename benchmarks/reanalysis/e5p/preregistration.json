@@ -1,0 +1,25 @@
+{
+ "written": "2026-11-05, after E5o (4bfc739) and before any fine-tune step, game, label or A/B of this step; a 2-step smoke run (runs/e5p_smoke, deleted) only checked that the data loads",
+ "user_instruction": "2026-11-05 'E4식 fine-tune 반복' (answer to: which direction after the external plateau of T'' generations 46-63)",
+ "question": "Does repeating the E4 recipe (small solver-supervised reanalysis fine-tune on the current model's own games vs external engines) from the external best gen_045 give a model that scores higher than gen_045 against external engines, and does a second round add to it?",
+ "change": "no change to the RL loop. A separate fine-tune track: configs/training/e5p_ft_r1.yaml and e5p_ft_r2.yaml are e4_reanalysis.yaml with only init_checkpoint, data.reanalysis, data.replay_chunks and run_name changed (seed 11, AdamW lr 2e-4, warmup 50, cosine, 1,500 steps, batch reanalysis 128 + replay 64 + Stage A 64, final step = candidate, val / test never used to pick a step).",
+ "round_1": {
+  "init": "runs/e5e_rl_T/models/gen_045.pt (model_sha 8181290b...)",
+  "data": "data/reanalysis_e5o/arrays.npz (914defb8...): gen_045's 720 games vs Pela 2023 / Yixin 2018 / KataGomo 2021r on the training-only openings renju_train_reanalysis_v1, labelled with gen_045 and the E4 solver budgets. gen_045 never trained on this buffer (generations 58-63 did, from a different start). Train split 15,440, val 3,812.",
+  "replay": "runs/e5e_rl_T/selfplay/gen_043-045 (16,561 positions)",
+  "candidate": "FT1 = runs/e5p_ft_r1/checkpoints/step_1500.pt",
+  "external_check": "new holdout renju_holdout_e5_v8: engine_games balance --candidates 200 --target 60 --seed 209, excluding all 12 existing sets (incl. renju_holdout_e5_v7). evaluation.ab baseline gen_045, candidate FT1, Pela 2023 + Yixin 2018, 60 pairs each, 500 ms. Rule as before: pooled 120 pairs, ACCEPT if 95% CI lower > 0 and 0 candidate failures; REJECT if CI upper < 0 or any candidate failure; otherwise INCONCLUSIVE.",
+  "go_on": "round 2 runs if the round-1 verdict is ACCEPT or INCONCLUSIVE; REJECT stops the step after round 1."
+ },
+ "round_2": {
+  "data": "FT1 plays the E4 / E5o training games: tournament dojo:FT1 vs ext:pela_2023 / ext:yixin_2018 / ext:katagomo_2021r on renju_train_reanalysis_v1, 120 pairs each, 500 ms, tier A; collect --dojo-engine <FT1 engine id> --out data/reanalysis_e5p_r2; label --ckpt FT1; build --ckpt FT1. Only the new buffer is used (not merged with E5o).",
+  "init": "FT1",
+  "candidate": "FT2 = runs/e5p_ft_r2/checkpoints/step_1500.pt",
+  "external_check": "new holdout renju_holdout_e5_v9 (seed 210, excluding all existing sets incl. v8). evaluation.ab baseline gen_045 (not FT1), candidate FT2, same opponents, pairs, time and rule."
+ },
+ "descriptive_only": "held-out diagnosis on the E4 test split (data/reanalysis_v1, 4,193 positions, 256 sims; reanalysis_eval) for FT1 and FT2 against the existing gen_045 run (e5f/eval_e5f_final_test.json); fine-tune val losses; FT1's training-game scores vs gen_045's (training openings, not a holdout). None of these decides anything.",
+ "risks_written_before": "(1) gen_045 already learned from E4-style labels for 45 generations (15% reanalysis mix): its val value loss on the E5o buffer is 0.307 at step 0 against 0.604 for taraguchi_v1 in E4, so the room left is smaller and the effect may be below what 120 pairs can show (about 0.10); INCONCLUSIVE is a likely and valid outcome. (2) Pela 2023 and Yixin 2018 are both training-game opponents and A/B opponents (openings differ), so a gain may be opponent-specific. (3) Round 2 reuses the same 120 training openings. (4) The fine-tune has no self-play after it, so policy/opening heads are only held by the replay batch.",
+ "stops": "any DojoZero failure in the training games, a training non-finite gradient, a labelling or build error stop the step before the next A/B; a stopped run is reported as stopped. No extra pairs or reruns based on an A/B result.",
+ "no_change": "default model unchanged (user decision); configs/training/e5e_rl_T.yaml untouched",
+ "operations": "AC power required before each 500 ms stage and before labelling (wait otherwise); the 5-minute fine-tunes and the held-out diagnosis do not depend on wall time and may run on battery; a sleep during a 500 ms stage is recorded; CPU load of other processes logged every 30 s; duplicate processes checked before start"
+}

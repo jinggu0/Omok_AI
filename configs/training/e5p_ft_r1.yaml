@@ -1,0 +1,41 @@
+# Phase 8 E5p round 1: E4 recipe (solver-supervised reanalysis fine-tune) repeated from the external best.
+# Only init_checkpoint, data.reanalysis, data.replay_chunks and run_name differ from e4_reanalysis.yaml.
+run_name: e5p_ft_r1
+run_dir: runs
+seed: 11
+device: auto
+amp_bf16: true
+init_checkpoint: runs/e5e_rl_T/models/gen_045.pt   # T'' gen_045, model_sha 8181290b... (external best)
+data:
+  reanalysis: data/reanalysis_e5o/arrays.npz        # E5o buffer: gen_045's games vs Pela / Yixin / KataGomo 2021r, labelled with gen_045 (train split only)
+  replay_chunks:                                      # self-play of gen_045's run (keeps policy/value/opening heads)
+    - runs/e5e_rl_T/selfplay/gen_043.jsonl.gz
+    - runs/e5e_rl_T/selfplay/gen_044.jsonl.gz
+    - runs/e5e_rl_T/selfplay/gen_045.jsonl.gz
+  tactical: data/stage_a_v1
+  tactical_holdout_pct: 2.0
+  augment: true
+batch:
+  reanalysis: 128
+  replay: 64
+  tactical: 64
+source_weight:
+  re: 1.0
+  rp: 1.0
+  sa: 0.5
+loss:
+  policy: 1.0
+  value: 1.0
+  aux: 0.5
+  opening: 1.0
+  danger: 1.0
+  refute: 1.0
+optim:
+  lr: 0.0002
+  weight_decay: 0.0001
+  betas: [0.9, 0.999]
+  grad_clip: 5.0
+  warmup_steps: 50
+  total_steps: 1500
+log_every: 50
+eval_every: 250
