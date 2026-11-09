@@ -1,0 +1,15 @@
+{
+ "written": "2026-11-09, after E5p (d180c95) and before the holdout or any game of this step",
+ "user_instruction": "2026-11-09 '외부 검정력 확대' (answer to: which direction after RL loop / buffer / E4-style fine-tune all showed no external gain over gen_045)",
+ "question": "Measured with enough pairs to see a 0.05 score difference, does the latest RL-loop candidate T'' gen_063 score differently from gen_045 against external engines? (E5o measured +0.017 [-0.051, +0.084] on 120 pairs.)",
+ "why_this_pair": "it decides whether the RL loop is truly flat after gen_045 or improving below what 120 pairs can see; E5p's FT1 / FT2 are not candidates for use, so they are not re-measured.",
+ "power": "e5o/external_power.json: pair-difference sd about 0.35, so 400 pairs give SE about 0.0175 and a 95% CI half-width about 0.034; a true 0.05 difference is detected with about 80% power. Observed A/B speed about 9 s per game (E5p), so 1,600 games take about 4 h on AC.",
+ "holdout": "new renju_holdout_e5_v10: engine_games balance --candidates 720 --target 200 --seed 211, excluding all 14 existing sets (incl. renju_holdout_e5_v9); same filter as every holdout (Rapfi 2025 vs AlphaGomoku 2026, 200 ms, colours swapped, neither colour wins both). If fewer than 200 openings pass, the A/B uses all that pass (pairs per opponent = kept) and this is reported; no second generation.",
+ "ab": "evaluation.ab --baseline dojo:runs/e5e_rl_T/models/gen_045.pt --candidate dojo:runs/e5e_rl_T/models/gen_063.pt --opponents pela_2023 yixin_2018 --openings renju_holdout_e5_v10 --pairs 200 --time-ms 500 (proof / filter off, colours alternated, arms alternated) - the same opponents, time and settings as E4-E5p, only more pairs.",
+ "decision": "primary = pooled pairs. ACCEPT (gen_063 better) if 95% CI lower > 0 and 0 candidate failures; REJECT (gen_063 worse) if CI upper < 0 or any candidate failure; otherwise INCONCLUSIVE. In addition, if the whole 95% CI lies inside (-0.05, +0.05) the result is reported as 'no external difference of 0.05 or more' (equivalence at that margin).",
+ "secondary": "per opponent paired differences; black / white scores of each arm per opponent from the strength DB game table (a_color, score_a); comparison with E5o's 120-pair estimate. None of these changes the decision.",
+ "sleep_rule": "the primary analysis uses all pairs. A pre-registered sensitivity analysis drops every pair in which a game has elapsed time of either side above 180 s + 1.5 s x plies (a sleep / standby pause); it is reported but does not decide.",
+ "stops": "no extra pairs, reruns or opening sets based on the result. A crash stops the run; a stopped run is reported as stopped and resumed only on the same openings with the remaining pairs if the tool allows it (otherwise reported as incomplete).",
+ "no_change": "default model unchanged (user decision); no training in this step",
+ "operations": "AC power required before the holdout and the A/B (wait otherwise); CPU load of other processes logged every 30 s; duplicate processes checked before start"
+}
