@@ -1,0 +1,128 @@
+{
+ "per_opponent": {
+  "pela_2023": {
+   "baseline": 0.4275,
+   "candidate": 0.4375,
+   "paired": {
+    "pairs": 200,
+    "mean_diff": 0.01,
+    "ci95": [
+     -0.05,
+     0.07
+    ],
+    "se": 0.030275120389073013
+   },
+   "diff_counts": {
+    "-1.0": 8,
+    "-0.5": 41,
+    "0.0": 96,
+    "0.5": 49,
+    "1.0": 6
+   }
+  },
+  "yixin_2018": {
+   "baseline": 0.1325,
+   "candidate": 0.12,
+   "paired": {
+    "pairs": 200,
+    "mean_diff": -0.0125,
+    "ci95": [
+     -0.05267135095047128,
+     0.027671350950471272
+    ],
+    "se": 0.0204955872196282
+   },
+   "diff_counts": {
+    "-1.0": 1,
+    "-0.5": 33,
+    "0.0": 136,
+    "0.5": 30
+   }
+  }
+ },
+ "colour": {
+  "baseline/pela_2023": {
+   "BLACK": {
+    "games": 200,
+    "score": 0.265
+   },
+   "WHITE": {
+    "games": 200,
+    "score": 0.59
+   }
+  },
+  "baseline/yixin_2018": {
+   "BLACK": {
+    "games": 200,
+    "score": 0.19
+   },
+   "WHITE": {
+    "games": 200,
+    "score": 0.075
+   }
+  },
+  "candidate/pela_2023": {
+   "BLACK": {
+    "games": 200,
+    "score": 0.27
+   },
+   "WHITE": {
+    "games": 200,
+    "score": 0.605
+   }
+  },
+  "candidate/yixin_2018": {
+   "BLACK": {
+    "games": 200,
+    "score": 0.155
+   },
+   "WHITE": {
+    "games": 200,
+    "score": 0.085
+   }
+  }
+ },
+ "search": {
+  "baseline/pela_2023": {
+   "sims_per_move": 99.64076141405468,
+   "ms_per_move": 592.1031220971896
+  },
+  "baseline/yixin_2018": {
+   "sims_per_move": 141.47705169766252,
+   "ms_per_move": 395.3945824957944
+  },
+  "candidate/pela_2023": {
+   "sims_per_move": 101.24642906670364,
+   "ms_per_move": 415.3226027314915
+  },
+  "candidate/yixin_2018": {
+   "sims_per_move": 143.37105492589365,
+   "ms_per_move": 399.5838914724244
+  }
+ },
+ "sleep": {
+  "games": [
+   {
+    "arm": "baseline",
+    "opponent": "pela_2023",
+    "opening": "bal1-0025",
+    "elapsed_a_s": 1389.117207899224,
+    "elapsed_b_s": 1.5169103999999998
+   }
+  ],
+  "pairs_dropped": [
+   [
+    "pela_2023",
+    "bal1-0025"
+   ]
+  ],
+  "sensitivity": {
+   "pairs": 399,
+   "mean_diff": 0.0,
+   "ci95_normal": [
+    -0.03580684219511044,
+    0.03580684219511044
+   ]
+  }
+ }
+}

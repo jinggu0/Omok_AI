@@ -268,6 +268,7 @@ lo ≤ score ≤ hi                   → primary calibration opponent
 | `renju_holdout_e5_v7` (`2a453605…`) | 60 | seed 208, 기존 11세트 제외(v6 포함), 같은 필터 (400판 중 균형 60, 실패 0) | E5o A/B 1회(T″ gen_063 vs gen_045)에 사용, 학습 사용 금지 |
 | `renju_holdout_e5_v8` (`fe7d189a…`) | 60 | seed 209, 기존 12세트 제외(v7 포함), 같은 필터 (400판 중 균형 60, 실패 0) | E5p 1라운드 A/B 1회(FT1 vs gen_045)에 사용, 학습 사용 금지 |
 | `renju_holdout_e5_v9` (`6527f6a4…`) | 60 | seed 210, 기존 13세트 제외(v8 포함), 같은 필터 (400판 중 균형 60, 실패 0) | E5p 2라운드 A/B 1회(FT2 vs gen_045)에 사용, 학습 사용 금지 |
+| `renju_holdout_e5_v10` (`6433567c…`) | 200 | seed 211, 기존 14세트 제외(v9 포함), 같은 필터 (후보 544개 중 균형 200, 엔진 실패 8 제외) | E5q 400쌍 A/B 1회(T″ gen_063 vs gen_045)에 사용, 학습 사용 금지 |
 새 holdout은 seed ≥ 201, 생성 시 `--exclude-sets`로 모든 기존 세트를 제외한다.
 
 ## 16. Rating 이름 규칙 (혼용 금지)

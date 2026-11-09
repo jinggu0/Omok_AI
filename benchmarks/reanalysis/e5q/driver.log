@@ -1,0 +1,12 @@
+[11-09 14:15:35] E5q driver start
+[11-09 14:15:36] holdout v10 start
+  1440/1440 games (4274s)
+balance filter result: {'black_twice': 180, 'white_twice': 150, 'draw_involved': 6, 'failure': 8, 'balanced': 200} -> kept 200
+renju_holdout_e5_v10: 200 openings, hash 6433567c369450fa
+[11-09 15:27:32] holdout v10 openings 200, pairs per opponent 200
+[11-09 15:27:36] ab start
+  "mean_diff": -0.00125,
+    "mean_diff": 0.01,
+    "mean_diff": -0.0125,
+[11-09 19:56:51] ab done: INCONCLUSIVE {'pairs': 400, 'mean_diff': -0.00125, 'ci95': [-0.0375, 0.03455114241537013], 'se': 0.01826588898743374} cand failures 0
+[11-09 19:56:52] ALL DONE
