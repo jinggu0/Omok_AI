@@ -1,0 +1,92 @@
+{
+ "pela_2023": {
+  "pairs": 120,
+  "gen_045": {
+   "score": 0.5,
+   "black": 0.375,
+   "white": 0.625,
+   "failures": {
+    "B:FORBIDDEN_MOVE": 4
+   },
+   "file": "runs/evaluation/e5o_traingames_vs_pela_2023.json"
+  },
+  "FT1": {
+   "score": 0.3458333333333333,
+   "black": 0.24166666666666667,
+   "white": 0.45,
+   "failures": {
+    "B:FORBIDDEN_MOVE": 6
+   },
+   "file": "runs/evaluation/e5p_r2_traingames_vs_pela_2023.json"
+  },
+  "paired_diff": -0.15416666666666667,
+  "ci95_normal": [
+   -0.22733038539775702,
+   -0.08100294793557634
+  ],
+  "diff_counts": {
+   "-1.0": 8,
+   "-0.5": 40,
+   "0.0": 53,
+   "0.5": 19
+  }
+ },
+ "yixin_2018": {
+  "pairs": 120,
+  "gen_045": {
+   "score": 0.2125,
+   "black": 0.25833333333333336,
+   "white": 0.16666666666666666,
+   "failures": {},
+   "file": "runs/evaluation/e5o_traingames_vs_yixin_2018.json"
+  },
+  "FT1": {
+   "score": 0.1625,
+   "black": 0.19166666666666668,
+   "white": 0.13333333333333333,
+   "failures": {},
+   "file": "runs/evaluation/e5p_r2_traingames_vs_yixin_2018.json"
+  },
+  "paired_diff": -0.05,
+  "ci95_normal": [
+   -0.10108316940126594,
+   0.001083169401265939
+  ],
+  "diff_counts": {
+   "-0.5": 26,
+   "0.0": 80,
+   "0.5": 14
+  }
+ },
+ "katagomo_2021r": {
+  "pairs": 120,
+  "gen_045": {
+   "score": 0.2833333333333333,
+   "black": 0.25833333333333336,
+   "white": 0.30833333333333335,
+   "failures": {},
+   "file": "runs/evaluation/e5o_traingames_vs_katagomo_2021r.json"
+  },
+  "FT1": {
+   "score": 0.20833333333333334,
+   "black": 0.20833333333333334,
+   "white": 0.20833333333333334,
+   "failures": {
+    "B:TIMEOUT": 5
+   },
+   "file": "runs/evaluation/e5p_r2_traingames_vs_katagomo_2021r.json"
+  },
+  "paired_diff": -0.075,
+  "ci95_normal": [
+   -0.13019644063545702,
+   -0.019803559364542984
+  ],
+  "diff_counts": {
+   "-1.0": 2,
+   "-0.5": 26,
+   "0.0": 81,
+   "0.5": 10,
+   "1.0": 1
+  }
+ }
+}

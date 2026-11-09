@@ -1,0 +1,2048 @@
+{
+ "schema_version": 1,
+ "set_id": "renju_holdout_e5_v9",
+ "profile": "RENJU_GOMOCUP",
+ "status": "v1 - approximate balance filter (rapfi_2025 vs alphagomoku_2026, 200 ms, 2 games per opening); Tier A/B. Filter stats: {'black_twice': 49, 'white_twice': 51, 'draw_involved': 2, 'failure': 0, 'balanced': 60}",
+ "openings": [
+  {
+   "opening_id": "bal1-0000",
+   "moves": [
+    "H8",
+    "G7",
+    "G6",
+    "J9",
+    "I10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 0",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.5,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 43,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": null,
+      "plies": 225,
+      "termination": "DRAW"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0001",
+   "moves": [
+    "H8",
+    "I7",
+    "F10",
+    "K7",
+    "H7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 3",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 26,
+      "termination": "FORBIDDEN_MOVE"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 25,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0002",
+   "moves": [
+    "H8",
+    "H9",
+    "F10",
+    "H7",
+    "E11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 5",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 60,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 41,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0003",
+   "moves": [
+    "H8",
+    "G8",
+    "F7",
+    "F5",
+    "E10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 6",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "BLACK",
+      "plies": 73,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "WHITE",
+      "plies": 40,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0004",
+   "moves": [
+    "H8",
+    "G9",
+    "F6",
+    "H9",
+    "H11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 8",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 26,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 47,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0005",
+   "moves": [
+    "H8",
+    "H7",
+    "F7",
+    "I6",
+    "F6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 18",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 24,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 27,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0006",
+   "moves": [
+    "H8",
+    "I7",
+    "I8",
+    "I6",
+    "E7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 20",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 28,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 31,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0007",
+   "moves": [
+    "H8",
+    "I9",
+    "H7",
+    "J6",
+    "E10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 22",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 20,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 33,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0008",
+   "moves": [
+    "H8",
+    "H7",
+    "H9",
+    "K6",
+    "E6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 23",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 37,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 48,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0009",
+   "moves": [
+    "H8",
+    "I7",
+    "F7",
+    "G11",
+    "H11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 25",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 28,
+      "termination": "FORBIDDEN_MOVE"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0010",
+   "moves": [
+    "H8",
+    "I8",
+    "I6",
+    "I5",
+    "K5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 27",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 32,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 37,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0011",
+   "moves": [
+    "H8",
+    "I8",
+    "I10",
+    "E10",
+    "G11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 28",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 35,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 50,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0012",
+   "moves": [
+    "H8",
+    "G9",
+    "G8",
+    "J6",
+    "E5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 30",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 50,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 31,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0013",
+   "moves": [
+    "H8",
+    "G9",
+    "I7",
+    "I6",
+    "E11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 31",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 30,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 83,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0014",
+   "moves": [
+    "H8",
+    "G9",
+    "H7",
+    "K7",
+    "J6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 33",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 27,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 38,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0015",
+   "moves": [
+    "H8",
+    "G9",
+    "H9",
+    "J11",
+    "K10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 38",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 34,
+      "termination": "FORBIDDEN_MOVE"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0016",
+   "moves": [
+    "H8",
+    "G8",
+    "H6",
+    "G11",
+    "J6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 40",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 30,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 25,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0017",
+   "moves": [
+    "H8",
+    "G8",
+    "F6",
+    "J7",
+    "E8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 42",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 23,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 70,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0018",
+   "moves": [
+    "H8",
+    "H9",
+    "F9",
+    "E8",
+    "G5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 46",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 31,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 68,
+      "termination": "FORBIDDEN_MOVE"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0019",
+   "moves": [
+    "H8",
+    "G8",
+    "H9",
+    "H11",
+    "K11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 49",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": -0.5,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 20,
+      "termination": "FORBIDDEN_MOVE"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": null,
+      "plies": 225,
+      "termination": "DRAW"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0020",
+   "moves": [
+    "H8",
+    "H9",
+    "F9",
+    "J9",
+    "J8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 53",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 42,
+      "termination": "FORBIDDEN_MOVE"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 73,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0021",
+   "moves": [
+    "H8",
+    "G8",
+    "I10",
+    "E11",
+    "G10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 61",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 31,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 52,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0022",
+   "moves": [
+    "H8",
+    "I9",
+    "F6",
+    "G7",
+    "H7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 62",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 48,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 27,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0023",
+   "moves": [
+    "H8",
+    "H7",
+    "J7",
+    "J9",
+    "G7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 63",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 46,
+      "termination": "FORBIDDEN_MOVE"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0024",
+   "moves": [
+    "H8",
+    "G9",
+    "F10",
+    "E6",
+    "J7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 67",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 28,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 43,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0025",
+   "moves": [
+    "H8",
+    "G8",
+    "I7",
+    "J5",
+    "E7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 68",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 42,
+      "termination": "FORBIDDEN_MOVE"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0026",
+   "moves": [
+    "H8",
+    "G8",
+    "G9",
+    "F7",
+    "J9"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 69",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 30,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 31,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0027",
+   "moves": [
+    "H8",
+    "I8",
+    "G6",
+    "K5",
+    "I10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 71",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 52,
+      "termination": "FORBIDDEN_MOVE"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0028",
+   "moves": [
+    "H8",
+    "G8",
+    "F9",
+    "J6",
+    "J5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 77",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 62,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0029",
+   "moves": [
+    "H8",
+    "G9",
+    "F7",
+    "J8",
+    "F8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 79",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 84,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0030",
+   "moves": [
+    "H8",
+    "H9",
+    "J6",
+    "H7",
+    "H6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 82",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 66,
+      "termination": "FORBIDDEN_MOVE"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0031",
+   "moves": [
+    "H8",
+    "G8",
+    "G9",
+    "I7",
+    "E6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 86",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 40,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0032",
+   "moves": [
+    "H8",
+    "H7",
+    "F8",
+    "G11",
+    "E5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 87",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 28,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 31,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0033",
+   "moves": [
+    "H8",
+    "G7",
+    "H9",
+    "G11",
+    "F10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 92",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 42,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0034",
+   "moves": [
+    "H8",
+    "I7",
+    "F6",
+    "E6",
+    "F10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 93",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 34,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 33,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0035",
+   "moves": [
+    "H8",
+    "I7",
+    "J9",
+    "I5",
+    "G8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 100",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 32,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 35,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0036",
+   "moves": [
+    "H8",
+    "I9",
+    "I10",
+    "K11",
+    "K5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 101",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 32,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0037",
+   "moves": [
+    "H8",
+    "G8",
+    "F8",
+    "F9",
+    "E8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 102",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 52,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 49,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0038",
+   "moves": [
+    "H8",
+    "G7",
+    "F9",
+    "E5",
+    "F11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 107",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 32,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 23,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0039",
+   "moves": [
+    "H8",
+    "G7",
+    "G9",
+    "H9",
+    "K6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 108",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 66,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0040",
+   "moves": [
+    "H8",
+    "I9",
+    "J9",
+    "H7",
+    "H11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 115",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 44,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 49,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0041",
+   "moves": [
+    "H8",
+    "H9",
+    "G6",
+    "H7",
+    "I11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 116",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 42,
+      "termination": "FORBIDDEN_MOVE"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 45,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0042",
+   "moves": [
+    "H8",
+    "G7",
+    "H10",
+    "F5",
+    "F8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 117",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 23,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 52,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0043",
+   "moves": [
+    "H8",
+    "I9",
+    "G6",
+    "G9",
+    "I6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 122",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 23,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 24,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0044",
+   "moves": [
+    "H8",
+    "I7",
+    "I6",
+    "I5",
+    "F10"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 123",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 31,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 32,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0045",
+   "moves": [
+    "H8",
+    "G8",
+    "H7",
+    "I9",
+    "E8"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 126",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 32,
+      "termination": "FORBIDDEN_MOVE"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 57,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0046",
+   "moves": [
+    "H8",
+    "H9",
+    "I10",
+    "J8",
+    "H7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 130",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "WHITE",
+      "plies": 62,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "BLACK",
+      "plies": 97,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0047",
+   "moves": [
+    "H8",
+    "G7",
+    "H9",
+    "E7",
+    "J7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 131",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 24,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 47,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0048",
+   "moves": [
+    "H8",
+    "G8",
+    "F9",
+    "I11",
+    "K11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 136",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 42,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 41,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0049",
+   "moves": [
+    "H8",
+    "I9",
+    "J9",
+    "G7",
+    "F7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 138",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 38,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 27,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0050",
+   "moves": [
+    "H8",
+    "I8",
+    "J7",
+    "F8",
+    "H9"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 140",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 38,
+      "termination": "FORBIDDEN_MOVE"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0051",
+   "moves": [
+    "H8",
+    "G7",
+    "J6",
+    "E9",
+    "I5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 144",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 22,
+      "termination": "FORBIDDEN_MOVE"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 29,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0052",
+   "moves": [
+    "H8",
+    "G8",
+    "I10",
+    "E9",
+    "H9"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 145",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 31,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 90,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0053",
+   "moves": [
+    "H8",
+    "I7",
+    "F7",
+    "H10",
+    "K6"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 147",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 36,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 53,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0054",
+   "moves": [
+    "H8",
+    "I8",
+    "F9",
+    "E7",
+    "J11"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 148",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 36,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 59,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0055",
+   "moves": [
+    "H8",
+    "I7",
+    "F7",
+    "F9",
+    "E5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 149",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 34,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 35,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0056",
+   "moves": [
+    "H8",
+    "G9",
+    "J7",
+    "J8",
+    "K5"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 151",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 38,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 51,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0057",
+   "moves": [
+    "H8",
+    "G8",
+    "G10",
+    "J9",
+    "I7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 155",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 35,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 48,
+      "termination": "FORBIDDEN_MOVE"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0058",
+   "moves": [
+    "H8",
+    "G9",
+    "F10",
+    "H5",
+    "J7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 158",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 32,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 91,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  },
+  {
+   "opening_id": "bal1-0059",
+   "moves": [
+    "H8",
+    "H9",
+    "G8",
+    "J9",
+    "K7"
+   ],
+   "rule_profile": "RENJU_GOMOCUP",
+   "source": "generated: first 5 stones of a random Taraguchi-10 opening (white to move)",
+   "source_version": "seed=210, candidate 159",
+   "expected_legal": true,
+   "approx_balance": {
+    "value_black": 0.0,
+    "method": "rapfi_2025 vs alphagomoku_2026, colours swapped, 200 ms/move, 2 games",
+    "games": [
+     {
+      "black": "alphagomoku_2026",
+      "winner": "WHITE",
+      "plies": 26,
+      "termination": "NORMAL_WIN"
+     },
+     {
+      "black": "rapfi_2025",
+      "winner": "BLACK",
+      "plies": 37,
+      "termination": "NORMAL_WIN"
+     }
+    ],
+    "uncertainty": "2 games: approximate"
+   },
+   "creation_method": "five_stone_candidates + build_balanced filter (neither colour wins both games)"
+  }
+ ]
+}

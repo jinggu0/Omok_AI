@@ -1,0 +1,49 @@
+[11-05 02:44:01] E5p driver start
+[11-05 02:44:01] fine-tune round 1 start
+[11-05 02:53:35] fine-tune round 1 done: {"final_checkpoint": "runs\\e5p_ft_r1\\checkpoints\\step_1500.pt", "model_sha": "847c51ed7ca25cf51789f91e1edc8060c45683e246116a79a8e828e45d3d007e"}
+[11-05 02:53:38] on battery - waiting for AC
+[11-05 02:55:39] holdout v8 start
+  400/400 games (862s)
+balance filter result: {'black_twice': 47, 'white_twice': 37, 'draw_involved': 2, 'failure': 0, 'balanced': 60} -> kept 60
+renju_holdout_e5_v8: 60 openings, hash fe7d189afd91cd01
+[11-05 03:10:19] ab start: runs/e5p_ft_r1/checkpoints/step_1500.pt on v8
+  "mean_diff": 0.0,
+    "mean_diff": 0.0,
+    "mean_diff": 0.0,
+[11-05 04:21:24] ab done: INCONCLUSIVE {'pairs': 120, 'mean_diff': 0.0, 'ci95': [-0.06352396490811212, 0.06352396490811212], 'se': 0.03241018617760822} cand failures 0
+[11-05 04:21:25] diag start benchmarks/reanalysis/e5p/eval_ft1_test.json
+[11-05 04:28:46] diag done benchmarks/reanalysis/e5p/eval_ft1_test.json
+[11-05 04:28:47] FT1 engine id dojo-847c51ed7ca2
+[11-05 04:28:49] games vs pela_2023 start
+[11-05 05:05:57] games vs pela_2023 done: 0.3458333333333333 0.24166666666666667 0.45 failures {'B:FORBIDDEN_MOVE': 6}
+[11-05 05:06:00] games vs yixin_2018 start
+[11-05 13:18:27] games vs yixin_2018 done: 0.1625 0.19166666666666668 0.13333333333333333 failures {}
+[11-05 13:18:29] on battery - waiting for AC
+[11-05 13:48:55] on battery - waiting for AC
+[11-05 14:19:13] on battery - waiting for AC
+[11-05 14:49:32] on battery - waiting for AC
+[11-07 19:29:39] games vs katagomo_2021r start
+[11-07 20:13:25] games vs katagomo_2021r done: 0.20833333333333334 0.20833333333333334 0.20833333333333334 failures {'B:TIMEOUT': 5}
+[11-07 20:13:26] collect
+[11-07 20:13:58] label start
+[11-09 02:14:34] label done
+[11-09 02:14:34] arrays
+[11-09 02:16:28] fine-tune round 2 start
+[11-09 02:46:09] fine-tune round 2 done: {"final_checkpoint": "runs\\e5p_ft_r2\\checkpoints\\step_1500.pt", "model_sha": "69c4c2670e078453cfe1b288317dbf7d5334322642bed696180b0286095b75a0"}
+[11-09 02:46:11] on battery - waiting for AC
+[11-09 03:16:30] on battery - waiting for AC
+[11-09 03:46:55] on battery - waiting for AC
+[11-09 04:17:18] on battery - waiting for AC
+[11-09 04:47:39] on battery - waiting for AC
+[11-09 10:24:02] holdout v9 start
+  400/400 games (794s)
+balance filter result: {'black_twice': 49, 'white_twice': 51, 'draw_involved': 2, 'failure': 0, 'balanced': 60} -> kept 60
+renju_holdout_e5_v9: 60 openings, hash 6527f6a435bbc935
+[11-09 10:37:42] ab start: runs/e5p_ft_r2/checkpoints/step_1500.pt on v9
+  "mean_diff": -0.0625,
+    "mean_diff": -0.13333333333333333,
+    "mean_diff": 0.008333333333333333,
+[11-09 13:17:00] ab done: INCONCLUSIVE {'pairs': 120, 'mean_diff': -0.0625, 'ci95': [-0.13452106854057005, 0.009521068540570055], 'se': 0.03674544313294391} cand failures 0
+[11-09 13:17:00] diag start benchmarks/reanalysis/e5p/eval_ft2_test.json
+[11-09 13:24:55] diag done benchmarks/reanalysis/e5p/eval_ft2_test.json
+[11-09 13:24:55] ALL DONE
