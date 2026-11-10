@@ -1,0 +1,23 @@
+[11-10 13:22:43] E5r driver start
+{"out": "runs/capacity_probe/init_b4c48.pt", "params": 192002, "model_sha": "d966f2a19746197237feb334199ac8c816fe4662062a626616b26e1e7a4f9a1e"}
+{"out": "runs/capacity_probe/init_b6c64.pt", "params": 477266, "model_sha": "0c93b26541d17227ab5b393def2d7558ef9eb9fe6fc20228b20263e36b629dae"}
+{"out": "runs/capacity_probe/init_b10c96.pt", "params": 1712114, "model_sha": "86b7b95b1b852ef709e2fbb903f44cde61364e4ff3299238bfb858d8ffeaf961"}
+{"out": "runs/capacity_probe/init_b10c128.pt", "params": 3019666, "model_sha": "810db2c378f7bd28fd73c6abc3acfc20f2619bbf52738effe264be9c834eea2c"}
+[11-10 13:23:50] throughput start
+runs/e5e_rl_T/models/gen_045.pt {"params": 477266, "model_config": {"in_planes": 26, "blocks": 6, "channels": 64, "head_hidden": 128, "tactical_heads": true}, "positions": 41, "sims_per_move": 51.32, "sims_median": 35.0, "nn_evals_per_move": 50.73, "ms_per_move": 404.3, "nn_evals_per_s": 125.48, "sims_ratio_to_first_median": 1.0}
+runs/capacity_probe/init_b4c48.pt {"params": 192002, "model_config": {"in_planes": 26, "blocks": 4, "channels": 48, "head_hidden": 128, "tactical_heads": true}, "positions": 41, "sims_per_move": 65.8, "sims_median": 49.0, "nn_evals_per_move": 65.02, "ms_per_move": 388.56, "nn_evals_per_s": 167.35, "sims_ratio_to_first_median": 1.06}
+runs/capacity_probe/init_b6c64.pt {"params": 477266, "model_config": {"in_planes": 26, "blocks": 6, "channels": 64, "head_hidden": 128, "tactical_heads": true}, "positions": 41, "sims_per_move": 53.88, "sims_median": 49.0, "nn_evals_per_move": 53.2, "ms_per_move": 405.15, "nn_evals_per_s": 131.3, "sims_ratio_to_first_median": 1.0}
+runs/capacity_probe/init_b10c96.pt {"params": 1712114, "model_config": {"in_planes": 26, "blocks": 10, "channels": 96, "head_hidden": 128, "tactical_heads": true}, "positions": 41, "sims_per_move": 37.88, "sims_median": 33.0, "nn_evals_per_move": 37.63, "ms_per_move": 443.61, "nn_evals_per_s": 84.84, "sims_ratio_to_first_median": 0.71}
+runs/capacity_probe/init_b10c128.pt {"params": 3019666, "model_config": {"in_planes": 26, "blocks": 10, "channels": 128, "head_hidden": 128, "tactical_heads": true}, "positions": 41, "sims_per_move": 39.17, "sims_median": 33.0, "nn_evals_per_move": 39.15, "ms_per_move": 407.05, "nn_evals_per_s": 96.17, "sims_ratio_to_first_median": 0.77}
+{"ckpt": "runs/e5e_rl_T/models/gen_045.pt", "params": 477266, "rp_loss": 7.765020887056987, "rp_policy": 1.943385471900304, "rp_value": 0.48672862723469734, "rp_aux": 0.007367301227835317, "rp_opening": 5.33122322956721, "rp_danger": 0.0, "rp_refute": 0.0, "re_loss": 2.364297698314925, "re_policy": 
+[11-10 13:26:03] fit b6c64 s1 start
+[11-10 14:13:28] fit b6c64 s1 done: {"step": 6000, "s": 2740.3794045448303, "rp_loss": 8.223249197006226, "rp_policy": 1.9942858964204788, "rp_value": 0.5350006769100825, "rp_aux": 0.011804912278118232, "rp_opening": 5.688060164451599, "rp_danger": 0.0, "rp_refute": 0.0, "re_loss": 2.80513950398
+[11-10 14:13:30] fit b6c64 s2 start
+[11-10 15:06:07] fit b6c64 s2 done: {"step": 6000, "s": 3092.608150959015, "rp_loss": 7.681569000085195, "rp_policy": 2.0174583892027536, "rp_value": 0.5540805471440157, "rp_aux": 0.013606381641390422, "rp_opening": 5.103226850430171, "rp_danger": 0.0, "rp_refute": 0.0, "re_loss": 2.892242031886
+[11-10 15:06:10] fit b4c48 s1 start
+[11-10 16:37:55] fit b4c48 s1 done: {"step": 6000, "s": 5340.390191078186, "rp_loss": 7.624984045823415, "rp_policy": 2.0100526163975396, "rp_value": 0.5482341460883617, "rp_aux": 0.014429434590662519, "rp_opening": 5.059482475121816, "rp_danger": 0.0, "rp_refute": 0.0, "re_loss": 2.845654021528
+[11-10 16:37:57] fit b10c96 s1 start
+[11-10 18:35:09] fit b10c96 s1 done: {"step": 6000, "s": 6961.313315629959, "rp_loss": 7.877480248610179, "rp_policy": 2.0078834146261215, "rp_value": 0.539973376939694, "rp_aux": 0.0097302000115936, "rp_opening": 5.324758360783259, "rp_danger": 0.0, "rp_refute": 0.0, "re_loss": 2.732091588185246
+[11-10 18:35:11] fit b10c128 s1 start
+[11-10 20:24:45] fit b10c128 s1 done: {"step": 6000, "s": 6467.173988580704, "rp_loss": 7.54834121465683, "rp_policy": 1.966456224521001, "rp_value": 0.5326793442169825, "rp_aux": 0.010764184524305165, "rp_opening": 5.043823500474294, "rp_danger": 0.0, "rp_refute": 0.0, "re_loss": 2.77345494578655
+[11-10 20:24:45] ALL DONE

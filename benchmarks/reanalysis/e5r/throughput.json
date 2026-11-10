@@ -1,0 +1,95 @@
+{
+ "time_ms": 500,
+ "positions_from": "runs/evaluation/e5o_traingames_vs_pela_2023.json",
+ "plies_after_opening": [
+  4,
+  12
+ ],
+ "rows": {
+  "runs/e5e_rl_T/models/gen_045.pt": {
+   "params": 477266,
+   "model_config": {
+    "in_planes": 26,
+    "blocks": 6,
+    "channels": 64,
+    "head_hidden": 128,
+    "tactical_heads": true
+   },
+   "positions": 41,
+   "sims_per_move": 51.31707317073171,
+   "sims_median": 35.0,
+   "nn_evals_per_move": 50.73170731707317,
+   "ms_per_move": 404.2992633767426,
+   "nn_evals_per_s": 125.48058310410347,
+   "sims_ratio_to_first_median": 1.0
+  },
+  "runs/capacity_probe/init_b4c48.pt": {
+   "params": 192002,
+   "model_config": {
+    "in_planes": 26,
+    "blocks": 4,
+    "channels": 48,
+    "head_hidden": 128,
+    "tactical_heads": true
+   },
+   "positions": 41,
+   "sims_per_move": 65.8048780487805,
+   "sims_median": 49.0,
+   "nn_evals_per_move": 65.02439024390245,
+   "ms_per_move": 388.56188787101974,
+   "nn_evals_per_s": 167.3462896739034,
+   "sims_ratio_to_first_median": 1.0583941605839415
+  },
+  "runs/capacity_probe/init_b6c64.pt": {
+   "params": 477266,
+   "model_config": {
+    "in_planes": 26,
+    "blocks": 6,
+    "channels": 64,
+    "head_hidden": 128,
+    "tactical_heads": true
+   },
+   "positions": 41,
+   "sims_per_move": 53.8780487804878,
+   "sims_median": 49.0,
+   "nn_evals_per_move": 53.19512195121951,
+   "ms_per_move": 405.14949756878906,
+   "nn_evals_per_s": 131.29751430134178,
+   "sims_ratio_to_first_median": 1.0
+  },
+  "runs/capacity_probe/init_b10c96.pt": {
+   "params": 1712114,
+   "model_config": {
+    "in_planes": 26,
+    "blocks": 10,
+    "channels": 96,
+    "head_hidden": 128,
+    "tactical_heads": true
+   },
+   "positions": 41,
+   "sims_per_move": 37.8780487804878,
+   "sims_median": 33.0,
+   "nn_evals_per_move": 37.63414634146341,
+   "ms_per_move": 443.61076343850027,
+   "nn_evals_per_s": 84.83596306310274,
+   "sims_ratio_to_first_median": 0.7142857142857143
+  },
+  "runs/capacity_probe/init_b10c128.pt": {
+   "params": 3019666,
+   "model_config": {
+    "in_planes": 26,
+    "blocks": 10,
+    "channels": 128,
+    "head_hidden": 128,
+    "tactical_heads": true
+   },
+   "positions": 41,
+   "sims_per_move": 39.170731707317074,
+   "sims_median": 33.0,
+   "nn_evals_per_move": 39.146341463414636,
+   "ms_per_move": 407.0506877856465,
+   "nn_evals_per_s": 96.17068006043796,
+   "sims_ratio_to_first_median": 0.7664233576642335
+  }
+ }
+}
