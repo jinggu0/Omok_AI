@@ -1,0 +1,21 @@
+{
+ "written": "2026-11-10, after E5q (3772019) and before any measurement of this step; smoke runs (runs/capacity_probe/smoke_*, deleted) only checked that the tool runs",
+ "user_instruction": "2026-11-10 '네트워크 용량 점검' (answer to: next direction after E5q showed gen_063 = gen_045 within 0.05 externally)",
+ "question": "Is the current 6-block x 64-channel trunk (477k parameters) the limit? Two diagnostic parts, no strength claim: (1) search cost - simulations per 500 ms move left by larger trunks; (2) fit - trained from scratch on the same fixed data with the same recipe, do larger trunks reach clearly lower held-out losses?",
+ "tool": "python/dojozero/tools/capacity_probe.py (init / throughput / fit / val), test tests/python/test_capacity_probe.py",
+ "arms": {
+  "b4c48": "4 blocks x 48 channels (smaller reference, shows the slope below the current size)",
+  "b6c64": "current size, seeds 1 and 2 (seed-to-seed noise of every metric)",
+  "b10c96": "10 x 96",
+  "b10c128": "10 x 128"
+ },
+ "throughput": "capacity_probe throughput --ckpts gen_045 + random-init checkpoints of all four sizes --positions 40 (mid-game states 4 and 12 plies after the opening from gen_045's 500 ms games vs Pela on the training-only openings; every checkpoint searches each position in turn, so background load hits all alike). Reported: sims per move, nn evals per second, and the median per-position sims ratio to gen_045. Absolute numbers depend on other load (logged); ratios are the result.",
+ "fit": "capacity_probe fit, identical for every arm except size and seed: AdamW lr 2e-3, wd 1e-4, warmup 300, cosine, 6,000 steps, batch = 64 reanalysis (data/reanalysis_v1 train split) + 192 replay (T'' self-play generations 46-62), D4 augmentation, bf16 on XPU, final step = result (no selection). Held out: replay generation 63 (24 x 256 fixed-seed positions, never trained on) and the reanalysis val split; the reanalysis test split is not read. gen_045 is measured on the same held-out sets as a reference (it was trained on far more data by RL; not a like-for-like arm).",
+ "primary_metrics": "final-step held-out rp_policy, rp_value (replay generation 63) and re_value, re_danger (reanalysis val).",
+ "readout": "noise d = |b6c64 seed 1 - seed 2| per metric. 'Capacity signal' if b10c128 is lower than the b6c64 seed mean by more than max(2 d, 1% of the b6c64 mean) on BOTH rp_policy and rp_value. 'No capacity signal' if b10c128 is within that band or higher on both. Anything else (one metric only, or b10c96 and b10c128 disagree in direction) is 'mixed'. The trend b4c48 -> b6c64 -> b10c96 -> b10c128 is reported for every metric.",
+ "consequence": "recommendation only. A capacity signal plus a throughput cost the 500 ms search can bear would support a larger-network training run (distillation from gen_045 data + RL), which is the user's decision; no such run is started in this step. No signal points away from network size.",
+ "risks_written_before": "(1) one learning rate and one step budget for all sizes: larger nets may be under-trained at 6,000 steps (would hide a real capacity gain) or overfit about 95k replay positions (held-out losses show it). (2) The replay targets come from the 6 x 64 net's own search, so a larger net can at best fit those targets better; this probes fitting capacity on the current data, not what a larger net could learn from its own self-play. (3) throughput on this laptop is shared with other user programs (GPU and CPU); ratios are interleaved per position, absolute numbers are indicative only. (4) one seed per larger arm.",
+ "stops": "a non-finite gradient or crash stops that arm, reported as stopped; no reruns or extra arms based on results.",
+ "no_change": "default model and RL loop unchanged; probe checkpoints live under runs/capacity_probe (git-ignored)",
+ "operations": "AC power before each stage; CPU load of other processes logged every 30 s; duplicate processes checked before start"
+}
