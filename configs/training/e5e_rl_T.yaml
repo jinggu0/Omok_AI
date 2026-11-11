@@ -9,7 +9,7 @@ generations: 6
 regret_positions: 20
 selfplay:
   games: 256
-  sims_full: 64
+  sims_full: 256  # E5t: from generation 64 (generations 1-63: 64)
   sims_fast: 16
   p_full: 0.75
   root: GUMBEL
