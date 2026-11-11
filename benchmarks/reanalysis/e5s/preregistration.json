@@ -1,0 +1,18 @@
+{
+ "written": "2026-11-11, after E5r (ba9e1a2) and before the measurement; smoke runs (n 6-8, small sims, deleted) only checked that the tool runs",
+ "user_instruction": "2026-11-11 'target 품질 점검' (answer to: after E5r, check the self-play target quality - more simulations)",
+ "question": "How far are the RL loop's recorded 64-simulation Gumbel policy targets from what the same network gives with 4x and 16x more search? Do the larger searches pick tactically unsafe moves less often? Diagnostic only: no training, no games.",
+ "tool": "python/dojozero/tools/target_quality.py",
+ "positions": "T'' self-play generation 63 (runs/e5e_rl_T/selfplay/gen_063.jsonl.gz), NORMAL_RENJU positions whose root was NOT proven by the root tactics (proven == 2 = search.h kUnknown; 1,762 of 3,740 normal positions are root-proven wins / losses whose target is the solver move whatever the sims). 1,000 of the 1,978 unproven positions, numpy seed 5.",
+ "searches": "generating network v6 = gen_058 (sha a3e5562a..., checked), self-play settings (GUMBEL root, m 16, Gumbel noise on, root tactics 2,000 nodes, max inflight 8). rec = recorded 64-sim target; a64 = fresh 64-sim search (other seed) = noise floor; m256 = 256 sims; ref = 1,024 sims. Target = Gumbel improved policy (selfplay._policy_target), top-1 = its argmax.",
+ "metrics": "top-1 agreement between targets; KL(ref || x); root value differences and value vs game outcome; solver label of each target's top-1 move (reanalysis_data._analyze_move, VCF 50k / VCT 30k): PROVEN_UNSAFE rate and the paired difference x - ref with a normal 95% CI.",
+ "readout": {
+  "tactical_gain": "unsafe(rec) - unsafe(ref) >= 0.02 with 95% CI lower > 0",
+  "policy_shift": "agree(a64, ref) <= agree(rec, a64) - 0.10 (16x more search moves the top-1 target at least 10 points more often than a reseed of the 64-sim search does)",
+  "verdict": "'targets improve with search' if tactical_gain or policy_shift holds; otherwise 'targets close to 16x search'. m256 is reported to show how much of any gap 256 sims recovers."
+ },
+ "consequence": "recommendation only. 'targets improve with search' supports an RL test with more self-play simulations (e.g. sims_full 256, checked by a 400-pair external A/B as in E5q) - a multi-hour run that is the user's decision. 'targets close' points away from simulation count as the limit.",
+ "risks_written_before": "(1) the 1,024-sim reference uses the same network, so it is a better estimate of that network's own search, not ground truth; the solver label is the only ground truth and covers only short forced wins (VCT 30k). (2) Gumbel noise is on in every search (as in self-play), so part of any disagreement is noise; a64 measures it. (3) root-proven positions are excluded, so rates describe only the unproven half of the targets. (4) one generation's positions (63), one network (v6).",
+ "no_change": "default model and RL loop unchanged",
+ "operations": "fixed simulations and node budgets: results do not depend on wall time or power; CPU load not logged for this short diagnostic"
+}
