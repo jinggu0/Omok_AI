@@ -1,0 +1,113 @@
+{
+ "per_opponent": {
+  "pela_2023": {
+   "baseline": 0.4325,
+   "candidate": 0.475,
+   "paired": {
+    "pairs": 200,
+    "mean_diff": 0.0425,
+    "ci95": [
+     -0.0175,
+     0.1025
+    ],
+    "se": 0.03044426079042447
+   },
+   "diff_counts": {
+    "-1.0": 5,
+    "-0.5": 42,
+    "0.0": 93,
+    "0.5": 51,
+    "1.0": 9
+   }
+  },
+  "yixin_2018": {
+   "baseline": 0.095,
+   "candidate": 0.095,
+   "paired": {
+    "pairs": 200,
+    "mean_diff": 0.0,
+    "ci95": [
+     -0.0375,
+     0.0375
+    ],
+    "se": 0.01908721058824995
+   },
+   "diff_counts": {
+    "-0.5": 29,
+    "0.0": 142,
+    "0.5": 29
+   }
+  }
+ },
+ "colour": {
+  "baseline/pela_2023": {
+   "BLACK": {
+    "games": 200,
+    "score": 0.275
+   },
+   "WHITE": {
+    "games": 200,
+    "score": 0.59
+   }
+  },
+  "baseline/yixin_2018": {
+   "BLACK": {
+    "games": 200,
+    "score": 0.115
+   },
+   "WHITE": {
+    "games": 200,
+    "score": 0.075
+   }
+  },
+  "candidate/pela_2023": {
+   "BLACK": {
+    "games": 200,
+    "score": 0.36
+   },
+   "WHITE": {
+    "games": 200,
+    "score": 0.59
+   }
+  },
+  "candidate/yixin_2018": {
+   "BLACK": {
+    "games": 200,
+    "score": 0.15
+   },
+   "WHITE": {
+    "games": 200,
+    "score": 0.04
+   }
+  }
+ },
+ "search": {
+  "baseline/pela_2023": {
+   "sims_per_move": 117.87356781241674,
+   "ms_per_move": 392.0678684907071
+  },
+  "baseline/yixin_2018": {
+   "sims_per_move": 103.44669870083645,
+   "ms_per_move": 401.8875075797387
+  },
+  "candidate/pela_2023": {
+   "sims_per_move": 117.77252878126241,
+   "ms_per_move": 386.98508261551495
+  },
+  "candidate/yixin_2018": {
+   "sims_per_move": 103.03569525839104,
+   "ms_per_move": 400.28967149721075
+  }
+ },
+ "sleep": {
+  "pairs_dropped": [],
+  "sensitivity": {
+   "pairs": 400,
+   "mean_diff": 0.02125,
+   "ci95_normal": [
+    -0.013981859211639105,
+    0.056481859211639104
+   ]
+  }
+ }
+}
