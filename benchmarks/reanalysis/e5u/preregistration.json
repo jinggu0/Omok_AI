@@ -1,0 +1,15 @@
+{
+ "written": "2026-11-12, after E5t (23f99f4) and before generation 70 or any game of this step",
+ "user_instruction": "2026-11-12 '256 sims 계속' (answer to: run more generations at 256 sims and check again?)",
+ "question": "After 12 more generations of 256-sim self-play (generations 64-81 at 256 sims in total, 18 generations, the same count as E5q's 46-63 at 64 sims), does the candidate score differently from gen_045 against external engines?",
+ "change": "none against E5t: configs/training/e5e_rl_T.yaml unchanged (selfplay.sims_full 256 since generation 64; sims_fast 16, p_full 0.75, opponent_sims 32, Gumbel m 16, league, replay window, training, EMA, reanalysis buffer data/reanalysis_e5o, gate v2, SPRT at 64 sims). The only variable is the number of generations.",
+ "run": "resume runs/e5e_rl_T for 12 generations (70-81) in chunks of <= 3, waiting for AC when on battery, stop after 3 consecutive failures.",
+ "external_check": "new holdout renju_holdout_e5_v12 = engine_games balance --candidates 720 --target 200 --seed 213, excluding all 16 existing sets (incl. v11). evaluation.ab baseline gen_045, candidate gen_081 (the LAST generation's candidate, whatever the internal SPRT said), Pela 2023 + Yixin 2018, 200 pairs each (fewer if fewer openings pass), 500 ms.",
+ "decision": "pooled pairs: ACCEPT if 95% CI lower > 0 and 0 candidate failures; REJECT if CI upper < 0 or any candidate failure; otherwise INCONCLUSIVE; in addition 'no external difference of 0.05 or more' if the whole CI lies inside (-0.05, +0.05) (same rules as E5q / E5t).",
+ "control": "historical, no concurrent arm: E5q gen_063 (18 generations at 64 sims after gen_045) vs gen_045 = -0.001 [-0.038, +0.035]; E5t gen_069 (6 generations at 256 sims) vs gen_045 = +0.021 [-0.014, +0.056]. Different holdouts; results are not pooled with E5t or E5q.",
+ "secondary": "per opponent, black / white per arm from the strength DB (e5q/secondary.py method), sims per move, sleep-rule sensitivity (drop pairs with a game whose elapsed time of either side exceeds 180 s + 1.5 s x plies); per generation gate values, SPRT, self-play black win rate and seconds per generation.",
+ "risks_written_before": "(1) The E5t estimate (+0.021) may be noise; this run is not a replication of E5t but a longer exposure. (2) A different holdout (v12) adds opening-set variance against the historical controls. (3) No concurrent 64-sim arm: a difference from gen_045 cannot be attributed to sims 256 alone versus more generations. (4) Pela 2023 and Yixin 2018 remain the only A/B opponents.",
+ "stops": "3 consecutive loop failures or a crash stop the run before the A/B and are reported; no extra pairs, reruns or generations based on the result.",
+ "no_change": "default model unchanged (user decision).",
+ "operations": "AC power required for each stage (wait otherwise); a sleep during a 500 ms stage is recorded; CPU load of other processes logged every 30 s; duplicate processes checked before start (none on 2026-11-12)"
+}
