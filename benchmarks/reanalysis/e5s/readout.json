@@ -1,0 +1,20 @@
+{
+ "tactical_gain": {
+  "value": {
+   "mean": 0.012,
+   "ci95": [
+    -0.0029158335902386527,
+    0.026915833590238653
+   ],
+   "n": 1000
+  },
+  "holds": false
+ },
+ "policy_shift": {
+  "agree_a64_ref": 0.565,
+  "agree_rec_a64_minus_0.10": 0.618,
+  "holds": true
+ },
+ "verdict": "targets improve with search",
+ "note": "verdict name as pre-registered; it holds through policy_shift only (top-1 moves change), not through the tactical criterion"
+}
